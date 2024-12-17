@@ -47,7 +47,7 @@
               <th>Unit Price</th>
               <th>Other Expenses</th>
               <th>Total Amount</th>
-              <th>Sale Date</th>
+              <th>Sale Date</th>  
             </tr>
           </thead>
           <tbody>
@@ -56,9 +56,9 @@
               <td>{{ sale.productName }}</td>
               <td>{{ sale.categoryName }}</td>
               <td>{{ sale.quantity }}</td>
-              <td>{{ sale.unitPrice | currency:'USD' }}</td>
-              <td>{{ sale.otherExpenses | currency:'USD' }}</td>
-              <td>{{ sale.totalAmount | currency:'USD' }}</td>
+              <td>{{ sale.unitPrice }}</td>
+              <td>{{ sale.otherExpenses }}</td>
+              <td>{{ sale.totalAmount }}</td>
               <td>{{ sale.saleDate }}</td>
             </tr>
           </tbody>
