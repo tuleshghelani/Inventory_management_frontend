@@ -1,0 +1,73 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.form-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.form-title {
+  color: var(--primary-color);
+  margin: 0 0 24px;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.purchase-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.form-field {
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+// Responsive adjustments
+@media (max-width: 599px) {
+  .container {
+    padding: 16px;
+  }
+
+  .form-card {
+    padding: 16px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Success snackbar styles
+::ng-deep .success-snackbar {
+  background: #4caf50;
+  color: white;
+}
+
+// Error snackbar styles
+::ng-deep .error-snackbar {
+  background: #f44336;
+  color: white;
+}

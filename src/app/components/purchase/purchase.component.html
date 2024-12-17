@@ -1,0 +1,119 @@
+<div class="purchase-container">
+  <div class="search-section card">
+    <h2>Search Purchases</h2>
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="search-controls">
+        <div class="form-group">
+          <input 
+            type="text" 
+            formControlName="search" 
+            class="form-control" 
+            placeholder="Search by invoice number..."
+          >
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-search"></i> Search
+        </button>
+      </div>
+    </form>
+  </div>
+    <button routerLink="/purchase/create" class="btn btn-primary">Add Purchase</button>
+  <div class="purchases-list card">
+    <h2>Purchases</h2>
+    
+    <div class="table-controls">
+      <div class="page-size-selector">
+        <label>Show entries:</label>
+        <select 
+          class="form-control" 
+          [(ngModel)]="pageSize" 
+          (change)="onPageSizeChange()"
+        >
+          <option *ngFor="let size of pageSizeOptions" [value]="size">
+            {{ size }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Invoice No.</th>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Other Expenses</th>
+            <th>Total Amount</th>
+            <th>Purchase Date</th>
+            <th>Remaining Qty</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let purchase of purchases">
+            <td>{{ purchase.invoiceNumber }}</td>
+            <td>{{ purchase.productName }}</td>
+            <td>{{ purchase.categoryName }}</td>
+            <td>{{ purchase.quantity }}</td>
+            <td>{{ purchase.unitPrice  }}</td>
+            <td>{{ purchase.otherExpenses  }}</td>
+            <td>{{ purchase.totalAmount  }}</td>
+            <td>{{ purchase.purchaseDate  }}</td>
+            <td>{{ purchase.remainingQuantity  }}</td>
+            <td class="actions">
+              <button 
+                class="btn-icon sale" 
+                (click)="openSaleModal(purchase)"
+                [disabled]="purchase.remainingQuantity === 0"
+              >
+                <i class="fas fa-shopping-cart"></i> Sale
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="pagination-container">
+      <div class="pagination-info">
+        Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalElements }} entries
+      </div>
+      <div class="pagination">
+        <button 
+          class="btn-page" 
+          [disabled]="currentPage === 0"
+          (click)="onPageChange(currentPage - 1)"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <ng-container *ngFor="let page of getPageNumbers()">
+          <button 
+            class="btn-page" 
+            [class.active]="page === currentPage + 1"
+            (click)="onPageChange(page - 1)"
+          >
+            {{ page }}
+          </button>
+        </ng-container>
+        
+        <button 
+          class="btn-page" 
+          [disabled]="currentPage === totalPages - 1"
+          (click)="onPageChange(currentPage + 1)"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-sale-modal 
+  *ngIf="selectedPurchase"
+  [purchase]="selectedPurchase"
+  (saleCreated)="loadPurchases()"
+></app-sale-modal>

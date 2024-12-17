@@ -1,0 +1,123 @@
+<div class="container">
+  <div class="form-card">
+    <h2 class="form-title">Add New Purchase</h2>
+    
+    <form [formGroup]="purchaseForm" (ngSubmit)="onSubmit()" class="purchase-form">
+      <div class="form-group">
+        <label for="productId">Select Product</label>
+        <select 
+          id="productId" 
+          formControlName="productId" 
+          class="form-control"
+          [class.is-invalid]="purchaseForm.get('productId')?.invalid && purchaseForm.get('productId')?.touched"
+        >
+          <option value="">Select Product</option>
+          <option *ngFor="let product of products" [value]="product.id">
+            {{ product.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('productId')?.hasError('required') && purchaseForm.get('productId')?.touched">
+          Product is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <input 
+          type="number" 
+          id="quantity" 
+          formControlName="quantity" 
+          class="form-control"
+          [class.is-invalid]="purchaseForm.get('quantity')?.invalid && purchaseForm.get('quantity')?.touched"
+          min="1"
+        >
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('quantity')?.hasError('required') && purchaseForm.get('quantity')?.touched">
+          Quantity is required
+        </div>
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('quantity')?.hasError('min')">
+          Quantity must be greater than 0
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="unitPrice">Unit Price</label>
+        <input 
+          type="number" 
+          id="unitPrice" 
+          formControlName="unitPrice" 
+          class="form-control"
+          [class.is-invalid]="purchaseForm.get('unitPrice')?.invalid && purchaseForm.get('unitPrice')?.touched"
+          min="0"
+          step="0.01"
+        >
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('unitPrice')?.hasError('required') && purchaseForm.get('unitPrice')?.touched">
+          Unit price is required
+        </div>
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('unitPrice')?.hasError('min')">
+          Unit price must be greater than or equal to 0
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="purchaseDate">Purchase Date</label>
+        <input 
+          type="date" 
+          id="purchaseDate" 
+          formControlName="purchaseDate" 
+          class="form-control"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="invoiceNumber">Invoice Number</label>
+        <input 
+          type="text" 
+          id="invoiceNumber" 
+          formControlName="invoiceNumber" 
+          class="form-control"
+          [class.is-invalid]="purchaseForm.get('invoiceNumber')?.invalid && purchaseForm.get('invoiceNumber')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('invoiceNumber')?.hasError('required') && purchaseForm.get('invoiceNumber')?.touched">
+          Invoice number is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="otherExpenses">Other Expenses</label>
+        <input 
+          type="number" 
+          id="otherExpenses" 
+          formControlName="otherExpenses" 
+          class="form-control"
+          [class.is-invalid]="purchaseForm.get('otherExpenses')?.invalid && purchaseForm.get('otherExpenses')?.touched"
+          min="0"
+          step="0.01"
+        >
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('otherExpenses')?.hasError('required') && purchaseForm.get('otherExpenses')?.touched">
+          Other expenses is required
+        </div>
+        <div class="invalid-feedback" *ngIf="purchaseForm.get('otherExpenses')?.hasError('min')">
+          Other expenses must be greater than or equal to 0
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="purchaseForm.invalid || loading"
+        >
+          {{ loading ? 'Saving...' : 'Save Purchase' }}
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-secondary"
+          (click)="purchaseForm.reset()"
+          [disabled]="loading"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+<header class="header">
+  <nav class="nav-container">
+    <div class="logo">
+      <span>Inventory System</span>
+    </div>
+    
+    <ul class="nav-links" *ngIf="isAuthenticated">
+      <li><a routerLink="/category" routerLinkActive="active">Category</a></li>
+      <li><a routerLink="/product" routerLinkActive="active">Product</a></li>
+      <li><a routerLink="/purchase" routerLinkActive="active">Purchase</a></li>
+      <li><a routerLink="/sale" routerLinkActive="active">Sale</a></li>
+    </ul>
+
+    <div class="nav-actions" *ngIf="isAuthenticated">
+      <button class="btn btn-logout" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </button>
+    </div>
+  </nav>
+</header>
