@@ -5,6 +5,7 @@ import { Purchase } from '../../models/purchase.model';
 import { SaleService } from '../../services/sale.service';
 import { ToastrService } from 'ngx-toastr';
 import { ModalService } from '../../services/modal.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sale-modal',
@@ -19,7 +20,9 @@ export class SaleModalComponent implements OnChanges {
   
   saleForm!: FormGroup;
   loading = false;
-  display$ = this.modalService.modalState$;
+  display$ = this.modalService.modalState$.pipe(
+    map(state => state.isOpen)
+  );
 
   constructor(
     private fb: FormBuilder,
@@ -38,7 +41,7 @@ export class SaleModalComponent implements OnChanges {
       .slice(0, 16);
 
     this.saleForm = this.fb.group({
-      purchaseId: [''],
+      purchaseId: ['', Validators.required],  // Add Validators.required
       quantity: ['', [Validators.required, Validators.min(1)]],
       unitPrice: ['', [Validators.required, Validators.min(0)]],
       saleDate: [localISOString],
@@ -56,6 +59,8 @@ export class SaleModalComponent implements OnChanges {
       otherExpenses: 0
     });
     
+    console.log('Form values after patch:', this.saleForm.value);
+    
     this.saleForm.get('quantity')?.setValidators([
       Validators.required,
       Validators.min(1),
@@ -68,6 +73,13 @@ export class SaleModalComponent implements OnChanges {
       this.loading = true;
       const formData = this.saleForm.value;
       
+      // Add check for purchaseId
+      if (!formData.purchaseId) {
+        this.toastr.error('Purchase ID is missing');
+        this.loading = false;
+        return;
+      }
+      
       if (formData.saleDate) {
         const date = new Date(formData.saleDate);
         formData.saleDate = date.toLocaleString('en-GB', {
@@ -79,8 +91,8 @@ export class SaleModalComponent implements OnChanges {
           second: '2-digit'
         }).replace(/\//g, '-').replace(',', '');
       }
-      console.log('formData : ', formData);
       
+      console.log('Sale form data being sent:', formData);  // Add this log
 
       this.saleService.createSale(formData).subscribe({
         next: (response) => {
@@ -90,11 +102,8 @@ export class SaleModalComponent implements OnChanges {
           this.close();
         },
         error: (error) => {
-            this.loading = false;
-          this.toastr.error(error.message || 'Failed to create sale');
-        },
-        complete: () => {
           this.loading = false;
+          this.toastr.error(error.message || 'Failed to create sale');
         }
       });
     }

@@ -129,6 +129,6 @@ export class PurchaseComponent implements OnInit {
 
   openSaleModal(purchase: Purchase) {
     this.selectedPurchase = purchase;
-    this.modalService.open();
+    this.modalService.open('sale');
   }
 }
