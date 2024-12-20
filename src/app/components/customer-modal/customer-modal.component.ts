@@ -1,6 +1,5 @@
 import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
 import { ToastrService } from 'ngx-toastr';
 import { ModalService } from '../../services/modal.service';
@@ -9,8 +8,6 @@ import { Customer } from '../../models/customer.model';
 
 @Component({
   selector: 'app-customer-modal',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './customer-modal.component.html',
   styleUrls: ['./customer-modal.component.scss']
 })

@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Purchase } from '../../models/purchase.model';
 import { SaleService } from '../../services/sale.service';
 import { ToastrService } from 'ngx-toastr';
@@ -9,8 +9,6 @@ import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-sale-modal',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './sale-modal.component.html',
   styleUrls: ['./sale-modal.component.scss']
 })

@@ -12,9 +12,7 @@ import { ModalService } from '../../services/modal.service';
 @Component({
   selector: 'app-customer',
   templateUrl: './customer.component.html',
-  styleUrls: ['./customer.component.scss'],
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, CustomerModalComponent]
+  styleUrls: ['./customer.component.scss']
 })
 export class CustomerComponent implements OnInit {
   customers: Customer[] = [];

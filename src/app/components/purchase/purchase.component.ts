@@ -11,15 +11,6 @@ import { ModalService } from '../../services/modal.service';
 
 @Component({
   selector: 'app-purchase',
-  standalone: true,
-  imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    FormsModule, 
-    RouterModule,
-    MatDialogModule,
-    SaleModalComponent
-  ],
   templateUrl: './purchase.component.html',
   styleUrl: './purchase.component.scss'
 })

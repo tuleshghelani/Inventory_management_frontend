@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ProfitService } from '../../services/profit.service';
 
 interface ProfitResponse {
@@ -31,15 +29,13 @@ interface Profit {
   selector: 'app-profit',
   templateUrl: './profit.component.html',
   styleUrls: ['./profit.component.scss'],
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
-  standalone: true
 })
 export class ProfitComponent implements OnInit {
   profits: any;
   currentPage = 0;
   pageSize = 5;
   searchTerm = '';
-  searchForm: FormGroup;
+  searchForm!: FormGroup;
   pageSizeOptions = [5, 10, 25, 50];
   totalElements = 0;
   startIndex = 0;

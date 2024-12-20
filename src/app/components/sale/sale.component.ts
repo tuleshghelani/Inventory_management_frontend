@@ -7,8 +7,6 @@ import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-sale',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
   templateUrl: './sale.component.html',
   styleUrl: './sale.component.scss'
 })

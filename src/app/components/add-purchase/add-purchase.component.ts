@@ -8,13 +8,6 @@ import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-add-purchase',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
-    RouterModule
-  ],
   templateUrl: './add-purchase.component.html',
   styleUrl: './add-purchase.component.scss'
 })
