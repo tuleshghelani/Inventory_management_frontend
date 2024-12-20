@@ -143,6 +143,7 @@
             <th>Description</th>
             <th>Min Stock</th>
             <th>Status</th>
+            <th>Remaining Quantity</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -158,6 +159,7 @@
                 {{ product.status === 'A' ? 'Active' : 'Inactive' }}
               </span>
             </td>
+            <td>{{ product.remainingQuantity }}</td>
             <td class="actions">
               <button class="btn-icon" (click)="editProduct(product)">
                 <i class="fas fa-edit"></i>

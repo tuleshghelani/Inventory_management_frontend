@@ -5,6 +5,7 @@ export interface Product {
   categoryName?: string;
   description: string;
   minimumStock: number;
+  remainingQuantity?: number;
   status: 'A' | 'I';
   createdAt?: string;
   updatedAt?: string;

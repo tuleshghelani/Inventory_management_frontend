@@ -21,17 +21,17 @@ export class ModalService {
   modalState$ = this.modalState.asObservable();
 
   open(modalType?: string, data?: any) {
+    document.body.style.overflow = 'hidden';
     this.modalState.next({
       isOpen: true,
       modalType,
       data
     });
-    document.body.style.overflow = 'hidden';
   }
 
   close() {
-    this.modalState.next(this.initialState);
     document.body.style.overflow = 'auto';
+    this.modalState.next(this.initialState);
   }
 
   getData() {

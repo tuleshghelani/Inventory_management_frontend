@@ -2,6 +2,7 @@ export interface Category {
   id?: number;
   name: string;
   status: 'A' | 'I';
+  remainingQuantity?: number;
   createdAt?: string;
   updatedAt?: string;
 }

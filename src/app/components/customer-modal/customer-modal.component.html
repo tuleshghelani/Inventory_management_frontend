@@ -1,4 +1,4 @@
-<div class="modal-overlay" *ngIf="(modalState$ | async)?.isOpen" (click)="close()">
+<div class="modal-overlay" *ngIf="display$ | async" (click)="close()">
     
   <div class="modal-container" (click)="$event.stopPropagation()">
     <div class="modal-header">
@@ -16,9 +16,9 @@
           id="name" 
           formControlName="name" 
           class="form-control"
-          [class.is-invalid]="customerForm.get('name')?.invalid && customerForm.get('name')?.touched"
+          [class.is-invalid]="(customerForm.get('name')?.invalid && (customerForm.get('name')?.touched || isSubmitted))"
         >
-        <div class="invalid-feedback" *ngIf="customerForm.get('name')?.errors?.['required']">
+        <div class="invalid-feedback" *ngIf="customerForm.get('name')?.invalid && (customerForm.get('name')?.touched || isSubmitted)">
           Name is required
         </div>
       </div>
@@ -30,13 +30,11 @@
           id="mobile" 
           formControlName="mobile" 
           class="form-control"
-          [class.is-invalid]="customerForm.get('mobile')?.invalid && customerForm.get('mobile')?.touched"
+          [class.is-invalid]="customerForm.get('mobile')?.invalid && (customerForm.get('mobile')?.touched || isSubmitted)"
         >
-        <div class="invalid-feedback" *ngIf="customerForm.get('mobile')?.errors?.['required']">
-          Mobile number is required
-        </div>
-        <div class="invalid-feedback" *ngIf="customerForm.get('mobile')?.errors?.['pattern']">
-          Please enter a valid 10-digit mobile number
+        <div class="invalid-feedback" *ngIf="customerForm.get('mobile')?.invalid && (customerForm.get('mobile')?.touched || isSubmitted)">
+          <span *ngIf="customerForm.get('mobile')?.errors?.['required']">Mobile number is required</span>
+          <span *ngIf="customerForm.get('mobile')?.errors?.['pattern']">Please enter a valid 10-digit mobile number</span>
         </div>
       </div>
 
@@ -47,13 +45,11 @@
           id="email" 
           formControlName="email" 
           class="form-control"
-          [class.is-invalid]="customerForm.get('email')?.invalid && customerForm.get('email')?.touched"
+          [class.is-invalid]="customerForm.get('email')?.invalid && (customerForm.get('email')?.touched || isSubmitted)"
         >
-        <div class="invalid-feedback" *ngIf="customerForm.get('email')?.errors?.['required']">
-          Email is required
-        </div>
-        <div class="invalid-feedback" *ngIf="customerForm.get('email')?.errors?.['email']">
-          Please enter a valid email address
+        <div class="invalid-feedback" *ngIf="customerForm.get('email')?.invalid && (customerForm.get('email')?.touched || isSubmitted)">
+          <span *ngIf="customerForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="customerForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
         </div>
       </div>
 

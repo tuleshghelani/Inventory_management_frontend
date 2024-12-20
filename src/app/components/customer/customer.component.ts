@@ -14,13 +14,13 @@ import { ModalService } from '../../services/modal.service';
   templateUrl: './customer.component.html',
   styleUrls: ['./customer.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, FormsModule, CustomerModalComponent]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, CustomerModalComponent]
 })
 export class CustomerComponent implements OnInit {
   customers: Customer[] = [];
   searchForm!: FormGroup;
   isLoading = false;
-  showCustomerModal = false;
+  displayModal = false;
   
   // Pagination properties
   currentPage = 0;
@@ -35,7 +35,7 @@ export class CustomerComponent implements OnInit {
     private customerService: CustomerService,
     private fb: FormBuilder,
     private toastr: ToastrService,
-    private modalService: ModalService
+    public modalService: ModalService
   ) {
     this.initializeForm();
   }
@@ -124,10 +124,6 @@ export class CustomerComponent implements OnInit {
   }
 
   openCustomerModal() {
-    this.modalService.open();
-  }
-
-  closeCustomerModal() {
-    this.showCustomerModal = false;
+    this.modalService.open('customer');
   }
 }

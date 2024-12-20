@@ -96,7 +96,7 @@
           <tr>
             <th>Name</th>
             <th>Status</th>
-            <th>Created At</th>
+            <th>Remaining Quantity</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -109,7 +109,7 @@
                 {{ category.status === 'A' ? 'Active' : 'Inactive' }}
               </span>
             </td>
-            <td>{{ category.createdAt | date:'medium' }}</td>
+            <td>{{ category.remainingQuantity }}</td>
             <td class="actions">
               <button class="btn-icon" (click)="editCategory(category)">
                 <i class="fas fa-edit"></i>
