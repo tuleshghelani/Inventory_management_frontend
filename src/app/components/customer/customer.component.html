@@ -42,6 +42,9 @@
     </div>
 
     <div class="table-responsive">
+      <div class="loading-overlay" *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin"></i>
+      </div>
       <table class="table">
           <thead>
             <tr>
@@ -54,6 +57,7 @@
               <th>Next Action Date</th>
               <th>Remarks</th>
               <th>Status</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -70,6 +74,11 @@
                 <span class="status-badge" [ngClass]="{'active': customer.status === 'A', 'inactive': customer.status !== 'A'}">
                   {{customer.status === 'A' ? 'Active' : 'Inactive'}}
                 </span>
+              </td>
+              <td class="actions">
+                <button class="btn-icon edit" (click)="openCustomerModal(customer)">
+                  <i class="fas fa-edit"></i>
+                </button>
               </td>
             </tr>
             <tr *ngIf="!customers?.length">
@@ -112,6 +121,6 @@
   </div>
 
   <app-customer-modal
-    (customerCreated)="loadCustomers()"
+    (customerSaved)="loadCustomers()"
   ></app-customer-modal>
 

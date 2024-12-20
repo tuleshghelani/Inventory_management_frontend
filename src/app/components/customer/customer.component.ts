@@ -53,11 +53,11 @@ export class CustomerComponent implements OnInit {
   loadCustomers(): void {
     this.isLoading = true;
     const params = {
-      page: this.currentPage,
-      size: this.pageSize,
+      currentPage: this.currentPage,
+      perPageRecord: this.pageSize,
       search: this.searchForm.get('search')?.value
     };
-
+  
     this.customerService.searchCustomers(params).subscribe({
       next: (response) => {
         if (response.success) {
@@ -123,7 +123,15 @@ export class CustomerComponent implements OnInit {
     this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalElements);
   }
 
-  openCustomerModal() {
-    this.modalService.open('customer');
+  // Update the openCustomerModal method
+  openCustomerModal(customer?: Customer) {
+    this.modalService.open('customer', customer);
+    // Subscribe to modal state changes
+    this.modalService.modalState$.subscribe(state => {
+      if (!state.isOpen) {
+        // When modal closes, reload customers
+        // this.loadCustomers();
+      }
+    });
   }
 }

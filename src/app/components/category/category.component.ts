@@ -74,31 +74,50 @@ export class CategoryComponent implements OnInit {
       this.isLoading = true;
       const category = this.categoryForm.value;
 
-      const request = this.isEditing
-        ? this.categoryService.updateCategory(this.editingId!, category)
+      const request = this.isEditing && this.editingId
+        ? this.categoryService.updateCategory(this.editingId, category)
         : this.categoryService.createCategory(category);
 
       request.subscribe({
         next: (response) => {
-          this.toastr.success(response.message);
+          this.toastr.success(response.message || 'Category saved successfully');
           this.resetForm();
           this.loadCategories();
         },
         error: (error) => {
           this.toastr.error(error.message || 'Operation failed');
           this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
+      });
+    } else {
+      Object.keys(this.categoryForm.controls).forEach(key => {
+        const control = this.categoryForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
         }
       });
     }
   }
 
   editCategory(category: Category): void {
+    if (!category.id) {
+      this.toastr.error('Invalid category ID');
+      return;
+    }
+    
     this.isEditing = true;
     this.editingId = category.id;
     this.categoryForm.patchValue({
       name: category.name,
       status: category.status
     });
+    
+    // Scroll to the form
+    const formElement = document.querySelector('.category-form');
+    formElement?.scrollIntoView({ behavior: 'smooth' });
   }
 
   deleteCategory(id: number): void {
@@ -119,6 +138,8 @@ export class CategoryComponent implements OnInit {
     this.isEditing = false;
     this.editingId = undefined;
     this.categoryForm.reset({ status: 'A' });
+    this.categoryForm.markAsPristine();
+    this.categoryForm.markAsUntouched();
   }
 
   onSearch(): void {

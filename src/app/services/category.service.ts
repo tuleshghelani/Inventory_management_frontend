@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Category, CategoryResponse, CategorySearchRequest } from '../models/category.model';
@@ -18,23 +18,18 @@ export class CategoryService {
   }
 
   searchCategories(params: CategorySearchRequest): Observable<ApiResponse<PaginatedResponse<Category>>> {
-    return this.http.post<ApiResponse<PaginatedResponse<Category>>>(`${this.apiUrl}/search`, {
-      size: params.size,
-      page: params.page,
-      search: params.search,
-      status: params.status
-    });
+    return this.http.post<ApiResponse<PaginatedResponse<Category>>>(`${this.apiUrl}/search`, params);
   }
 
-  createCategory(category: Category): Observable<any> {
-    return this.http.post(`${this.apiUrl}`, category);
+  createCategory(category: Category): Observable<ApiResponse<Category>> {
+    return this.http.post<ApiResponse<Category>>(`${this.apiUrl}`, category);
   }
 
-  updateCategory(id: number, category: Category): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, category);
+  updateCategory(id: number, category: Category): Observable<ApiResponse<Category>> {
+    return this.http.put<ApiResponse<Category>>(`${this.apiUrl}/${id}`, category);
   }
 
-  deleteCategory(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  deleteCategory(id: number): Observable<ApiResponse<void>> {
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 }

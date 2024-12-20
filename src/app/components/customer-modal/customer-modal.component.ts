@@ -1,10 +1,11 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
 import { ToastrService } from 'ngx-toastr';
 import { ModalService } from '../../services/modal.service';
 import { map } from 'rxjs/operators';
+import { Customer } from '../../models/customer.model';
 
 @Component({
   selector: 'app-customer-modal',
@@ -14,7 +15,8 @@ import { map } from 'rxjs/operators';
   styleUrls: ['./customer-modal.component.scss']
 })
 export class CustomerModalComponent implements OnInit {
-  @Output() customerCreated = new EventEmitter<boolean>();
+  @Input() customer?: Customer;
+  @Output() customerSaved = new EventEmitter<boolean>();
   
   customerForm!: FormGroup;
   loading = false;
@@ -22,6 +24,7 @@ export class CustomerModalComponent implements OnInit {
   display$ = this.modalService.modalState$.pipe(
     map(state => state.isOpen && state.modalType === 'customer')
   );
+  isEditing = false;
 
   constructor(
     private fb: FormBuilder,
@@ -32,6 +35,14 @@ export class CustomerModalComponent implements OnInit {
 
   ngOnInit() {
     this.initForm();
+    this.modalService.modalState$.subscribe(state => {
+      if (state.isOpen && state.data) {
+        this.isEditing = true;
+        this.patchForm(state.data);
+      } else {
+        this.isEditing = false;
+      }
+    });
   }
 
   private initForm() {
@@ -41,15 +52,35 @@ export class CustomerModalComponent implements OnInit {
       .slice(0, 16);
 
     this.customerForm = this.fb.group({
+      id: [null],
       name: ['', Validators.required],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      email: ['', [Validators.required, Validators.email]],
+      mobile: ['', []],
+      email: ['', [Validators.email]],
       gst: ['', [Validators.pattern('^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$')]],
-      address: ['', Validators.required],
+      address: ['',[]],
       remainingPaymentAmount: [0, [Validators.required, Validators.min(0)]],
       nextActionDate: [localISOString],
       remarks: [''],
       status: ['A']
+    });
+  }
+
+  private patchForm(customer: Customer) {
+    const nextActionDate = customer.nextActionDate ? 
+      new Date(customer.nextActionDate.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1'))
+        .toISOString().slice(0, 16) : '';
+
+    this.customerForm.patchValue({
+      id: customer.id,
+      name: customer.name,
+      mobile: customer.mobile,
+      email: customer.email,
+      gst: customer.gst,
+      address: customer.address,
+      remainingPaymentAmount: customer.remainingPaymentAmount,
+      nextActionDate: nextActionDate,
+      remarks: customer.remarks,
+      status: customer.status
     });
   }
 
@@ -71,16 +102,22 @@ export class CustomerModalComponent implements OnInit {
         }).replace(/\//g, '-').replace(',', '');
       }
 
-      this.customerService.createCustomer(formData).subscribe({
+      const request = this.isEditing ?
+        this.customerService.updateCustomer(this.customer!.id, formData) :
+        this.customerService.createCustomer(formData);
+
+      request.subscribe({
         next: (response) => {
           if (response.success) {
-            this.toastr.success(response.message);
-            this.customerCreated.emit(true);
+            this.toastr.success(response.message || 
+              `Customer ${this.isEditing ? 'updated' : 'created'} successfully`);
+            this.customerSaved.emit(true);
             this.close();
           }
         },
         error: (error) => {
-          this.toastr.error(error.message || 'Failed to create customer');
+          this.toastr.error(error.message || 
+            `Failed to ${this.isEditing ? 'update' : 'create'} customer`);
         },
         complete: () => {
           this.loading = false;
