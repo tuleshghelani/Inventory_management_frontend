@@ -19,7 +19,7 @@ export class SaleModalComponent implements OnChanges {
   
   saleForm!: FormGroup;
   loading = false;
-  display$ = this.modalService.display$;
+  display$ = this.modalService.modalState$;
 
   constructor(
     private fb: FormBuilder,

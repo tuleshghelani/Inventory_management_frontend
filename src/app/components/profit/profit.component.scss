@@ -1,0 +1,187 @@
+.profit-container {
+    padding: 20px;
+    background-color: var(--background);
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        padding: 20px;
+
+        h2 {
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+    }
+
+    .search-section {
+        .search-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+
+            .form-group {
+                flex: 1;
+            }
+        }
+    }
+
+    .table-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+
+        .page-size-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            label {
+                margin-bottom: 0;
+                color: var(--text-secondary);
+            }
+
+            select {
+                width: 80px;
+                padding: 5px;
+                border-radius: 4px;
+                border: 1px solid var(--supporting);
+                background-color: white;
+                color: var(--text-primary);
+            }
+        }
+    }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+        background-color: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--supporting);
+        }
+
+        th {
+            background-color: var(--secondary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tbody tr {
+            &:hover {
+                background-color: rgba(174, 198, 207, 0.1);
+            }
+        }
+
+        .actions {
+            white-space: nowrap;
+            
+            .btn-icon {
+                padding: 6px 10px;
+                margin: 0 2px;
+                border: none;
+                border-radius: 4px;
+                background: none;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: var(--supporting);
+                }
+
+                i {
+                    font-size: 14px;
+                    color: var(--secondary);
+                }
+            }
+        }
+    }
+
+    .text-success {
+        color: var(--accent2) !important;
+    }
+
+    .text-danger {
+        color: var(--primary) !important;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 20px;
+
+        .pagination-info {
+            color: var(--text-secondary);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 5px;
+
+            .btn-page {
+                padding: 6px 12px;
+                border: 1px solid var(--supporting);
+                background: white;
+                cursor: pointer;
+                border-radius: 4px;
+                color: var(--text-primary);
+                transition: all 0.3s ease;
+
+                &:hover:not(:disabled) {
+                    background-color: var(--supporting);
+                }
+
+                &.active {
+                    background-color: var(--primary);
+                    color: white;
+                    border-color: var(--primary);
+                }
+
+                &:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
+            }
+        }
+    }
+}
+
+.form-control {
+    padding: 10px;
+    border: 1px solid var(--supporting);
+    border-radius: 4px;
+    width: 100%;
+    color: var(--text-primary);
+    
+    &:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(253, 120, 35, 0.25);
+    }
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    
+    &.btn-primary {
+        background-color: var(--primary);
+        color: white;
+        
+        &:hover {
+            background-color: darken(#FD7823, 10%);
+        }
+    }
+} 
