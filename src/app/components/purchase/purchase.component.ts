@@ -3,11 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PurchaseService } from '../../services/purchase.service';
 import { Purchase } from '../../models/purchase.model';
-import { ToastrService } from 'ngx-toastr';
 import { RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SaleModalComponent } from '../sale-modal/sale-modal.component';
 import { ModalService } from '../../services/modal.service';
+import { LoaderComponent } from '../../shared/components/loader/loader.component';
+import { SnackbarService } from '../../shared/services/snackbar.service';
+import { Product } from '../../models/product.model';
+import { ProductService } from '../../services/product.service';
 
 @Component({
   selector: 'app-purchase',
@@ -18,10 +21,11 @@ import { ModalService } from '../../services/modal.service';
     FormsModule, 
     RouterModule,
     MatDialogModule,
-    SaleModalComponent
+    SaleModalComponent,
+    LoaderComponent
   ],
   templateUrl: './purchase.component.html',
-  styleUrl: './purchase.component.scss'
+  styleUrls: ['./purchase.component.scss']
 })
 export class PurchaseComponent implements OnInit {
   purchases: Purchase[] = [];
@@ -37,11 +41,13 @@ export class PurchaseComponent implements OnInit {
   startIndex = 0;
   endIndex = 0;
   selectedPurchase: Purchase | null = null;
+  products: Product[] = [];
 
   constructor(
     private purchaseService: PurchaseService,
+    private productService: ProductService,
     private fb: FormBuilder,
-    private toastr: ToastrService,
+    private snackbar: SnackbarService,
     private dialog: MatDialog,
     private modalService: ModalService
   ) {
@@ -49,6 +55,7 @@ export class PurchaseComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadProducts();
     this.loadPurchases();
   }
 
@@ -77,8 +84,8 @@ export class PurchaseComponent implements OnInit {
         this.endIndex = Math.min((this.currentPage + 1) * this.pageSize, this.totalElements);
         this.isLoading = false;
       },
-      error: () => {
-        this.toastr.error('Failed to load purchases');
+      error: (error) => {
+        this.snackbar.error(error.message || 'Failed to load purchases');
         this.isLoading = false;
       }
     });
@@ -137,16 +144,27 @@ export class PurchaseComponent implements OnInit {
       this.isLoading = true;
       this.purchaseService.deletePurchase(id).subscribe({
         next: () => {
-          this.toastr.success('Purchase deleted successfully');
+          this.snackbar.success('Purchase deleted successfully');
           this.loadPurchases();
         },
         error: (error) => {
-          this.toastr.error(error.message || 'Failed to delete purchase');
-        },
-        complete: () => {
+          this.snackbar.error(error.message || 'Failed to delete purchase');
           this.isLoading = false;
         }
       });
     }
+  }
+
+  private loadProducts(): void {
+    this.productService.getProducts({ status: 'A' }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+        }
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to load products');
+      }
+    });
   }
 }

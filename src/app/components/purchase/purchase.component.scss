@@ -2,6 +2,8 @@
     padding: 2rem;
     // max-width: 1200px;
     margin: 0 auto;
+    position: relative;
+    min-height: 200px;
   
     .search-section {
       margin-bottom: 2rem;
@@ -17,6 +19,10 @@
   
         button {
           height: 42px;
+        }
+  
+        select.form-control {
+          min-width: 200px;
         }
       }
     }
@@ -224,5 +230,46 @@
           font-size: 14px;
         }
       }
+    }
+  }
+  
+  ::ng-deep {
+    .custom-snackbar {
+      &.success {
+        background-color: var(--accent2);
+      }
+      
+      &.error {
+        background-color: #dc3545;
+      }
+      
+      .snackbar-message {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: white;
+        
+        i {
+          font-size: 1.2rem;
+        }
+      }
+    }
+  }
+  
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  
+    i {
+      font-size: 2rem;
+      color: var(--primary);
     }
   }

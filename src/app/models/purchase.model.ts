@@ -18,6 +18,7 @@ export interface PurchaseSearchRequest {
   perPageRecord: number;
   search?: string;
   categoryId?: number;
+  productId?: number;
 }
 
 export interface PurchaseResponse {
