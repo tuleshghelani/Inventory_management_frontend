@@ -1,6 +1,8 @@
 .category-container {
+  position: relative;
+  min-height: 200px;
   padding: 2rem;
-  max-width: 1200px;
+  // max-width: 1200px;
   margin: 0 auto;
 
   .search-section {

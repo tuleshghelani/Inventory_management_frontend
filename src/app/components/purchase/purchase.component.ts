@@ -131,4 +131,22 @@ export class PurchaseComponent implements OnInit {
     this.selectedPurchase = purchase;
     this.modalService.open('sale');
   }
+
+  deletePurchase(id: number): void {
+    if (confirm('Are you sure you want to delete this purchase? This action cannot be undone.')) {
+      this.isLoading = true;
+      this.purchaseService.deletePurchase(id).subscribe({
+        next: () => {
+          this.toastr.success('Purchase deleted successfully');
+          this.loadPurchases();
+        },
+        error: (error) => {
+          this.toastr.error(error.message || 'Failed to delete purchase');
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
+      });
+    }
+  }
 }

@@ -1,13 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/category.model';
 import { FormsModule } from '@angular/forms';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { LoaderComponent } from '../../shared/components/loader/loader.component';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-category',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule,
+    LoaderComponent,
+    FormsModule
+  ],
   templateUrl: './category.component.html',
   styleUrls: ['./category.component.scss'],
   animations: [
@@ -66,6 +77,9 @@ export class CategoryComponent implements OnInit {
   }
 
   closeDialog(): void {
+    if (!this.categoryForm.dirty) {
+      this.isLoading = false;
+    }
     this.isDialogOpen = false;
     this.resetForm();
   }
@@ -112,14 +126,12 @@ export class CategoryComponent implements OnInit {
             this.loadCategories();
           } else {
             this.snackbar.error(response.message || 'Operation failed');
+            this.isLoading = false;
           }
         },
         error: (error) => {
           const errorMessage = error?.error?.message || 'Operation failed';
           this.snackbar.error(errorMessage);
-          this.isLoading = false;
-        },
-        complete: () => {
           this.isLoading = false;
         }
       });
@@ -150,6 +162,7 @@ export class CategoryComponent implements OnInit {
   }
 
   deleteCategory(id: number): void {
+    this.isLoading = true;
     if (confirm('Are you sure you want to delete this category?')) {
       this.categoryService.deleteCategory(id).subscribe({
         next: (response:any) => {
@@ -163,6 +176,7 @@ export class CategoryComponent implements OnInit {
         error: (error) => {
           const errorMessage = error?.error?.message || 'Failed to delete category';
           this.snackbar.error(errorMessage);
+          this.isLoading = false;
         }
       });
     }

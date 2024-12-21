@@ -68,8 +68,16 @@
                 class="btn-icon sale" 
                 (click)="openSaleModal(purchase)"
                 [disabled]="purchase.remainingQuantity === 0"
+                title="Create Sale"
               >
-                <i class="fas fa-shopping-cart"></i> Sale
+                <i class="fas fa-shopping-cart"></i>
+              </button>
+              <button 
+                class="btn-icon delete" 
+                (click)="deletePurchase(purchase.id!)"
+                title="Delete Purchase"
+              >
+                <i class="fas fa-trash"></i>
               </button>
             </td>
           </tr>

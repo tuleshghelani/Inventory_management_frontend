@@ -40,6 +40,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
       backdrop-filter: blur(10px);
       position: relative;
       right: 0;
+      z-index: 1020;
     }
 
     .snackbar-content {
