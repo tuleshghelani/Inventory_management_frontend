@@ -168,3 +168,42 @@ body {
     }
   }
 }
+
+// Custom Snackbar Container Styles
+.custom-snackbar-container {
+  position: fixed !important;
+  z-index: 1001 !important;
+
+  &.mat-mdc-snack-bar-container {
+    position: fixed !important;
+    margin: 0 !important;
+    max-width: none !important;
+    top: 20px !important;
+    right: 20px !important;
+    left: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  .mdc-snackbar__surface {
+    background: none !important;
+    box-shadow: none !important;
+    min-width: auto !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    transform: none !important;
+  }
+
+  .mat-mdc-snack-bar-label {
+    padding: 0 !important;
+  }
+
+  .mdc-snackbar__label {
+    padding: 0 !important;
+  }
+
+  // Override any Material auto-positioning
+  transform: none !important;
+  -webkit-transform: none !important;
+  -ms-transform: none !important;
+}

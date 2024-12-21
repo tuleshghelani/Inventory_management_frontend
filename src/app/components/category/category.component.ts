@@ -2,13 +2,25 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/category.model';
-import { ToastrService } from 'ngx-toastr';
 import { FormsModule } from '@angular/forms';
+import { SnackbarService } from '../../shared/services/snackbar.service';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-category',
   templateUrl: './category.component.html',
-  styleUrls: ['./category.component.scss']
+  styleUrls: ['./category.component.scss'],
+  animations: [
+    trigger('dialogAnimation', [
+      transition(':enter', [
+        style({ transform: 'translate(-50%, -48%) scale(0.95)', opacity: 0 }),
+        animate('200ms ease-out', style({ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('150ms ease-in', style({ transform: 'translate(-50%, -48%) scale(0.95)', opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class CategoryComponent implements OnInit {
   categories: Category[] = [];
@@ -24,11 +36,12 @@ export class CategoryComponent implements OnInit {
   totalElements = 0;
   startIndex = 0;
   endIndex = 0;
+  isDialogOpen = false;
 
   constructor(
     private categoryService: CategoryService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private snackbar: SnackbarService
   ) {
     this.categoryForm = this.fb.group({
       name: ['', Validators.required],
@@ -43,6 +56,18 @@ export class CategoryComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCategories();
+  }
+
+  openCreateDialog(): void {
+    this.isEditing = false;
+    this.editingId = undefined;
+    this.categoryForm.reset({ status: 'A' });
+    this.isDialogOpen = true;
+  }
+
+  closeDialog(): void {
+    this.isDialogOpen = false;
+    this.resetForm();
   }
 
   loadCategories(): void {
@@ -63,7 +88,8 @@ export class CategoryComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        this.toastr.error('Failed to load categories');
+        const errorMessage = error?.error?.message || 'Failed to load categories';
+        this.snackbar.error(errorMessage);
         this.isLoading = false;
       }
     });
@@ -79,13 +105,18 @@ export class CategoryComponent implements OnInit {
         : this.categoryService.createCategory(category);
 
       request.subscribe({
-        next: (response) => {
-          this.toastr.success(response.message || 'Category saved successfully');
-          this.resetForm();
-          this.loadCategories();
+        next: (response:any) => {
+          if (response?.success) {
+            this.snackbar.success(response.message || 'Category saved successfully');
+            this.closeDialog();
+            this.loadCategories();
+          } else {
+            this.snackbar.error(response.message || 'Operation failed');
+          }
         },
         error: (error) => {
-          this.toastr.error(error.message || 'Operation failed');
+          const errorMessage = error?.error?.message || 'Operation failed';
+          this.snackbar.error(errorMessage);
           this.isLoading = false;
         },
         complete: () => {
@@ -104,7 +135,7 @@ export class CategoryComponent implements OnInit {
 
   editCategory(category: Category): void {
     if (!category.id) {
-      this.toastr.error('Invalid category ID');
+      this.snackbar.error('Invalid category ID');
       return;
     }
     
@@ -115,20 +146,23 @@ export class CategoryComponent implements OnInit {
       status: category.status
     });
     
-    // Scroll to the form
-    const formElement = document.querySelector('.category-form');
-    formElement?.scrollIntoView({ behavior: 'smooth' });
+    this.isDialogOpen = true;
   }
 
   deleteCategory(id: number): void {
     if (confirm('Are you sure you want to delete this category?')) {
       this.categoryService.deleteCategory(id).subscribe({
-        next: (response) => {
-          this.toastr.success('Category deleted successfully');
-          this.loadCategories();
+        next: (response:any) => {
+          if (response?.success) {
+            this.snackbar.success(response.message || 'Category deleted successfully');
+            this.loadCategories();
+          } else {
+            this.snackbar.error(response.message || 'Failed to delete category');
+          }
         },
         error: (error) => {
-          this.toastr.error('Failed to delete category');
+          const errorMessage = error?.error?.message || 'Failed to delete category';
+          this.snackbar.error(errorMessage);
         }
       });
     }
