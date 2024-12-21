@@ -13,6 +13,7 @@ import { ProductComponent } from './components/product/product.component';
 // import { PurchaseComponent } from './components/purchase/purchase.component';
 // import { SalesComponent } from './components/sales/sales.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { AppRoutingModule } from './app-routing.module';
     
 @NgModule({
@@ -36,7 +37,8 @@ import { AppRoutingModule } from './app-routing.module';
     ToastrModule.forRoot()
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })
