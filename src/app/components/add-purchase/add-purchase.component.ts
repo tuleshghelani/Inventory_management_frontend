@@ -6,6 +6,7 @@ import { PurchaseService } from '../../services/purchase.service';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { RouterModule } from '@angular/router';
+import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-add-purchase',
@@ -14,7 +15,8 @@ import { RouterModule } from '@angular/router';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    LoaderComponent
+    LoaderComponent,
+    SearchableSelectComponent
   ],
   templateUrl: './add-purchase.component.html',
   styleUrls: ['./add-purchase.component.scss']
@@ -96,31 +98,44 @@ export class AddPurchaseComponent implements OnInit {
   onSubmit() {
     if (this.purchaseForm.valid) {
       this.loading = true;
-      const formData = this.purchaseForm.value;
+      const formData = { ...this.purchaseForm.value };
       
+      // Only format the date if it's a valid date string
+      if (formData.purchaseDate && isNaN(new Date(formData.purchaseDate).getTime())) {
+        this.snackbar.error('Invalid purchase date');
+        this.loading = false;
+        return;
+      }
+
       if (formData.purchaseDate) {
-        const date = new Date(formData.purchaseDate);
-        formData.purchaseDate = date.toLocaleString('en-GB', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        }).replace(/\//g, '-').replace(',', '');
+        try {
+          const date = new Date(formData.purchaseDate);
+          formData.purchaseDate = date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          }).replace(/\//g, '-').replace(',', '');
+        } catch (error) {
+          this.snackbar.error('Invalid date format');
+          this.loading = false;
+          return;
+        }
       }
 
       this.purchaseService.createPurchase(formData).subscribe({
-        next: (response) => {
-          if (response.success) {
+        next: (response: any) => {
+          if (response?.success) {
             this.snackbar.success('Purchase created successfully');
             this.resetForm();
-            this.loading = false;
+          } else {
+            this.snackbar.error(response?.message || 'Failed to create purchase');
           }
         },
         error: (error) => {
-          this.snackbar.error('Failed to create purchase');
-          this.loading = false;
+          this.snackbar.error(error?.message || 'Failed to create purchase');
         },
         complete: () => {
           this.loading = false;

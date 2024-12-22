@@ -11,18 +11,22 @@
       .search-controls {
         display: flex;
         gap: 1rem;
-        align-items: flex-end;
+        align-items: flex-start;
   
         .form-group {
           flex: 1;
+          min-width: 0;
+  
+          input.form-control,
+          app-searchable-select {
+            // height: 42px;
+          }
         }
   
         button {
           height: 42px;
-        }
-  
-        select.form-control {
-          min-width: 200px;
+          white-space: nowrap;
+          padding: 0 1.5rem;
         }
       }
     }
@@ -130,8 +134,13 @@
   
       .search-controls {
         flex-direction: column;
-        
+        gap: 1rem;
+  
         .form-group {
+          width: 100%;
+        }
+  
+        button {
           width: 100%;
         }
       }

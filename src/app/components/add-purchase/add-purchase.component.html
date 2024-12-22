@@ -16,17 +16,16 @@
           <label for="productId">
             <i class="fas fa-box"></i> Select Product <span class="required">*</span>
           </label>
-          <select 
-            id="productId" 
-            formControlName="productId" 
-            class="form-control"
+          <app-searchable-select
+            formControlName="productId"
+            [options]="products"
+            labelKey="name"
+            valueKey="id"
+            [placeholder]="'Select Product'"
+            [defaultOption]="{ label: 'Select Product', value: '' }"
+            [searchPlaceholder]="'Search products...'"
             [class.is-invalid]="isFieldInvalid('productId')"
-          >
-            <option value="">Select Product</option>
-            <option *ngFor="let product of products" [value]="product.id">
-              {{ product.name }}
-            </option>
-          </select>
+          ></app-searchable-select>
           <div class="invalid-feedback" *ngIf="isFieldInvalid('productId')">
             Product is required
           </div>

@@ -11,6 +11,7 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
+import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 
 @Component({
   selector: 'app-purchase',
@@ -22,7 +23,8 @@ import { ProductService } from '../../services/product.service';
     RouterModule,
     MatDialogModule,
     SaleModalComponent,
-    LoaderComponent
+    LoaderComponent,
+    SearchableSelectComponent
   ],
   templateUrl: './purchase.component.html',
   styleUrls: ['./purchase.component.scss']
