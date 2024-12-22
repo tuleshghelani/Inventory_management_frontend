@@ -124,7 +124,7 @@ export class ProductComponent implements OnInit {
     if (this.productForm.valid) {
       this.isLoading = true;
       const product = this.productForm.value;
-
+      let tempIsEditing = this.isEditing;
       const request = this.isEditing
         ? this.productService.updateProduct(this.editingId!, product)
         : this.productService.createProduct(product);
@@ -133,8 +133,11 @@ export class ProductComponent implements OnInit {
         next: (response) => {
           this.snackbarService.success(response.message);
           this.resetForm();
-          this.closeDialog();
-          this.loadProducts();
+          this.isLoading = false;
+          console.log('this.isEditing', this.isEditing);
+          if(tempIsEditing) {
+            this.closeDialog();
+          }
         },
         error: (error) => {
           this.snackbarService.error(error.message || 'Operation failed');
@@ -237,5 +240,6 @@ export class ProductComponent implements OnInit {
     }
     this.isDialogOpen = false;
     this.resetForm();
+    this.loadProducts();
   }
 }
