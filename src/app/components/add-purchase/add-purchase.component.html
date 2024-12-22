@@ -16,16 +16,28 @@
           <label for="productId">
             <i class="fas fa-box"></i> Select Product <span class="required">*</span>
           </label>
-          <app-searchable-select
-            formControlName="productId"
-            [options]="products"
-            labelKey="name"
-            valueKey="id"
-            [placeholder]="'Select Product'"
-            [defaultOption]="{ label: 'Select Product', value: '' }"
-            [searchPlaceholder]="'Search products...'"
-            [class.is-invalid]="isFieldInvalid('productId')"
-          ></app-searchable-select>
+          <div class="product-select-group">
+            <app-searchable-select
+              formControlName="productId"
+              [options]="products"
+              labelKey="name"
+              valueKey="id"
+              [placeholder]="'Select Product'"
+              [defaultOption]="{ label: 'Select Product', value: '' }"
+              [searchPlaceholder]="'Search products...'"
+              [class.is-invalid]="isFieldInvalid('productId')"
+            ></app-searchable-select>
+            <button 
+              type="button" 
+              class="btn-icon refresh" 
+              (click)="refreshProducts()" 
+              [disabled]="isLoadingProducts"
+              title="Refresh Products"
+              tooltip="Refresh Products"
+            >
+              <i class="fas" [ngClass]="isLoadingProducts ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+            </button>
+          </div>
           <div class="invalid-feedback" *ngIf="isFieldInvalid('productId')">
             Product is required
           </div>

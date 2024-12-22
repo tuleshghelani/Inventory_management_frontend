@@ -6,6 +6,7 @@ import { SaleService } from '../../services/sale.service';
 import { ToastrService } from 'ngx-toastr';
 import { ModalService } from '../../services/modal.service';
 import { map } from 'rxjs/operators';
+import { SnackbarService } from '../../shared/services/snackbar.service';
 
 @Component({
   selector: 'app-sale-modal',
@@ -27,7 +28,7 @@ export class SaleModalComponent implements OnChanges {
   constructor(
     private fb: FormBuilder,
     private saleService: SaleService,
-    private toastr: ToastrService,
+    private snackbar: SnackbarService,
     private modalService: ModalService
   ) {
     this.initForm();
@@ -51,12 +52,19 @@ export class SaleModalComponent implements OnChanges {
   }
 
   setupForm(purchase: Purchase) {
+    // Get current date in local timezone
+    const now = new Date();
+    const localISOString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+      .toISOString()
+      .slice(0, 16);
+
     this.saleForm.patchValue({
       purchaseId: purchase.id,
       unitPrice: purchase.unitPrice,
       quantity: '',
       invoiceNumber: '',
-      otherExpenses: 0
+      otherExpenses: 0,
+      saleDate: localISOString
     });
     
     console.log('Form values after patch:', this.saleForm.value);
@@ -75,7 +83,7 @@ export class SaleModalComponent implements OnChanges {
       
       // Add check for purchaseId
       if (!formData.purchaseId) {
-        this.toastr.error('Purchase ID is missing');
+        this.snackbar.error('Purchase ID is missing');
         this.loading = false;
         return;
       }
@@ -96,14 +104,14 @@ export class SaleModalComponent implements OnChanges {
 
       this.saleService.createSale(formData).subscribe({
         next: (response) => {
-          this.toastr.success('Sale created successfully');
+          this.snackbar.success('Sale created successfully');
           this.saleCreated.emit(true);
           this.loading = false;
           this.close();
         },
         error: (error) => {
           this.loading = false;
-          this.toastr.error(error.message || 'Failed to create sale');
+          this.snackbar.error(error?.error?.message || 'Failed to create sale');
         }
       });
     }
@@ -111,7 +119,7 @@ export class SaleModalComponent implements OnChanges {
 
   close() {
     this.modalService.close();
-    this.saleForm.reset();
+    this.initForm();
   }
 
   ngOnChanges(changes: SimpleChanges) {

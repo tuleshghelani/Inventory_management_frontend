@@ -198,3 +198,37 @@
     margin-bottom: 1rem;
   }
 }
+
+.product-select-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+
+  app-searchable-select {
+    flex: 1;
+  }
+
+  .btn-icon.refresh {
+    background-color: var(--background);
+    color: var(--primary);
+    width: 42px;
+    height: 42px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}

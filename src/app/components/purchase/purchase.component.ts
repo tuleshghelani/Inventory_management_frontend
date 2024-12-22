@@ -13,6 +13,7 @@ import { Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 import { DateUtils } from '../../shared/utils/date-utils';
+import { CacheService } from '../../shared/services/cache.service';
 
 @Component({
   selector: 'app-purchase',
@@ -45,6 +46,7 @@ export class PurchaseComponent implements OnInit {
   endIndex = 0;
   selectedPurchase: Purchase | null = null;
   products: Product[] = [];
+  isLoadingProducts = false;
 
   constructor(
     private purchaseService: PurchaseService,
@@ -53,14 +55,15 @@ export class PurchaseComponent implements OnInit {
     private snackbar: SnackbarService,
     private dialog: MatDialog,
     private modalService: ModalService,
-    private dateUtils: DateUtils
+    private dateUtils: DateUtils,
+    private cacheService: CacheService
   ) {
     this.initializeForm();
   }
 
   ngOnInit(): void {
-    this.loadProducts();
     this.loadPurchases();
+    this.loadProducts();
   }
 
   private initializeForm(): void {
@@ -160,14 +163,34 @@ export class PurchaseComponent implements OnInit {
   }
 
   private loadProducts(): void {
+    this.isLoadingProducts = true;
     this.productService.getProducts({ status: 'A' }).subscribe({
       next: (response) => {
         if (response.success) {
           this.products = response.data;
         }
+        this.isLoadingProducts = false;
       },
       error: (error) => {
         this.snackbar.error('Failed to load products');
+        this.isLoadingProducts = false;
+      }
+    });
+  }
+
+  refreshProducts(): void {
+    this.isLoadingProducts = true;
+    this.productService.refreshProducts().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+          this.snackbar.success('Products refreshed successfully');
+        }
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to refresh products');
+        this.isLoadingProducts = false;
       }
     });
   }

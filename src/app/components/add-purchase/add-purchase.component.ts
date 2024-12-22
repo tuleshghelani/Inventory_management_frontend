@@ -7,6 +7,7 @@ import { SnackbarService } from '../../shared/services/snackbar.service';
 import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { RouterModule } from '@angular/router';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
+import { CacheService } from '../../shared/services/cache.service';
 
 @Component({
   selector: 'app-add-purchase',
@@ -25,18 +26,53 @@ export class AddPurchaseComponent implements OnInit {
   purchaseForm!: FormGroup;
   products: any[] = [];
   loading = false;
+  isLoadingProducts = false;
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
     private purchaseService: PurchaseService,
-    private snackbar: SnackbarService
+    private snackbar: SnackbarService,
+    private cacheService: CacheService
   ) {
     this.initForm();
   }
 
   ngOnInit() {
-    this.fetchProducts();
+    this.loadProducts();
+  }
+
+  private loadProducts(): void {
+    this.isLoadingProducts = true;
+    this.productService.getProducts({ status: 'A' }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+        }
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to load products');
+        this.isLoadingProducts = false;
+      }
+    });
+  }
+
+  refreshProducts(): void {
+    this.isLoadingProducts = true;
+    this.productService.refreshProducts().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+          this.snackbar.success('Products refreshed successfully');
+        }
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to refresh products');
+        this.isLoadingProducts = false;
+      }
+    });
   }
 
   private initForm() {
@@ -53,23 +89,6 @@ export class AddPurchaseComponent implements OnInit {
       purchaseDate: [localISOString, Validators.required],
       invoiceNumber: ['', Validators.required],
       otherExpenses: [0, [Validators.required, Validators.min(0)]]
-    });
-  }
-
-  fetchProducts() {
-    this.loading = true;
-    this.productService.getProducts({ status: 'A' }).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.products = response.data;
-        }
-      },
-      error: (error) => {
-        this.snackbar.error('Failed to fetch products');
-      },
-      complete: () => {
-        this.loading = false;
-      }
     });
   }
 
