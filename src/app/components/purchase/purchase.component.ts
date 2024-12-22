@@ -12,6 +12,7 @@ import { SnackbarService } from '../../shared/services/snackbar.service';
 import { Product } from '../../models/product.model';
 import { ProductService } from '../../services/product.service';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
+import { DateUtils } from '../../shared/utils/date-utils';
 
 @Component({
   selector: 'app-purchase',
@@ -51,7 +52,8 @@ export class PurchaseComponent implements OnInit {
     private fb: FormBuilder,
     private snackbar: SnackbarService,
     private dialog: MatDialog,
-    private modalService: ModalService
+    private modalService: ModalService,
+    private dateUtils: DateUtils
   ) {
     this.initializeForm();
   }

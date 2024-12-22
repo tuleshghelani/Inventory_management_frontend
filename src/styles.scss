@@ -207,3 +207,13 @@ body {
   -webkit-transform: none !important;
   -ms-transform: none !important;
 }
+
+// Responsive adjustments
+@media (max-width: 576px) {
+  .custom-snackbar-container {
+    .mat-mdc-snack-bar-container {
+      margin: 10px !important;
+      max-width: calc(100% - 20px) !important;
+    }
+  }
+}

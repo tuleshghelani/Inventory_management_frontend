@@ -1,7 +1,7 @@
 .profit-container {
-    padding: 0;
+    padding: 2rem;
     background-color: var(--background);
-    width: 100%;
+    // width: 100%;
 
     .card {
         background: white;
@@ -131,7 +131,7 @@
     padding: 10px;
     border: 1px solid var(--supporting);
     border-radius: 4px;
-    width: 100%;
+    // width: 100%;
     color: var(--text-primary);
     
     &:focus {

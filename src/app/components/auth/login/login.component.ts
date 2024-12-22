@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { ToastrService } from 'ngx-toastr';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +17,7 @@ export class LoginComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private toastr: ToastrService
+    private snackbar: SnackbarService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -32,14 +32,16 @@ export class LoginComponent {
         next: (response) => {
           localStorage.setItem('token', response.accessToken);
           localStorage.setItem('user', JSON.stringify(response.user));
-          this.toastr.success('Login successful');
+          this.snackbar.success('Login successful');
           this.router.navigate(['/category']);
         },
         error: (error) => {
-          this.toastr.error(error.message || 'Login failed');
+          this.snackbar.error(error?.error?.message || 'Login failed');
           this.isLoading = false;
         }
       });
+    } else {
+      this.snackbar.warning('Please fill in all required fields correctly');
     }
   }
 }

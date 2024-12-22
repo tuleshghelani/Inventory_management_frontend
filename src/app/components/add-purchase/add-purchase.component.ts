@@ -130,12 +130,12 @@ export class AddPurchaseComponent implements OnInit {
           if (response?.success) {
             this.snackbar.success('Purchase created successfully');
             this.resetForm();
-          } else {
-            this.snackbar.error(response?.message || 'Failed to create purchase');
+            this.loading = false;
           }
         },
         error: (error) => {
-          this.snackbar.error(error?.message || 'Failed to create purchase');
+          this.snackbar.error(error?.error?.message || 'Failed to create purchase');
+          this.loading = false;
         },
         complete: () => {
           this.loading = false;

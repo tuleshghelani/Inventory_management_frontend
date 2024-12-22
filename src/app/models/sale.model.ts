@@ -17,6 +17,8 @@ export interface SaleSearchRequest {
   currentPage: number;
   perPageRecord: number;
   search?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface SaleResponse {
