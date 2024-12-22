@@ -22,7 +22,7 @@ import { LoaderComponent } from './shared/components/loader/loader.component';
     AppComponent,
     LoginComponent,
     HeaderComponent,
-    ProductComponent,
+    // ProductComponent,
     // PurchaseComponent,
     // SalesComponent
   ],

@@ -21,6 +21,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.clear();
     this.authStateSubject.next(false);
   }
 

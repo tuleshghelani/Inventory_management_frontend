@@ -1,4 +1,5 @@
 <div class="product-container">
+  <app-loader [show]="isLoading" message="Processing..."></app-loader>
   <div class="search-section card">
     <h2>Search Products</h2>
     <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
@@ -32,89 +33,9 @@
     </form>
   </div>
 
-  <div class="product-form card">
-    <h2>{{ isEditing ? 'Edit' : 'Create' }} Product</h2>
-    <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="name">Product Name</label>
-        <input 
-          type="text" 
-          id="name" 
-          formControlName="name" 
-          class="form-control"
-          [class.is-invalid]="productForm.get('name')?.invalid && productForm.get('name')?.touched"
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="categoryId">Category</label>
-        <select 
-          id="categoryId" 
-          formControlName="categoryId" 
-          class="form-control"
-          [class.is-invalid]="productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched"
-        >
-          <option value="">Select Category</option>
-          <option *ngFor="let category of categories" [value]="category.id">
-            {{ category.name }}
-          </option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea 
-          id="description" 
-          formControlName="description" 
-          class="form-control"
-          rows="3"
-          [class.is-invalid]="productForm.get('description')?.invalid && productForm.get('description')?.touched"
-        ></textarea>
-      </div>
-
-      <div class="form-group">
-        <label for="minimumStock">Minimum Stock</label>
-        <input 
-          type="number" 
-          id="minimumStock" 
-          formControlName="minimumStock" 
-          class="form-control"
-          min="0"
-          [class.is-invalid]="productForm.get('minimumStock')?.invalid && productForm.get('minimumStock')?.touched"
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="status">Status</label>
-        <select 
-          id="status" 
-          formControlName="status" 
-          class="form-control"
-        >
-          <option value="A">Active</option>
-          <option value="I">Inactive</option>
-        </select>
-      </div>
-
-      <div class="form-actions">
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          [disabled]="productForm.invalid || isLoading"
-        >
-          {{ isEditing ? 'Update' : 'Create' }} Product
-        </button>
-        <button 
-          type="button" 
-          class="btn btn-secondary"
-          (click)="resetForm()"
-          *ngIf="isEditing"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
-  </div>
+  <button class="btn btn-primary" (click)="openCreateDialog()">
+    <i class="fas fa-plus"></i> Create Product
+  </button>
 
   <div class="products-list card">
     <h2>Products</h2>
@@ -206,4 +127,117 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Product Dialog -->
+<div class="dialog-backdrop" *ngIf="isDialogOpen" (click)="closeDialog()"></div>
+<div class="dialog" *ngIf="isDialogOpen" [@dialogAnimation]>
+  <div class="dialog-header">
+    <h2>
+      <i class="fas {{ isEditing ? 'fa-edit' : 'fa-plus-circle' }}"></i>
+      {{ isEditing ? 'Edit' : 'Create' }} Product
+    </h2>
+    <button class="close-button" (click)="closeDialog()" title="Close">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="name">
+          <i class="fas fa-tag"></i> Product Name <span class="required">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="name" 
+          formControlName="name" 
+          class="form-control"
+          [class.is-invalid]="productForm.get('name')?.invalid && productForm.get('name')?.touched"
+          placeholder="Enter product name"
+        >
+        <div class="invalid-feedback" *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched">
+          Product name is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categoryId">
+          <i class="fas fa-folder"></i> Category <span class="required">*</span>
+        </label>
+        <select 
+          id="categoryId" 
+          formControlName="categoryId" 
+          class="form-control"
+          [class.is-invalid]="productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched"
+        >
+          <option value="">Select Category</option>
+          <option *ngFor="let category of categories" [value]="category.id">
+            {{ category.name }}
+          </option>
+        </select>
+        <div class="invalid-feedback" *ngIf="productForm.get('categoryId')?.invalid && productForm.get('categoryId')?.touched">
+          Category is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="minimumStock">
+          <i class="fas fa-cubes"></i> Minimum Stock <span class="required">*</span>
+        </label>
+        <input 
+          type="number" 
+          id="minimumStock" 
+          formControlName="minimumStock" 
+          class="form-control"
+          min="0"
+          [class.is-invalid]="productForm.get('minimumStock')?.invalid && productForm.get('minimumStock')?.touched"
+          placeholder="Enter minimum stock level"
+        >
+        <div class="invalid-feedback" *ngIf="productForm.get('minimumStock')?.invalid && productForm.get('minimumStock')?.touched">
+          Minimum stock must be 0 or greater
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="status">
+          <i class="fas fa-toggle-on"></i> Status
+        </label>
+        <select 
+          id="status" 
+          formControlName="status" 
+          class="form-control"
+        >
+          <option value="A">Active</option>
+          <option value="I">Inactive</option>
+        </select>
+      </div>
+
+      <div class="form-group full-width">
+        <label for="description">
+          <i class="fas fa-align-left"></i> Description
+        </label>
+        <textarea 
+          id="description" 
+          formControlName="description" 
+          class="form-control"
+          rows="3"
+          placeholder="Enter product description"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="dialog-actions">
+      <button type="button" class="btn btn-secondary" (click)="closeDialog()">
+        <i class="fas fa-times"></i> Cancel
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="productForm.invalid || isLoading"
+      >
+        <i class="fas" [ngClass]="isLoading ? 'fa-spinner fa-spin' : (isEditing ? 'fa-save' : 'fa-plus')"></i>
+        {{ isEditing ? 'Update' : 'Create' }}
+      </button>
+    </div>
+  </form>
 </div>

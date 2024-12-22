@@ -77,54 +77,90 @@
 
   .pagination-container {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 0;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--supporting);
 
-    .pagination-info {
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-info {
       color: var(--text-secondary);
       font-size: 0.9rem;
     }
 
-    .pagination {
+    .pagination-controls {
       display: flex;
-      gap: 0.5rem;
-      align-items: center;
+      flex-direction: column;
+      gap: 1rem;
 
-      .btn-page {
-        min-width: 40px;
-        height: 40px;
-        border: 1px solid var(--supporting);
-        background: white;
-        border-radius: 4px;
+      @media (min-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .items-per-page {
         display: flex;
         align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: var(--text-primary);
+        gap: 0.5rem;
 
-        &:hover:not(:disabled) {
-          background-color: var(--background);
-          border-color: var(--primary);
-          color: var(--primary);
+        label {
+          color: var(--text-secondary);
+          font-size: 0.9rem;
+          white-space: nowrap;
         }
 
-        &.active {
-          background-color: var(--primary);
-          border-color: var(--primary);
-          color: white;
+        select {
+          width: 70px;
+          padding: 0.25rem;
+        }
+      }
+
+      .pagination {
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
+
+        .btn-page {
+          min-width: 36px;
+          height: 36px;
+          padding: 0 0.5rem;
+          border: 1px solid var(--supporting);
+          background: white;
+          color: var(--text-primary);
+          border-radius: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+
+          &:hover:not(:disabled) {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+          }
+
+          &.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+          }
+
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
         }
 
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        i {
-          font-size: 0.8rem;
+        .ellipsis {
+          color: var(--text-secondary);
+          padding: 0 0.5rem;
         }
       }
     }

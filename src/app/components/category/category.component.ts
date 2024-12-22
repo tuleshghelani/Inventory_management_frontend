@@ -231,4 +231,21 @@ export class CategoryComponent implements OnInit {
 
     return pageNumbers;
   }
+
+  getVisiblePages(): number[] {
+    const pages: number[] = [];
+    const totalPages = this.totalPages;
+    const currentPage = this.currentPage;
+
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i);
+    }
+
+    // Always include current page and 1 page before and after
+    for (let i = Math.max(1, currentPage - 1); i <= Math.min(currentPage + 1, totalPages - 2); i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
 }
