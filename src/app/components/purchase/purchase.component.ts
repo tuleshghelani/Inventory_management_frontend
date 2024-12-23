@@ -155,7 +155,7 @@ export class PurchaseComponent implements OnInit {
           this.loadPurchases();
         },
         error: (error) => {
-          this.snackbar.error(error.message || 'Failed to delete purchase');
+          this.snackbar.error(error?.error?.message || 'Failed to delete purchase');
           this.isLoading = false;
         }
       });

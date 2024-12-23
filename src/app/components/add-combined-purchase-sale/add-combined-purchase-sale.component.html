@@ -10,13 +10,11 @@
       </div>
       
       <form [formGroup]="combinedForm" (ngSubmit)="onSubmit()" class="combined-form">
-        <!-- Product Selection Section -->
+        <!-- Product and Quantity Section -->
         <div class="section-card">
-          <h3 class="section-title">
-            <i class="fas fa-box"></i> Product Details
-          </h3>
-          <div class="form-row">
-            <div class="form-group full-width">
+          <div class="form-row two-columns">
+            <!-- Product Selection -->
+            <div class="form-group">
               <label for="productId">
                 <i class="fas fa-box"></i> Select Product <span class="required">*</span>
               </label>
@@ -41,86 +39,10 @@
                   <i class="fas" [ngClass]="isLoadingProducts ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
                 </button>
               </div>
-              <div class="invalid-feedback" *ngIf="isFieldInvalid('productId')">
-                Product is required
-              </div>
             </div>
-          </div>
-        </div>
-         <!-- Purchase Section -->
-        <div class="section-card">
-          <h3 class="section-title">
-            <i class="fas fa-shopping-cart"></i> Purchase Details
-          </h3>
-          <div class="form-grid">
+
+            <!-- Quantity -->
             <div class="form-group">
-              <label for="purchaseUnitPrice">
-                <i class="fas fa-tag"></i> Purchase Unit Price <span class="required">*</span>
-              </label>
-              <div class="input-group">
-                <span class="input-group-text">₹</span>
-                <input 
-                  type="number" 
-                  id="purchaseUnitPrice" 
-                  formControlName="purchaseUnitPrice" 
-                  class="form-control"
-                  [class.is-invalid]="isFieldInvalid('purchaseUnitPrice')"
-                  min="0.01"
-                  step="0.01"
-                >
-              </div>
-              <div class="invalid-feedback" *ngIf="getFieldError('purchaseUnitPrice')">
-                {{ getFieldError('purchaseUnitPrice') }}
-              </div>
-            </div>
-             <div class="form-group">
-              <label for="purchaseDate">
-                <i class="fas fa-calendar"></i> Purchase Date <span class="required">*</span>
-              </label>
-              <input 
-                type="datetime-local" 
-                id="purchaseDate" 
-                formControlName="purchaseDate" 
-                class="form-control"
-                [class.is-invalid]="isFieldInvalid('purchaseDate')"
-              >
-            </div>
-             <div class="form-group">
-              <label for="purchaseInvoiceNumber">
-                <i class="fas fa-file-invoice"></i> Purchase Invoice Number
-              </label>
-              <input 
-                type="text" 
-                id="purchaseInvoiceNumber" 
-                formControlName="purchaseInvoiceNumber" 
-                class="form-control"
-              >
-            </div>
-             <div class="form-group">
-              <label for="purchaseOtherExpenses">
-                <i class="fas fa-coins"></i> Purchase Other Expenses
-              </label>
-              <div class="input-group">
-                <span class="input-group-text">₹</span>
-                <input 
-                  type="number" 
-                  id="purchaseOtherExpenses" 
-                  formControlName="purchaseOtherExpenses" 
-                  class="form-control"
-                  min="0"
-                  step="0.01"
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-         <!-- Quantity Section -->
-        <div class="section-card">
-          <h3 class="section-title">
-            <i class="fas fa-hashtag"></i> Quantity
-          </h3>
-          <div class="form-row">
-            <div class="form-group full-width">
               <label for="quantity">
                 <i class="fas fa-hashtag"></i> Quantity <span class="required">*</span>
               </label>
@@ -132,80 +54,160 @@
                 [class.is-invalid]="isFieldInvalid('quantity')"
                 min="1"
               >
-              <div class="invalid-feedback" *ngIf="getFieldError('quantity')">
-                {{ getFieldError('quantity') }}
-              </div>
             </div>
           </div>
         </div>
-         <!-- Sale Section -->
+
+        <!-- Purchase and Sale Details Section -->
         <div class="section-card">
-          <h3 class="section-title">
-            <i class="fas fa-cash-register"></i> Sale Details
-          </h3>
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="saleUnitPrice">
-                <i class="fas fa-tag"></i> Sale Unit Price <span class="required">*</span>
-              </label>
-              <div class="input-group">
-                <span class="input-group-text">₹</span>
-                <input 
-                  type="number" 
-                  id="saleUnitPrice" 
-                  formControlName="saleUnitPrice" 
-                  class="form-control"
-                  [class.is-invalid]="isFieldInvalid('saleUnitPrice')"
-                  min="0.01"
-                  step="0.01"
-                >
+          <div class="purchase-sale-grid">
+            <!-- Left Column - Purchase Details -->
+            <div class="purchase-section">
+              <h3 class="section-title">
+                <i class="fas fa-shopping-cart"></i> Purchase Details
+              </h3>
+              <div class="form-column">
+                <!-- Purchase Unit Price -->
+                <div class="form-group">
+                  <label for="purchaseUnitPrice">
+                    <i class="fas fa-tag"></i> Purchase Unit Price <span class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input 
+                      type="number" 
+                      id="purchaseUnitPrice" 
+                      formControlName="purchaseUnitPrice" 
+                      class="form-control"
+                      [class.is-invalid]="isFieldInvalid('purchaseUnitPrice')"
+                      min="0.01"
+                      step="0.01"
+                    >
+                  </div>
+                </div>
+
+                <!-- Purchase Date -->
+                <div class="form-group">
+                  <label for="purchaseDate">
+                    <i class="fas fa-calendar"></i> Purchase Date <span class="required">*</span>
+                  </label>
+                  <input 
+                    type="datetime-local" 
+                    id="purchaseDate" 
+                    formControlName="purchaseDate" 
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('purchaseDate')"
+                  >
+                </div>
+
+                <!-- Purchase Invoice Number -->
+                <div class="form-group">
+                  <label for="purchaseInvoiceNumber">
+                    <i class="fas fa-file-invoice"></i> Purchase Invoice Number
+                  </label>
+                  <input 
+                    type="text" 
+                    id="purchaseInvoiceNumber" 
+                    formControlName="purchaseInvoiceNumber" 
+                    class="form-control"
+                  >
+                </div>
+
+                <!-- Purchase Other Expenses -->
+                <div class="form-group">
+                  <label for="purchaseOtherExpenses">
+                    <i class="fas fa-coins"></i> Purchase Other Expenses
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input 
+                      type="number" 
+                      id="purchaseOtherExpenses" 
+                      formControlName="purchaseOtherExpenses" 
+                      class="form-control"
+                      min="0"
+                      step="0.01"
+                    >
+                  </div>
+                </div>
               </div>
-              <div class="invalid-feedback" *ngIf="getFieldError('saleUnitPrice')">
-                {{ getFieldError('saleUnitPrice') }}
-              </div>
             </div>
-             <div class="form-group">
-              <label for="saleDate">
-                <i class="fas fa-calendar"></i> Sale Date <span class="required">*</span>
-              </label>
-              <input 
-                type="datetime-local" 
-                id="saleDate" 
-                formControlName="saleDate" 
-                class="form-control"
-                [class.is-invalid]="isFieldInvalid('saleDate')"
-              >
-            </div>
-             <div class="form-group">
-              <label for="saleInvoiceNumber">
-                <i class="fas fa-file-invoice"></i> Sale Invoice Number
-              </label>
-              <input 
-                type="text" 
-                id="saleInvoiceNumber" 
-                formControlName="saleInvoiceNumber" 
-                class="form-control"
-              >
-            </div>
-             <div class="form-group">
-              <label for="saleOtherExpenses">
-                <i class="fas fa-coins"></i> Sale Other Expenses
-              </label>
-              <div class="input-group">
-                <span class="input-group-text">₹</span>
-                <input 
-                  type="number" 
-                  id="saleOtherExpenses" 
-                  formControlName="saleOtherExpenses" 
-                  class="form-control"
-                  min="0"
-                  step="0.01"
-                >
+
+            <!-- Right Column - Sale Details -->
+            <div class="sale-section">
+              <h3 class="section-title">
+                <i class="fas fa-cash-register"></i> Sale Details
+              </h3>
+              <div class="form-column">
+                <!-- Sale Unit Price -->
+                <div class="form-group">
+                  <label for="saleUnitPrice">
+                    <i class="fas fa-tag"></i> Sale Unit Price <span class="required">*</span>
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input 
+                      type="number" 
+                      id="saleUnitPrice" 
+                      formControlName="saleUnitPrice" 
+                      class="form-control"
+                      [class.is-invalid]="isFieldInvalid('saleUnitPrice')"
+                      min="0.01"
+                      step="0.01"
+                    >
+                  </div>
+                </div>
+
+                <!-- Sale Date -->
+                <div class="form-group">
+                  <label for="saleDate">
+                    <i class="fas fa-calendar"></i> Sale Date <span class="required">*</span>
+                  </label>
+                  <input 
+                    type="datetime-local" 
+                    id="saleDate" 
+                    formControlName="saleDate" 
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('saleDate')"
+                  >
+                </div>
+
+                <!-- Sale Invoice Number -->
+                <div class="form-group">
+                  <label for="saleInvoiceNumber">
+                    <i class="fas fa-file-invoice"></i> Sale Invoice Number
+                  </label>
+                  <input 
+                    type="text" 
+                    id="saleInvoiceNumber" 
+                    formControlName="saleInvoiceNumber" 
+                    class="form-control"
+                  >
+                </div>
+
+                <!-- Sale Other Expenses -->
+                <div class="form-group">
+                  <label for="saleOtherExpenses">
+                    <i class="fas fa-coins"></i> Sale Other Expenses
+                  </label>
+                  <div class="input-group">
+                    <span class="input-group-text">₹</span>
+                    <input 
+                      type="number" 
+                      id="saleOtherExpenses" 
+                      formControlName="saleOtherExpenses" 
+                      class="form-control"
+                      min="0"
+                      step="0.01"
+                    >
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-         <div class="form-actions">
+
+        <div class="form-actions">
           <button 
             type="button" 
             class="btn btn-secondary"
