@@ -6,11 +6,12 @@ import { Sale, SaleSearchRequest } from '../../models/sale.model';
 import { ToastrService } from 'ngx-toastr';
 import { SnackbarService } from '../../shared/services/snackbar.service';
 import { DateUtils } from '../../shared/utils/date-utils';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sale',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
   templateUrl: './sale.component.html',
   styleUrl: './sale.component.scss'
 })

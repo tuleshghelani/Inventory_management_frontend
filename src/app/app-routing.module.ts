@@ -9,6 +9,7 @@ import { AddPurchaseComponent } from './components/add-purchase/add-purchase.com
 import { SaleComponent } from './components/sale/sale.component';
 import { ProfitComponent } from './components/profit/profit.component';
 import { CustomerComponent } from './components/customer/customer.component';
+import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -45,6 +46,11 @@ const routes: Routes = [
   {
     path: 'customer',
     component: CustomerComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'combined-purchase-sale',
+    component: AddCombinedPurchaseSaleComponent,
     canActivate: [AuthGuard]
   },
   {

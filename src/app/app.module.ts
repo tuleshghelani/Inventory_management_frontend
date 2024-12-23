@@ -16,6 +16,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { AppRoutingModule } from './app-routing.module';
 import { LoaderComponent } from './shared/components/loader/loader.component';
+import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
     
 @NgModule({
   declarations: [
