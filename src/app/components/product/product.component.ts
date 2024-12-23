@@ -72,6 +72,7 @@ export class ProductComponent implements OnInit {
       categoryId: ['', Validators.required],
       description: [null],
       minimumStock: [0, [Validators.required, Validators.min(0)]],
+      amount: [0, [Validators.required, Validators.min(0)]],
       status: ['A', Validators.required]
     });
 
@@ -155,6 +156,7 @@ export class ProductComponent implements OnInit {
       categoryId: product.categoryId,
       description: product.description,
       minimumStock: product.minimumStock,
+      amount: product.amount,
       status: product.status
     });
     this.isDialogOpen = true;
