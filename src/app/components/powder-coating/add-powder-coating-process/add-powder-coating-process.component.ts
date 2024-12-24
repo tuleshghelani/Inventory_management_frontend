@@ -1,0 +1,197 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { ProductService } from '../../../services/product.service';
+import { CustomerService } from '../../../services/customer.service';
+import { PowderCoatingService } from '../../../services/powder-coating.service';
+import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
+
+@Component({
+  selector: 'app-add-powder-coating-process',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    SearchableSelectComponent,
+    LoaderComponent,
+    RouterLink
+  ],
+  templateUrl: './add-powder-coating-process.component.html',
+  styleUrls: ['./add-powder-coating-process.component.scss']
+})
+export class AddPowderCoatingProcessComponent implements OnInit {
+  processForm!: FormGroup;
+  products: any[] = [];
+  customers: any[] = [];
+  loading = false;
+  isLoadingProducts = false;
+  isLoadingCustomers = false;
+  processId?: number;
+  isEditMode = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private productService: ProductService,
+    private customerService: CustomerService,
+    private powderCoatingService: PowderCoatingService,
+    private snackbar: SnackbarService
+  ) {
+    this.initializeForm();
+    this.processId = this.route.snapshot.params['id'];
+    this.isEditMode = !!this.processId;
+  }
+
+  ngOnInit(): void {
+    this.loadProducts();
+    this.loadCustomers();
+    if (this.isEditMode) {
+      this.loadProcess();
+    }
+  }
+
+  private initializeForm(): void {
+    this.processForm = this.fb.group({
+      customerId: ['', [Validators.required]],
+      productId: ['', [Validators.required]],
+      quantity: ['', [Validators.required, Validators.min(1)]],
+      status: ['A']
+    });
+  }
+
+  loadProducts(): void {
+    this.isLoadingProducts = true;
+    this.productService.getProducts({ status: 'A' }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+        }
+        this.isLoadingProducts = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load products');
+        this.isLoadingProducts = false;
+      }
+    });
+  }
+
+  loadCustomers(): void {
+    this.isLoadingCustomers = true;
+    this.customerService.getCustomers({ status: 'A' }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.customers = response.data;
+        }
+        this.isLoadingCustomers = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load customers');
+        this.isLoadingCustomers = false;
+      }
+    });
+  }
+
+  refreshProducts(): void {
+    this.isLoadingProducts = true;
+    this.productService.refreshProducts().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+          this.snackbar.success('Products refreshed successfully');
+        }
+        this.isLoadingProducts = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to refresh products');
+        this.isLoadingProducts = false;
+      }
+    });
+  }
+
+  refreshCustomers(): void {
+    this.isLoadingCustomers = true;
+    this.customerService.refreshCustomers().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.customers = response.data;
+          this.snackbar.success('Customers refreshed successfully');
+        }
+        this.isLoadingCustomers = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to refresh customers');
+        this.isLoadingCustomers = false;
+      }
+    });
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.processForm.get(fieldName);
+    return field ? field.invalid && (field.dirty || field.touched) : false;
+  }
+
+  getFieldError(fieldName: string): string {
+    const control = this.processForm.get(fieldName);
+    if (control?.errors && control.touched) {
+      if (control.errors['required']) return `${fieldName} is required`;
+      if (control.errors['min']) return `${fieldName} must be at least ${control.errors['min'].min}`;
+    }
+    return '';
+  }
+
+  resetForm(): void {
+    this.processForm.reset({ status: 'A' });
+  }
+
+  loadProcess(): void {
+    this.loading = true;
+    this.powderCoatingService.getProcess(this.processId!).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.processForm.patchValue({
+            customerId: response.data.customerId,
+            productId: response.data.productId,
+            quantity: response.data.quantity,
+            status: response.data.status
+          });
+        } else {
+          this.snackbar.error('Failed to load process details');
+          this.router.navigate(['/powder-coating-process']);
+        }
+        this.loading = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load process details');
+        this.loading = false;
+        this.router.navigate(['/powder-coating-process']);
+      }
+    });
+  }
+
+  onSubmit(): void {
+    if (this.processForm.valid) {
+      this.loading = true;
+      const request = this.isEditMode ? 
+        this.powderCoatingService.updateProcess(this.processId!, this.processForm.value) :
+        this.powderCoatingService.createProcess(this.processForm.value);
+
+      request.subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.snackbar.success(`Process ${this.isEditMode ? 'updated' : 'created'} successfully`);
+            this.router.navigate(['/powder-coating-process']);
+          }
+          this.loading = false;
+        },
+        error: () => {
+          this.snackbar.error(`Failed to ${this.isEditMode ? 'update' : 'create'} process`);
+          this.loading = false;
+        }
+      });
+    }
+  }
+}

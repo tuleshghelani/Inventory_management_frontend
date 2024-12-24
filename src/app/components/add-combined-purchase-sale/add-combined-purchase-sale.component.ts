@@ -32,6 +32,7 @@ export class AddCombinedPurchaseSaleComponent implements OnInit {
    private snackbar: SnackbarService
  ) {
    this.initForm();
+   this.setupProductChangeListener();
  }
   ngOnInit() {
    this.loadProducts();
@@ -142,5 +143,18 @@ export class AddCombinedPurchaseSaleComponent implements OnInit {
    }
    return '';
  }
-
+ 
+  private setupProductChangeListener() {
+    this.combinedForm.get('productId')?.valueChanges.subscribe(selectedProductId => {
+      if (selectedProductId) {
+        const selectedProduct = this.products.find(product => product.id === selectedProductId);
+        if (selectedProduct) {
+          this.combinedForm.patchValue({
+            purchaseUnitPrice: selectedProduct.purchase_amount,
+            saleUnitPrice: selectedProduct.sale_amount
+          }, { emitEvent: false });
+        }
+      }
+    });
+  }
 }
