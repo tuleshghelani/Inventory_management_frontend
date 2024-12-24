@@ -114,4 +114,69 @@
       </form>
     </div>
   </div>
+
+  <div class="returns-section card" *ngIf="isEditMode">
+    <div class="returns-header" (click)="toggleReturns()" [class.expanded]="showReturns">
+      <div class="header-content">
+        <i class="fas fa-undo"></i>
+        <h3>Process Returns</h3>
+      </div>
+      <i class="fas" [ngClass]="showReturns ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+    </div>
+
+    <div class="returns-content" [class.expanded]="showReturns">
+      <app-loader [show]="isLoadingReturns"></app-loader>
+      
+      <div class="table-actions">
+        <button 
+          class="btn btn-primary add-return-btn" 
+          (click)="openReturnModal()"
+          [disabled]="isLoadingReturns"
+        >
+          <i class="fas fa-plus"></i> Add Return
+        </button>
+      </div>
+
+      <div class="table-responsive" [class.loading]="isLoadingReturns">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Return Quantity</th>
+              <th>Return Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let return of returns; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ return.returnQuantity }}</td>
+              <td>{{ return.createdAt | date:'medium' }}</td>
+              <td class="actions-cell">
+                <button 
+                  class="btn btn-icon btn-danger" 
+                  (click)="deleteReturn(return.id)"
+                  [disabled]="isLoadingReturns"
+                  title="Delete Return"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="returns.length === 0">
+              <td colspan="4" class="text-center">No returns found</td>
+            </tr>
+          </tbody>
+          <tfoot *ngIf="returns.length > 0">
+            <tr>
+              <td><strong>Total Returns</strong></td>
+              <td colspan="3"><strong>{{ getTotalReturns() }}</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <app-return-modal (returnCreated)="loadReturns()"></app-return-modal>
 </div>

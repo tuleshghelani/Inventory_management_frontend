@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
@@ -8,6 +8,8 @@ import { PowderCoatingService } from '../../../services/powder-coating.service';
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { PowderCoatingReturn } from '../../../models/powder-coating.model';
+import { ReturnModalComponent } from '../return-modal/return-modal.component';
 
 @Component({
   selector: 'app-add-powder-coating-process',
@@ -17,12 +19,15 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
     ReactiveFormsModule,
     SearchableSelectComponent,
     LoaderComponent,
-    RouterLink
+    RouterLink,
+    ReturnModalComponent
   ],
   templateUrl: './add-powder-coating-process.component.html',
   styleUrls: ['./add-powder-coating-process.component.scss']
 })
 export class AddPowderCoatingProcessComponent implements OnInit {
+  @ViewChild(ReturnModalComponent) returnModal!: ReturnModalComponent;
+  
   processForm!: FormGroup;
   products: any[] = [];
   customers: any[] = [];
@@ -31,6 +36,9 @@ export class AddPowderCoatingProcessComponent implements OnInit {
   isLoadingCustomers = false;
   processId?: number;
   isEditMode = false;
+  showReturns = false;
+  isLoadingReturns = false;
+  returns: PowderCoatingReturn[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -192,6 +200,61 @@ export class AddPowderCoatingProcessComponent implements OnInit {
           this.loading = false;
         }
       });
+    }
+  }
+
+  toggleReturns(): void {
+    this.showReturns = !this.showReturns;
+    if (this.showReturns && this.returns.length === 0) {
+      this.loadReturns();
+    }
+  }
+
+  loadReturns(): void {
+    if (!this.processId) return;
+    
+    this.isLoadingReturns = true;
+    this.powderCoatingService.getProcessReturns(this.processId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.returns = response.data;
+        }
+        this.isLoadingReturns = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load returns');
+        this.isLoadingReturns = false;
+      }
+    });
+  }
+
+  getTotalReturns(): number {
+    return this.returns.reduce((sum, ret) => sum + ret.returnQuantity, 0);
+  }
+
+  deleteReturn(id: number): void {
+    if (confirm('Are you sure you want to delete this return?')) {
+      this.isLoadingReturns = true;
+      this.powderCoatingService.deleteReturn(id).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.snackbar.success('Return deleted successfully');
+            this.loadReturns();
+          }
+        },
+        error: () => {
+          this.snackbar.error('Failed to delete return');
+          this.isLoadingReturns = false;
+        }
+      });
+    }
+  }
+
+  openReturnModal(): void {
+    if (this.processId && this.returnModal) {
+      this.returnModal.open(this.processId);
+    } else {
+      this.snackbar.error('Unable to open return modal');
     }
   }
 }

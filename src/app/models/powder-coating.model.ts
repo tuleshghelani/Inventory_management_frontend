@@ -6,8 +6,10 @@ export interface PowderCoatingProcess {
   customerName: string;
   quantity: number;
   remainingQuantity: number;
-  status: 'A' | 'I';
   createdAt: string;
+  showReturns?: boolean;
+  returns?: PowderCoatingReturn[];
+  isLoadingReturns?: boolean;
 }
 
 export interface PowderCoatingSearchRequest {
@@ -30,4 +32,22 @@ export interface PowderCoatingResponse {
     size: number;
     number: number;
   };
+}
+
+export interface PowderCoatingReturn {
+  id: number;
+  returnQuantity: number;
+  createdAt: string;
+}
+
+export interface PowderCoatingReturnResponse {
+  success: boolean;
+  message: string;
+  data: PowderCoatingReturn[];
+}
+
+export interface PowderCoatingReturnRequest {
+  id: number;
+  returnQuantity: number;
+  returnDate?: string;
 } 

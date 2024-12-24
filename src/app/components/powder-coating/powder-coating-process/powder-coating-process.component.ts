@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PowderCoatingService } from '../../../services/powder-coating.service';
@@ -10,6 +10,7 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { PowderCoatingProcess } from '../../../models/powder-coating.model';
 import { RouterLink } from '@angular/router';
 import { CustomerService } from '../../../services/customer.service';
+import { ReturnModalComponent } from '../return-modal/return-modal.component';
 
 @Component({
   selector: 'app-powder-coating-process',
@@ -20,12 +21,14 @@ import { CustomerService } from '../../../services/customer.service';
     LoaderComponent,
     SearchableSelectComponent,
     FormsModule,
-    RouterLink
+    RouterLink,
+    ReturnModalComponent
   ],
   templateUrl: './powder-coating-process.component.html',
   styleUrls: ['./powder-coating-process.component.scss']
 })
 export class PowderCoatingProcessComponent implements OnInit {
+  @ViewChild(ReturnModalComponent) returnModal!: ReturnModalComponent;
   processes: PowderCoatingProcess[] = [];
   products: any[] = [];
   // categories: any[] = [];
@@ -233,5 +236,15 @@ export class PowderCoatingProcessComponent implements OnInit {
         this.isLoadingCustomers = false;
       }
     });
+  }
+
+  
+
+  openReturnModal(processId: number): void {
+    if (processId && this.returnModal) {
+      this.returnModal.open(processId);
+    } else {
+      this.snackbar.error('Unable to open return modal');
+    }
   }
 }
