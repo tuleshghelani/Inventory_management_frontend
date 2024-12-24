@@ -1,11 +1,10 @@
-import { Component, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ModalService } from '../../../services/modal.service';
 import { PowderCoatingService } from '../../../services/powder-coating.service';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
-import { DateUtils } from '../../../shared/utils/date-utils';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-return-modal',
@@ -14,22 +13,33 @@ import { DateUtils } from '../../../shared/utils/date-utils';
   templateUrl: './return-modal.component.html',
   styleUrls: ['./return-modal.component.scss']
 })
-export class ReturnModalComponent implements OnDestroy {
+export class ReturnModalComponent implements OnInit {
   @Output() returnCreated = new EventEmitter<void>();
   
-  display$ = new BehaviorSubject<boolean>(false);
   returnForm!: FormGroup;
   loading = false;
   processId?: number;
-  private destroy$ = new Subject<void>();
+  
+  display$ = this.modalService.modalState$.pipe(
+    map(state => state.isOpen && state.modalType === 'return')
+  );
 
   constructor(
     private fb: FormBuilder,
     private powderCoatingService: PowderCoatingService,
     private snackbar: SnackbarService,
-    private dateUtils: DateUtils
+    private modalService: ModalService
   ) {
     this.initForm();
+  }
+
+  ngOnInit() {
+    this.modalService.modalState$.subscribe(state => {
+      if (state.isOpen && state.modalType === 'return' && state.data) {
+        this.processId = state.data;
+        this.initForm();
+      }
+    });
   }
 
   private initForm(): void {
@@ -37,25 +47,15 @@ export class ReturnModalComponent implements OnDestroy {
     const localISOString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
       .toISOString()
       .slice(0, 16);
+
     this.returnForm = this.fb.group({
       returnQuantity: ['', [Validators.required, Validators.min(1)]],
       returnDate: [localISOString]
     });
   }
 
-  open(processId: number): void {
-    this.processId = processId;
-    this.display$.next(true);
-  }
-
-  close(): void {
-    this.display$.next(false);
-    this.returnForm.reset();
-    this.initForm();
-  }
-
   onSubmit(): void {
-    if (this.returnForm.valid && this.processId) { 
+    if (this.returnForm.valid && this.processId) {
       this.loading = true;
       const formData = this.returnForm.value;
       
@@ -72,27 +72,26 @@ export class ReturnModalComponent implements OnDestroy {
         }).replace(/\//g, '-').replace(',', '') : undefined
       };
 
-      this.powderCoatingService.createReturn(request)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.snackbar.success('Return created successfully');
-              this.returnCreated.emit();
-              this.close();
-            }
-            this.loading = false;
-          },
-          error: (error:any) => {
-            this.snackbar.error(error?.error?.message || 'Failed to create return');
-            this.loading = false;
+      this.powderCoatingService.createReturn(request).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.snackbar.success('Return created successfully');
+            this.returnCreated.emit();
+            this.close();
           }
-        });
+          this.loading = false;
+        },
+        error: (error) => {
+          this.snackbar.error(error?.error?.message || 'Failed to create return');
+          this.loading = false;
+        }
+      });
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  close(): void {
+    this.modalService.close();
+    this.returnForm.reset();
+    this.initForm();
   }
 } 

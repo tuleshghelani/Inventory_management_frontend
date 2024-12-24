@@ -10,6 +10,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { PowderCoatingReturn } from '../../../models/powder-coating.model';
 import { ReturnModalComponent } from '../return-modal/return-modal.component';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-add-powder-coating-process',
@@ -47,7 +48,8 @@ export class AddPowderCoatingProcessComponent implements OnInit {
     private productService: ProductService,
     private customerService: CustomerService,
     private powderCoatingService: PowderCoatingService,
-    private snackbar: SnackbarService
+    private snackbar: SnackbarService,
+    private modalService: ModalService
   ) {
     this.initializeForm();
     this.processId = this.route.snapshot.params['id'];
@@ -252,7 +254,7 @@ export class AddPowderCoatingProcessComponent implements OnInit {
 
   openReturnModal(): void {
     if (this.processId && this.returnModal) {
-      this.returnModal.open(this.processId);
+      this.modalService.open('return', this.processId);
     } else {
       this.snackbar.error('Unable to open return modal');
     }

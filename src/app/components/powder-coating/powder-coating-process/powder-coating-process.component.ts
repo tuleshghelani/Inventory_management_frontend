@@ -11,6 +11,7 @@ import { PowderCoatingProcess } from '../../../models/powder-coating.model';
 import { RouterLink } from '@angular/router';
 import { CustomerService } from '../../../services/customer.service';
 import { ReturnModalComponent } from '../return-modal/return-modal.component';
+import { ModalService } from '../../../services/modal.service';
 
 @Component({
   selector: 'app-powder-coating-process',
@@ -53,7 +54,8 @@ export class PowderCoatingProcessComponent implements OnInit {
     private categoryService: CategoryService,
     private fb: FormBuilder,
     private snackbar: SnackbarService,
-    private customerService: CustomerService
+    private customerService: CustomerService,
+    private modalService: ModalService
   ) {
     this.initializeForm();
   }
@@ -241,10 +243,6 @@ export class PowderCoatingProcessComponent implements OnInit {
   
 
   openReturnModal(processId: number): void {
-    if (processId && this.returnModal) {
-      this.returnModal.open(processId);
-    } else {
-      this.snackbar.error('Unable to open return modal');
-    }
+    this.modalService.open('return', processId);
   }
 }

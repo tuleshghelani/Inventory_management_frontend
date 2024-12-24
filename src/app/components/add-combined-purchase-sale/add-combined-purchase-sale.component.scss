@@ -109,6 +109,16 @@
       margin-left: 4px;
     }
   }
+
+  .input-group {
+    input[formControlName="purchaseUnitPrice"] {
+      transition: background-color 0.3s ease;
+      
+      &.auto-filled {
+        animation: highlight-background 1s ease;
+      }
+    }
+  }
 }
 
 .product-select-group {
@@ -390,4 +400,39 @@
 .sale-section {
 //   border: 2px solid var(--primary) !important;
   border-radius: var(--border-radius);
+}
+
+.input-group {
+  input[formControlName="purchaseUnitPrice"] {
+    transition: all 0.3s ease;
+    
+    &.ng-touched:not(:focus) {
+      background-color: rgba(var(--primary-rgb), 0.05);
+    }
+  }
+}
+
+@keyframes highlight {
+  0% {
+    background-color: rgba(var(--primary-rgb), 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.auto-filled {
+  animation: highlight 1s ease;
+}
+
+@keyframes highlight-background {
+  0% {
+    background-color: rgba(var(--primary-rgb), 0.1);
+  }
+  50% {
+    background-color: rgba(var(--primary-rgb), 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
