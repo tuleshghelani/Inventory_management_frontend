@@ -9,6 +9,7 @@ import { SearchableSelectComponent } from '../../../shared/components/searchable
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { PowderCoatingProcess } from '../../../models/powder-coating.model';
 import { RouterLink } from '@angular/router';
+import { CustomerService } from '../../../services/customer.service';
 
 @Component({
   selector: 'app-powder-coating-process',
@@ -31,6 +32,8 @@ export class PowderCoatingProcessComponent implements OnInit {
   searchForm!: FormGroup;
   isLoading = false;
   isLoadingProducts = false;
+  customers: any[] = [];
+  isLoadingCustomers = false;
 
   // Pagination
   currentPage = 0;
@@ -46,7 +49,8 @@ export class PowderCoatingProcessComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private fb: FormBuilder,
-    private snackbar: SnackbarService
+    private snackbar: SnackbarService,
+    private customerService: CustomerService
   ) {
     this.initializeForm();
   }
@@ -54,6 +58,7 @@ export class PowderCoatingProcessComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadProcesses();
+    this.loadCustomers();
   }
 
   private initializeForm(): void {
@@ -195,5 +200,38 @@ export class PowderCoatingProcessComponent implements OnInit {
     this.searchForm.reset();
     this.currentPage = 0;
     this.loadProcesses();
+  }
+
+  loadCustomers(): void {
+    this.isLoadingCustomers = true;
+    this.customerService.getCustomers({ status: 'A' }).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.customers = response.data;
+        }
+        this.isLoadingCustomers = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load customers');
+        this.isLoadingCustomers = false;
+      }
+    });
+  }
+
+  refreshCustomers(): void {
+    this.isLoadingCustomers = true;
+    this.customerService.refreshCustomers().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.customers = response.data;
+          this.snackbar.success('Customers refreshed successfully');
+        }
+        this.isLoadingCustomers = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to refresh customers');
+        this.isLoadingCustomers = false;
+      }
+    });
   }
 }
