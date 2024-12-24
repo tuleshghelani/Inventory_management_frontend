@@ -12,6 +12,7 @@ import { CustomerComponent } from './components/customer/customer.component';
 import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
 import { PowderCoatingProcessComponent } from './components/powder-coating/powder-coating-process/powder-coating-process.component';
 import { AddPowderCoatingProcessComponent } from './components/powder-coating/add-powder-coating-process/add-powder-coating-process.component';
+import { TransportComponent } from './components/transport/transport.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -69,6 +70,11 @@ const routes: Routes = [
     path: 'powder-coating-process/edit/:id',
     component: AddPowderCoatingProcessComponent,
     title: 'Edit Powder Coating Process'
+  },
+  {
+    path: 'transport',
+    component: TransportComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: '**',

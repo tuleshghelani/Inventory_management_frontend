@@ -144,8 +144,10 @@
     cursor: pointer;
     transition: all 0.3s ease;
 
-    &:hover:not(:disabled) {
-      background: var(--primary-dark);
+    &:hover:not(:disabled) {      
+      background: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
     }
 
     &:disabled {
