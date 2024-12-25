@@ -33,7 +33,6 @@
             <i class="fas fa-tag"></i> Unit Price <span class="required">*</span>
           </label>
           <div class="input-group">
-            <span class="input-group-text">₹</span>
             <input 
               type="number" 
               id="unitPrice" 
@@ -76,7 +75,6 @@
             <i class="fas fa-coins"></i> Other Expenses
           </label>
           <div class="input-group">
-            <span class="input-group-text">₹</span>
             <input 
               type="number" 
               id="otherExpenses" 
@@ -84,6 +82,58 @@
               class="form-control"
               min="0"
               step="0.01"
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="discount-group">
+        <div class="form-group">
+          <label for="discount">
+            <i class="fas fa-percent"></i> Discount Percentage
+          </label>
+          <div class="input-group">
+            <input 
+              type="number" 
+              id="discount" 
+              formControlName="discount" 
+              class="form-control"
+              [class.is-invalid]="saleForm.get('discount')?.invalid && saleForm.get('discount')?.touched"
+              min="0"
+              max="100"
+              step="0.01"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="discountAmount">
+            <i class="fas fa-tags"></i> Discount Amount
+          </label>
+          <div class="input-group">
+            <input 
+              type="number" 
+              id="discountAmount" 
+              formControlName="discountAmount" 
+              class="form-control"
+              [class.is-invalid]="saleForm.get('discountAmount')?.invalid && saleForm.get('discountAmount')?.touched"
+              min="0"
+              step="0.01"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="discountedPrice">
+            <i class="fas fa-calculator"></i> Final Price
+          </label>
+          <div class="input-group">
+            <input 
+              type="number" 
+              id="discountedPrice" 
+              formControlName="discountedPrice" 
+              class="form-control"
+              readonly
             >
           </div>
         </div>

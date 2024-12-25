@@ -1,4 +1,6 @@
 <div class="profit-container">
+    <app-loader [show]="isLoading"></app-loader>
+    
     <div class="search-section card">
         <h2>Search Profits</h2>
         <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
@@ -64,7 +66,7 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>#</th>
                         <th>Product Name</th>
                         <th>Sale Invoice</th>
                         <th>Sale Amount</th>
@@ -77,8 +79,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let profit of profits?.content">
-                        <td>{{profit.id}}</td>
+                    <tr *ngFor="let profit of profits?.content; let index = index">
+                        <td>{{startIndex + index + 1}}</td>
                         <td>{{profit.productName}}</td>
                         <td>{{profit.saleInvoice}}</td>
                         <td>{{profit.saleAmount}}</td>

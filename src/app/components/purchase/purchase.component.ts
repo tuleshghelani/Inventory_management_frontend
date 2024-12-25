@@ -69,8 +69,9 @@ export class PurchaseComponent implements OnInit {
   private initializeForm(): void {
     this.searchForm = this.fb.group({
       search: [''],
-      categoryId: [''],
-      productId: ['']
+      productId: [''],
+      startDate: [''],
+      endDate: ['']
     });
   }
 
@@ -193,5 +194,11 @@ export class PurchaseComponent implements OnInit {
         this.isLoadingProducts = false;
       }
     });
+  }
+
+  resetForm(): void {
+    this.searchForm.reset();
+    this.currentPage = 0;
+    this.loadPurchases();
   }
 }

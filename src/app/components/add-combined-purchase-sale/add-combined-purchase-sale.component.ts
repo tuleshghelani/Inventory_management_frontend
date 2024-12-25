@@ -7,6 +7,15 @@ import { LoaderComponent } from '../../shared/components/loader/loader.component
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 import { ProductService } from '../../services/product.service';
 import { CombinedPurchaseSaleService } from '../../services/combined-purchase-sale.service';
+
+interface DiscountCalculation {
+  quantity: number;
+  unitPrice: number;
+  discountPercentage: number;
+  discountAmount: number;
+  finalPrice: number;
+}
+
 @Component({
  selector: 'app-add-combined-purchase-sale',
  standalone: true,
@@ -38,7 +47,6 @@ export class AddCombinedPurchaseSaleComponent implements OnInit {
    this.loadProducts();
  }
   private initForm() {
-   // Get current date in local timezone
    const now = new Date();
    const localISOString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
      .toISOString()
@@ -53,8 +61,19 @@ export class AddCombinedPurchaseSaleComponent implements OnInit {
      saleUnitPrice: ['', [Validators.required, Validators.min(0.01)]],
      saleDate: [localISOString, Validators.required],
      saleInvoiceNumber: [''],
-     saleOtherExpenses: [0, [Validators.required, Validators.min(0)]]
+     saleOtherExpenses: [0, [Validators.required, Validators.min(0)]],
+     purchaseDiscount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+     purchaseDiscountAmount: [0, [Validators.required, Validators.min(0)]],
+     purchaseDiscountedPrice: [{ value: 0, disabled: true }],
+     
+     saleDiscount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+     saleDiscountAmount: [0, [Validators.required, Validators.min(0)]],
+     saleDiscountedPrice: [{ value: 0, disabled: true }]
    });
+
+   // Setup value change subscriptions
+   this.setupPurchaseDiscountCalculation();
+   this.setupSaleDiscountCalculation();
  }
   private loadProducts(): void {
    this.isLoadingProducts = true;
@@ -90,23 +109,38 @@ export class AddCombinedPurchaseSaleComponent implements OnInit {
   onSubmit() {
    if (this.combinedForm.valid) {
      this.loading = true;
-     const formData = this.combinedForm.value;
+     const formData = {...this.combinedForm.value};
      
      // Format dates
      ['purchaseDate', 'saleDate'].forEach(dateField => {
        if (formData[dateField]) {
-         const date = new Date(formData[dateField]);
-         formData[dateField] = date.toLocaleString('en-GB', {
-           day: '2-digit',
-           month: '2-digit',
-           year: 'numeric',
-           hour: '2-digit',
-           minute: '2-digit',
-           second: '2-digit'
-         }).replace(/\//g, '-').replace(',', '');
+         try {
+           const date = new Date(formData[dateField]);
+           if (!isNaN(date.getTime())) { // Check if date is valid
+             formData[dateField] = date.toLocaleString('en-GB', {
+               day: '2-digit',
+               month: '2-digit',
+               year: 'numeric',
+               hour: '2-digit',
+               minute: '2-digit',
+               second: '2-digit'
+             }).replace(/\//g, '-').replace(',', '');
+           } else {
+             this.snackbar.error(`Invalid ${dateField} format`);
+             this.loading = false;
+             return;
+           }
+         } catch (error) {
+           this.snackbar.error(`Invalid ${dateField} format`);
+           this.loading = false;
+           return;
+         }
        }
      });
-      this.combinedService.createCombinedPurchaseSale(formData).subscribe({
+
+     if (!this.loading) return; // Stop if date validation failed
+     
+     this.combinedService.createCombinedPurchaseSale(formData).subscribe({
        next: (response:any) => {
          this.snackbar.success('Combined purchase and sale created successfully');
          this.resetForm();
@@ -124,11 +158,18 @@ export class AddCombinedPurchaseSaleComponent implements OnInit {
    const localISOString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
      .toISOString()
      .slice(0, 16);
-    this.combinedForm.reset({
+
+   this.combinedForm.reset({
      purchaseDate: localISOString,
      saleDate: localISOString,
      purchaseOtherExpenses: 0,
-     saleOtherExpenses: 0
+     saleOtherExpenses: 0,
+     purchaseDiscount: 0,
+     purchaseDiscountAmount: 0,
+     purchaseDiscountedPrice: 0,
+     saleDiscount: 0,
+     saleDiscountAmount: 0,
+     saleDiscountedPrice: 0
    });
  }
   isFieldInvalid(fieldName: string): boolean {
@@ -156,5 +197,75 @@ export class AddCombinedPurchaseSaleComponent implements OnInit {
         }
       }
     });
+  }
+
+  private setupPurchaseDiscountCalculation() {
+    const purchaseFields = ['quantity', 'purchaseUnitPrice', 'purchaseDiscount', 'purchaseDiscountAmount'];
+    purchaseFields.forEach(field => {
+      this.combinedForm.get(field)?.valueChanges.subscribe(() => {
+        this.calculatePurchaseDiscount();
+      });
+    });
+  }
+
+  private setupSaleDiscountCalculation() {
+    const saleFields = ['quantity', 'saleUnitPrice', 'saleDiscount', 'saleDiscountAmount'];
+    saleFields.forEach(field => {
+      this.combinedForm.get(field)?.valueChanges.subscribe(() => {
+        this.calculateSaleDiscount();
+      });
+    });
+  }
+
+  private calculateDiscount(values: DiscountCalculation): DiscountCalculation {
+    const totalPrice = values.quantity * values.unitPrice;
+    
+    // If discount amount is manually changed, use it directly
+    if (values.discountAmount > 0) {
+      values.finalPrice = totalPrice - values.discountAmount;
+      values.discountPercentage = (values.discountAmount / totalPrice) * 100;
+    } else if (values.discountPercentage > 0) {
+      // Calculate discount amount from percentage
+      values.discountAmount = (totalPrice * values.discountPercentage) / 100;
+      values.finalPrice = totalPrice - values.discountAmount;
+    } else {
+      values.finalPrice = totalPrice;
+    }
+    
+    return values;
+  }
+
+  private calculatePurchaseDiscount(): void {
+    const values = {
+      quantity: this.combinedForm.get('quantity')?.value || 0,
+      unitPrice: this.combinedForm.get('purchaseUnitPrice')?.value || 0,
+      discountPercentage: this.combinedForm.get('purchaseDiscount')?.value || 0,
+      discountAmount: this.combinedForm.get('purchaseDiscountAmount')?.value || 0,
+      finalPrice: 0
+    };
+
+    const result = this.calculateDiscount(values);
+    this.combinedForm.patchValue({
+      purchaseDiscountAmount: result.discountAmount,
+      purchaseDiscount: result.discountPercentage,
+      purchaseDiscountedPrice: result.finalPrice
+    }, { emitEvent: false });
+  }
+
+  private calculateSaleDiscount(): void {
+    const values = {
+      quantity: this.combinedForm.get('quantity')?.value || 0,
+      unitPrice: this.combinedForm.get('saleUnitPrice')?.value || 0,
+      discountPercentage: this.combinedForm.get('saleDiscount')?.value || 0,
+      discountAmount: this.combinedForm.get('saleDiscountAmount')?.value || 0,
+      finalPrice: 0
+    };
+
+    const result = this.calculateDiscount(values);
+    this.combinedForm.patchValue({
+      saleDiscountAmount: result.discountAmount,
+      saleDiscount: result.discountPercentage,
+      saleDiscountedPrice: result.finalPrice
+    }, { emitEvent: false });
   }
 }

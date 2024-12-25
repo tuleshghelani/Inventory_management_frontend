@@ -1,32 +1,87 @@
 .purchase-container {
     padding: 2rem;
-    // max-width: 1200px;
-    margin: 0 auto;
     position: relative;
     min-height: 200px;
+    background-color: var(--background);
+  
+    .card {
+      background: white;
+      border-radius: 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+  
+      h2 {
+        margin-bottom: 20px;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+      }
+    }
   
     .search-section {
-      margin-bottom: 2rem;
-  
       .search-controls {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
         align-items: flex-start;
   
-        .form-group {
-          flex: 1;
-          min-width: 0;
+        @media (max-width: 768px) {
+          grid-template-columns: 1fr;
+        }
   
-          input.form-control,
-          app-searchable-select {
-            // height: 42px;
+        .form-group {
+          margin: 0;
+  
+          .product-select-group {
+            display: flex;
+            gap: 0.5rem;
+  
+            app-searchable-select {
+              flex: 1;
+            }
+  
+            .btn-icon {
+              width: 42px;
+              padding: 0;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border: 1px solid var(--border-color);
+              border-radius: var(--border-radius);
+              background: var(--primary);
+  
+              &:hover:not(:disabled) {
+                background: var(--primary);
+              }
+  
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+            }
           }
         }
   
-        button {
-          height: 42px;
-          white-space: nowrap;
-          padding: 0 1.5rem;
+        .button-group {
+          display: flex;
+          gap: 0.5rem;
+  
+          @media (max-width: 768px) {
+            grid-column: 1 / -1;
+          }
+  
+          button {
+            flex: 1;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+  
+            i {
+              font-size: 1rem;
+            }
+          }
         }
       }
     }
@@ -146,6 +201,8 @@
       }
     }
   }
+
+  
   
   @media (max-width: 576px) {
     .pagination-container {
@@ -294,9 +351,9 @@
   
     .btn-icon.refresh {
       background-color: var(--background);
-      color: var(--primary);
+      color: white;
       width: 42px;
-      height: 42px;
+      height: 35px;
       border-radius: 6px;
       transition: all 0.2s ease;
   

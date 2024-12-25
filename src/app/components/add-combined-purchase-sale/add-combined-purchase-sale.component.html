@@ -73,7 +73,6 @@
                     <i class="fas fa-tag"></i> Purchase Unit Price <span class="required">*</span>
                   </label>
                   <div class="input-group">
-                    <span class="input-group-text">₹</span>
                     <input 
                       type="number" 
                       id="purchaseUnitPrice" 
@@ -119,7 +118,6 @@
                     <i class="fas fa-coins"></i> Purchase Other Expenses
                   </label>
                   <div class="input-group">
-                    <span class="input-group-text">₹</span>
                     <input 
                       type="number" 
                       id="purchaseOtherExpenses" 
@@ -128,6 +126,59 @@
                       min="0"
                       step="0.01"
                     >
+                  </div>
+                </div>
+
+                <!-- Purchase Discount Section -->
+                <div class="discount-group">
+                  <div class="form-group">
+                    <label for="purchaseDiscount">
+                      <i class="fas fa-percent"></i> Discount Percentage
+                    </label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="purchaseDiscount" 
+                        formControlName="purchaseDiscount" 
+                        class="form-control"
+                        [class.is-invalid]="isFieldInvalid('purchaseDiscount')"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                      >
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="purchaseDiscountAmount">
+                      <i class="fas fa-tags"></i> Discount Amount
+                    </label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="purchaseDiscountAmount" 
+                        formControlName="purchaseDiscountAmount" 
+                        class="form-control"
+                        [class.is-invalid]="isFieldInvalid('purchaseDiscountAmount')"
+                        min="0"
+                        step="0.01"
+                      >
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="purchaseDiscountedPrice">
+                      <i class="fas fa-calculator"></i> Final Price
+                    </label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="purchaseDiscountedPrice" 
+                        formControlName="purchaseDiscountedPrice" 
+                        class="form-control"
+                        readonly
+                      >
+                    </div>
                   </div>
                 </div>
               </div>
@@ -145,7 +196,6 @@
                     <i class="fas fa-tag"></i> Sale Unit Price <span class="required">*</span>
                   </label>
                   <div class="input-group">
-                    <span class="input-group-text">₹</span>
                     <input 
                       type="number" 
                       id="saleUnitPrice" 
@@ -191,7 +241,6 @@
                     <i class="fas fa-coins"></i> Sale Other Expenses
                   </label>
                   <div class="input-group">
-                    <span class="input-group-text">₹</span>
                     <input 
                       type="number" 
                       id="saleOtherExpenses" 
@@ -200,6 +249,59 @@
                       min="0"
                       step="0.01"
                     >
+                  </div>
+                </div>
+
+                <!-- Sale Discount Section -->
+                <div class="discount-group">
+                  <div class="form-group">
+                    <label for="saleDiscount">
+                      <i class="fas fa-percent"></i> Discount Percentage
+                    </label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="saleDiscount" 
+                        formControlName="saleDiscount" 
+                        class="form-control"
+                        [class.is-invalid]="isFieldInvalid('saleDiscount')"
+                        min="0"
+                        max="100"
+                        step="0.01"
+                      >
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="saleDiscountAmount">
+                      <i class="fas fa-tags"></i> Discount Amount
+                    </label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="saleDiscountAmount" 
+                        formControlName="saleDiscountAmount" 
+                        class="form-control"
+                        [class.is-invalid]="isFieldInvalid('saleDiscountAmount')"
+                        min="0"
+                        step="0.01"
+                      >
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="saleDiscountedPrice">
+                      <i class="fas fa-calculator"></i> Final Price
+                    </label>
+                    <div class="input-group">
+                      <input 
+                        type="number" 
+                        id="saleDiscountedPrice" 
+                        formControlName="saleDiscountedPrice" 
+                        class="form-control"
+                        readonly
+                      >
+                    </div>
                   </div>
                 </div>
               </div>

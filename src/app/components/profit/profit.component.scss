@@ -1,5 +1,7 @@
 .profit-container {
     padding: 2rem;
+    position: relative;
+    min-height: 200px;
     background-color: var(--background);
     // width: 100%;
 
@@ -25,7 +27,7 @@
         .search-controls {
             display: flex;
             gap: 10px;
-            align-items: center;
+            align-items: baseline;
 
             .form-group {
                 flex: 1;

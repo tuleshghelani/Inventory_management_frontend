@@ -140,7 +140,6 @@
         transition: all 0.3s ease;
 
         .select-trigger {
-          height: 42px;
         }
       }
     }
@@ -150,7 +149,6 @@
     background-color: var(--background);
     color: var(--primary);
     width: 42px;
-    height: 42px;
     border-radius: 6px;
     transition: all 0.2s ease;
     flex-shrink: 0;
@@ -441,5 +439,37 @@
   }
   100% {
     background-color: transparent;
+  }
+}
+
+.discount-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group {
+    margin-bottom: 0;
+    
+    .input-group {
+      .form-control {
+        
+        &:read-only {
+          background-color: var(--background-light);
+          cursor: not-allowed;
+        }
+      }
+      
+      .input-group-text {
+        min-width: 40px;
+        justify-content: center;
+      }
+    }
   }
 }

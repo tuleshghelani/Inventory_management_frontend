@@ -232,3 +232,53 @@
     }
   }
 }
+
+.discount-group {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background-color: var(--background-light);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+
+  .form-group {
+    margin: 0;
+    
+    .input-group {
+      display: flex;
+      align-items: center;
+      
+      .input-group-text {
+        min-width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--background);
+        border: 1px solid var(--border-color);
+        border-right: none;
+        border-radius: var(--border-radius) 0 0 var(--border-radius);
+      }
+
+      .form-control {
+        flex: 1;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        
+        &:read-only {
+          background-color: var(--background-light);
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}

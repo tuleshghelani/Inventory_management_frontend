@@ -76,7 +76,6 @@ export class AddPurchaseComponent implements OnInit {
   }
 
   private initForm() {
-    // Get current date in local timezone
     const now = new Date();
     const localISOString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
       .toISOString()
@@ -88,8 +87,50 @@ export class AddPurchaseComponent implements OnInit {
       unitPrice: ['', [Validators.required, Validators.min(0.01)]],
       purchaseDate: [localISOString, Validators.required],
       invoiceNumber: ['', Validators.required],
-      otherExpenses: [0, [Validators.required, Validators.min(0)]]
+      otherExpenses: [0, [Validators.required, Validators.min(0)]],
+      discount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      discountAmount: [0, [Validators.required, Validators.min(0)]],
+      discountedPrice: [{ value: 0, disabled: true }]
     });
+
+    this.setupDiscountCalculation();
+  }
+
+  private setupDiscountCalculation() {
+    const fields = ['quantity', 'unitPrice', 'discount', 'discountAmount'];
+    fields.forEach(field => {
+      this.purchaseForm.get(field)?.valueChanges.subscribe(() => {
+        this.calculateDiscount();
+      });
+    });
+  }
+
+  private calculateDiscount(): void {
+    const values = {
+      quantity: this.purchaseForm.get('quantity')?.value || 0,
+      unitPrice: this.purchaseForm.get('unitPrice')?.value || 0,
+      discountPercentage: this.purchaseForm.get('discount')?.value || 0,
+      discountAmount: this.purchaseForm.get('discountAmount')?.value || 0,
+      finalPrice: 0
+    };
+
+    const totalPrice = values.quantity * values.unitPrice;
+    
+    if (values.discountAmount > 0) {
+      values.finalPrice = totalPrice - values.discountAmount;
+      values.discountPercentage = (values.discountAmount / totalPrice) * 100;
+    } else if (values.discountPercentage > 0) {
+      values.discountAmount = (totalPrice * values.discountPercentage) / 100;
+      values.finalPrice = totalPrice - values.discountAmount;
+    } else {
+      values.finalPrice = totalPrice;
+    }
+
+    this.purchaseForm.patchValue({
+      discountAmount: values.discountAmount,
+      discount: values.discountPercentage,
+      discountedPrice: values.finalPrice
+    }, { emitEvent: false });
   }
 
   isFieldInvalid(fieldName: string): boolean {

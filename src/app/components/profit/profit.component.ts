@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ProfitService } from '../../services/profit.service';
+import { LoaderComponent } from '../../shared/components/loader/loader.component';
 
 interface ProfitResponse {
   success: boolean;
@@ -31,7 +32,12 @@ interface Profit {
   selector: 'app-profit',
   templateUrl: './profit.component.html',
   styleUrls: ['./profit.component.scss'],
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [
+    CommonModule, 
+    ReactiveFormsModule, 
+    FormsModule,
+    LoaderComponent
+  ],
   standalone: true
 })
 export class ProfitComponent implements OnInit {
@@ -44,6 +50,7 @@ export class ProfitComponent implements OnInit {
   totalElements = 0;
   startIndex = 0;
   endIndex = 0;
+  isLoading = false;
 
   constructor(
     private profitService: ProfitService,
@@ -75,6 +82,7 @@ export class ProfitComponent implements OnInit {
   }
 
   onSearch() {
+    this.isLoading = true;
     const formValues = this.searchForm.value;
     
     const params: any = {
@@ -99,9 +107,11 @@ export class ProfitComponent implements OnInit {
         this.profits = response.data;
         this.totalElements = response.data.totalElements;
         this.updatePaginationIndexes();
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading profits:', error);
+        this.isLoading = false;
       }
     });
   }
@@ -112,6 +122,7 @@ export class ProfitComponent implements OnInit {
   }
 
   loadProfits() {
+    this.isLoading = true;
     const formValues = this.searchForm.value;
     
     const params: any = {
@@ -119,12 +130,10 @@ export class ProfitComponent implements OnInit {
       size: this.pageSize,
     };
 
-    // Only add search if it's not empty
     if (formValues.search?.trim()) {
       params.search = formValues.search.trim();
     }
 
-    // Only add dates if they are selected
     if (formValues.startDate) {
       params.startDate = this.formatDateForApi(formValues.startDate, true);
     }
@@ -138,9 +147,11 @@ export class ProfitComponent implements OnInit {
         this.profits = response.data;
         this.totalElements = response.data.totalElements;
         this.updatePaginationIndexes();
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error loading profits:', error);
+        this.isLoading = false;
       }
     });
   }
