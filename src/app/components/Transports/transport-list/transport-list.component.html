@@ -81,8 +81,11 @@
             <td>{{ transport.customerName }}</td>
             <td>{{ transport.createdAt | date:'medium' }}</td>
             <td class="actions">
-              <button class="btn-icon" [routerLink]="['/transports', transport.id]" title="View Details">
+              <button class="btn-icon" [routerLink]="['/transport', transport.id]" title="View Details">
                 <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-icon" [routerLink]="['/transport/edit', transport.id]" title="Edit Transport">
+                <i class="fas fa-edit"></i>
               </button>
             </td>
           </tr>

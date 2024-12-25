@@ -23,9 +23,9 @@ export class TransportService {
     return this.http.get(`${this.apiUrl}/${id}`);
   }
 
-  updateTransport(id: number, data: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, data);
-  }
+  // updateTransport(id: number, data: any): Observable<any> {
+  //   return this.http.put(`${this.apiUrl}/${id}`, data);
+  // }
 
   deleteTransport(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
@@ -33,5 +33,13 @@ export class TransportService {
 
   searchTransports(params: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/search`, params );
+  }
+
+  getTransportDetail(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/detail`, { id });
+  }
+
+  updateTransport(data: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update`, data);
   }
 } 

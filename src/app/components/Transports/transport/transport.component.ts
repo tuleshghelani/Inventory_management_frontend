@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../services/product.service';
 import { CustomerService } from '../../../services/customer.service';
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
@@ -36,15 +36,26 @@ export class TransportComponent implements OnInit {
   showDeleteItemModal = false;
   deleteBagIndex: number | null = null;
   deleteItemIndices: { bagIndex: number; itemIndex: number } | null = null;
+  transportId: number | null = null;
+  isEditMode = false;
 
   constructor(
     private fb: FormBuilder,
+    private route: ActivatedRoute,
+    private router: Router,
     private productService: ProductService,
     private customerService: CustomerService,
     private transportService: TransportService,
     private snackbar: SnackbarService
   ) {
     this.initializeForm();
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.transportId = +params['id'];
+        this.isEditMode = true;
+        this.loadTransportDetail();
+      }
+    });
   }
 
   ngOnInit(): void {
@@ -134,6 +145,10 @@ export class TransportComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.products = response.data;
+          // If in edit mode, populate the form after products are loaded
+          if (this.isEditMode && this.transportId) {
+            this.loadTransportDetail();
+          }
         }
         this.isLoadingProducts = false;
       },
@@ -248,21 +263,43 @@ export class TransportComponent implements OnInit {
     
     if (validation.isValid) {
       this.loading = true;
-      this.transportService.createTransport(this.transportForm.value).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.snackbar.success('Transport created successfully');
-            this.resetForm();
+      const formData = this.transportForm.value;
+
+      // Add transportId for update operation
+      if (this.isEditMode && this.transportId) {
+        formData.id = this.transportId;
+        this.transportService.updateTransport(formData).subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.snackbar.success('Transport updated successfully');
+              this.resetForm();
+            }
+            this.loading = false;
+            if(this.isEditMode) {
+              this.router.navigate(['/transport']);
+            }
+          },
+          error: (error) => {
+            this.snackbar.error(error?.error?.message || 'Failed to update transport');
+            this.loading = false;
           }
-          this.loading = false;
-        },
-        error: (error) => {
-          this.snackbar.error(error?.error?.message || 'Failed to create transport');
-          this.loading = false;
-        }
-      });
+        });
+      } else {
+        this.transportService.createTransport(formData).subscribe({
+          next: (response) => {
+            if (response.success) {
+              this.snackbar.success('Transport created successfully');
+              this.resetForm();
+            }
+            this.loading = false;
+          },
+          error: (error) => {
+            this.snackbar.error(error?.error?.message || 'Failed to create transport');
+            this.loading = false;
+          }
+        });
+      }
     } else {
-      // Show all validation errors
       validation.errors.forEach(error => {
         this.snackbar.error(error);
       });
@@ -323,5 +360,76 @@ export class TransportComponent implements OnInit {
     this.showDeleteItemModal = false;
     this.deleteBagIndex = null;
     this.deleteItemIndices = null;
+  }
+  private loadTransportDetail(): void {
+    if (!this.transportId) return;
+    
+    this.loading = true;
+    this.transportService.getTransportDetail(this.transportId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.populateForm(response.data);
+        }
+        this.loading = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to load transport details');
+        this.loading = false;
+      }
+    });
+  }
+
+  private populateForm(data: any): void {
+    if (!this.products.length) {
+      this.snackbar.error('Products not loaded yet');
+      return;
+    }
+
+    // Clear existing bags
+    while (this.bags.length) {
+      this.bags.removeAt(0);
+    }
+
+    // Set customer
+    this.transportForm.patchValue({
+      customerId: data.customerId
+    });
+
+    // Add bags and their items
+    data.bags.forEach((bag: any) => {
+      const bagGroup = this.fb.group({
+        weight: [bag.weight, [Validators.required, Validators.min(0.01)]],
+        items: this.fb.array([])
+      });
+
+      const items = JSON.parse(bag.items);
+      const itemsArray = bagGroup.get('items') as FormArray;
+
+      items.forEach((item: any) => {
+        // Convert productId to number by removing quotes and using parseInt
+        const productId = parseInt(item.productId.toString().replace(/"/g, ''), 10);
+        
+        // Find the product in the products array
+        const product = this.products.find(p => p.id === productId);
+        
+        if (!product) {
+          console.warn(`Product with ID ${productId} not found`);
+        }
+
+        // Create form group with product selection
+        const itemGroup = this.fb.group({
+          productId: [productId, [Validators.required]],
+          quantity: [item.quantity, [Validators.required, Validators.min(1)]],
+          remarks: [item.remarks || '']
+        });
+
+        itemsArray.push(itemGroup);
+      });
+
+      this.bags.push(bagGroup);
+    });
+
+    // Trigger change detection
+    this.transportForm.updateValueAndValidity();
   }
 }

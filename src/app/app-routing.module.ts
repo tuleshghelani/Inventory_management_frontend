@@ -83,6 +83,11 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
+    path: 'transport/edit/:id',
+    component: TransportComponent,
+    canActivate: [AuthGuard]
+  },
+  {
     path: '**',
     redirectTo: '/login',
     pathMatch: 'full'
