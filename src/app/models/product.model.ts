@@ -6,7 +6,8 @@ export interface Product {
   description: string;
   minimumStock: number;
   remainingQuantity?: number;
-  amount?: number;
+  purchaseAmount?: number;
+  saleAmount?: number;
   status: 'A' | 'I';
   createdAt?: string;
   updatedAt?: string;

@@ -65,7 +65,8 @@
             <th>Min Stock</th>
             <th>Status</th>
             <th>Remaining Quantity</th>
-            <th>Amount</th>
+            <th>Purchase Amount</th>
+            <th>Sale Amount</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -82,7 +83,8 @@
               </span>
             </td>
             <td>{{ product.remainingQuantity }}</td>
-            <td>{{ product.amount }}</td>
+            <td>{{ product.purchaseAmount }}</td>
+            <td>{{ product.saleAmount }}</td>
             <td class="actions">
               <button class="btn-icon" (click)="editProduct(product)">
                 <i class="fas fa-edit"></i>
@@ -215,13 +217,25 @@
       </div>
 
       <div class="form-group">
-        <label for="amount">
-          <i class="fas fa-rupee-sign"></i> Amount <span class="required">*</span>
+        <label for="purchaseAmount">
+          <i class="fas fa-rupee-sign"></i> Purchase Amount <span class="required">*</span>
         </label>
         <input 
           type="number" 
-          id="amount" 
-          formControlName="amount" 
+          id="purchaseAmount" 
+          formControlName="purchaseAmount" 
+          class="form-control"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="saleAmount">
+          <i class="fas fa-rupee-sign"></i> Sale Amount <span class="required">*</span>
+        </label>
+        <input 
+          type="number" 
+          id="saleAmount" 
+          formControlName="saleAmount" 
           class="form-control"
         >
       </div>
