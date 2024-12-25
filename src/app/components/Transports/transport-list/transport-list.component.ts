@@ -48,8 +48,8 @@ export class TransportListComponent implements OnInit {
   private initializeForm(): void {
     this.searchForm = this.fb.group({
       search: [''],
-      startDate: [''],
-      endDate: ['']
+      startDate: [null],
+      endDate: [null]
     });
   }
 
@@ -62,7 +62,7 @@ export class TransportListComponent implements OnInit {
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();
-    const time = isStartDate ? '00:00:00' : '23:59:59.999';
+    const time = isStartDate ? '00:00:00' : '23:59:59';
 
     return `${day}-${month}-${year} ${time}`;
   }
@@ -74,8 +74,8 @@ export class TransportListComponent implements OnInit {
     const params = {
       currentPage: this.currentPage,
       perPageRecord: this.pageSize,
-      startDate: formValues.startDate ? this.formatDateForApi(formValues.startDate, true) : '',
-      endDate: formValues.endDate ? this.formatDateForApi(formValues.endDate, false) : '',
+      startDate: formValues.startDate ? this.formatDateForApi(formValues.startDate, true) : null,
+      endDate: formValues.endDate ? this.formatDateForApi(formValues.endDate, false) : null,
       search: formValues.search?.trim() || '',
       sortBy: 'id',
       sortDir: 'desc'
