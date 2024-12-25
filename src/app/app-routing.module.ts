@@ -14,6 +14,8 @@ import { PowderCoatingProcessComponent } from './components/powder-coating/powde
 import { AddPowderCoatingProcessComponent } from './components/powder-coating/add-powder-coating-process/add-powder-coating-process.component';
 import { TransportComponent } from './components/Transports/transport/transport.component';
 import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
+import { EmployeeListComponent } from './components/employee/employee-list/employee-list.component';
+import { EmployeeFormComponent } from './components/employee/employee-form/employee-form.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -85,6 +87,21 @@ const routes: Routes = [
   {
     path: 'transport/edit/:id',
     component: TransportComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'employee',
+    component: EmployeeListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'employee/create',
+    component: EmployeeFormComponent,
+    canActivate: [AuthGuard]
+  },  
+  {
+    path: 'employee/edit/:id',
+    component: EmployeeFormComponent,
     canActivate: [AuthGuard]
   },
   {
