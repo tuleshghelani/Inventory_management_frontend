@@ -37,7 +37,7 @@
             </button>
           </div>
           <div class="invalid-feedback" *ngIf="isFieldInvalid(transportForm.get('customerId'))">
-            Customer is required
+            Please select a customer
           </div>
         </div>
 
@@ -62,7 +62,7 @@
                 <button 
                   type="button" 
                   class="btn btn-danger remove-bag-btn" 
-                  (click)="removeBag(bagIndex)"
+                  (click)="onDeleteBag(bagIndex)"
                   [disabled]="bags.length === 1"
                 >
                   <i class="fas fa-trash"></i>
@@ -83,7 +83,7 @@
                     step="0.01"
                   >
                   <div class="invalid-feedback" *ngIf="isFieldInvalid(bag.get('weight'))">
-                    Weight must be greater than 0
+                    {{ getCustomErrorMessage(bag.get('weight'), 'weight') }}
                   </div>
                 </div>
               </div>
@@ -140,7 +140,9 @@
                         [class.is-invalid]="isFieldInvalid(item.get('quantity'))"
                         min="1"
                       >
-                      <div class="invalid-feedback" *ngIf="isFieldInvalid(item.get('quantity'))"></div>
+                      <div class="invalid-feedback" *ngIf="isFieldInvalid(item.get('quantity'))">
+                        {{ getCustomErrorMessage(item.get('quantity'), 'quantity') }}
+                      </div>
                     </div>
 
                     <div class="form-group">
@@ -156,7 +158,7 @@
                     <button 
                       type="button" 
                       class="btn btn-danger remove-item-btn" 
-                      (click)="removeItem(bagIndex, itemIndex)"
+                      (click)="onDeleteItem(bagIndex, itemIndex)"
                       [disabled]="getBagItems(bagIndex).length === 1"
                     >
                       <i class="fas fa-times"></i>
@@ -190,3 +192,19 @@
     </div>
   </div>
 </div>
+
+<app-confirm-modal
+  [show]="showDeleteBagModal"
+  title="Delete Bag"
+  message="Are you sure you want to delete this bag and all its items?"
+  (confirm)="confirmDeleteBag()"
+  (cancel)="cancelDelete()"
+></app-confirm-modal>
+
+<app-confirm-modal
+  [show]="showDeleteItemModal"
+  title="Delete Item"
+  message="Are you sure you want to delete this item?"
+  (confirm)="confirmDeleteItem()"
+  (cancel)="cancelDelete()"
+></app-confirm-modal>

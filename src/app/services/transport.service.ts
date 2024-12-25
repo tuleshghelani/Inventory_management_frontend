@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class TransportService {
-  private apiUrl = `${environment.apiUrl}/transport`;
+  private apiUrl = `${environment.apiUrl}/api/transport`;
 
   constructor(private http: HttpClient) {}
 
@@ -32,6 +32,6 @@ export class TransportService {
   }
 
   searchTransports(params: any): Observable<any> {
-    return this.http.get(`${this.apiUrl}/search`, { params });
+    return this.http.post(`${this.apiUrl}/search`, params );
   }
 } 

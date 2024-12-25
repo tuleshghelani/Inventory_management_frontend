@@ -114,6 +114,11 @@
 
     @media (max-width: 768px) {
       grid-template-columns: 1fr;
+      
+      .product-select-group {
+        flex-direction: row;
+        align-items: center;
+      }
     }
   }
 }
@@ -175,4 +180,18 @@
   color: #dc3545;
   font-size: 0.875rem;
   margin-top: 0.25rem;
+}
+
+.product-select-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  
+  app-searchable-select {
+    flex: 1;
+  }
+
+  .btn-icon {
+    margin-top: 0;
+  }
 }

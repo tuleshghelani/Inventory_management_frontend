@@ -12,7 +12,8 @@ import { CustomerComponent } from './components/customer/customer.component';
 import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
 import { PowderCoatingProcessComponent } from './components/powder-coating/powder-coating-process/powder-coating-process.component';
 import { AddPowderCoatingProcessComponent } from './components/powder-coating/add-powder-coating-process/add-powder-coating-process.component';
-import { TransportComponent } from './components/transport/transport.component';
+import { TransportComponent } from './components/Transports/transport/transport.component';
+import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -72,8 +73,13 @@ const routes: Routes = [
     title: 'Edit Powder Coating Process'
   },
   {
-    path: 'transport',
+    path: 'transport/create',
     component: TransportComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'transport',
+    component: TransportListComponent,
     canActivate: [AuthGuard]
   },
   {
