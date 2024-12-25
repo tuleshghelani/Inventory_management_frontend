@@ -1,102 +1,35 @@
 <div class="category-container">
+  <app-loader [show]="isLoading"></app-loader>
   <div class="search-section card">
     <h2>Search Categories</h2>
-    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-      <div class="search-controls">
-        <div class="form-group">
-          <input 
-            type="text" 
-            formControlName="search" 
-            class="form-control" 
-            placeholder="Search categories..."
-          >
-        </div>
-        <div class="form-group">
-          <select formControlName="status" class="form-control">
+    <div class="search-container">
+      <form [formGroup]="searchForm" class="search-form">
+        <div class="search-inputs">
+          <input type="text" class="form-control" placeholder="Search categories..." formControlName="search">
+          <select class="form-control" formControlName="status">
             <option value="A">Active</option>
             <option value="I">Inactive</option>
           </select>
+          <button class="btn btn-primary" (click)="onSearch()">
+            <i class="fas fa-search"></i> Search
+          </button>
         </div>
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-search"></i> Search
-        </button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
-
-  <div class="category-form card">
-    <h2>{{ isEditing ? 'Edit' : 'Create' }} Category</h2>
-    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="name">Category Name</label>
-        <input 
-          type="text" 
-          id="name" 
-          formControlName="name" 
-          class="form-control"
-          [class.is-invalid]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
-        >
-      </div>
-
-      <div class="form-group">
-        <label for="status">Status</label>
-        <select 
-          id="status" 
-          formControlName="status" 
-          class="form-control"
-        >
-          <option value="A">Active</option>
-          <option value="I">Inactive</option>
-        </select>
-      </div>
-
-      <div class="form-actions">
-        <button 
-          type="submit" 
-          class="btn btn-primary"
-          [disabled]="categoryForm.invalid || isLoading"
-        >
-          {{ isEditing ? 'Update' : 'Create' }} Category
-        </button>
-        <button 
-          type="button" 
-          class="btn btn-secondary"
-          (click)="resetForm()"
-          *ngIf="isEditing"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
-  </div>
+  <button class="btn btn-primary" (click)="openCreateDialog()">
+    <i class="fas fa-plus"></i> Create Category
+  </button>
 
   <div class="categories-list card">
     <h2>Categories</h2>
     
-    <div class="table-controls">
-      <div class="page-size-selector">
-        <label>Show entries:</label>
-        <select 
-          class="form-control" 
-          [(ngModel)]="pageSize" 
-          (change)="onPageSizeChange()"
-        >
-          <option value="5">5</option>
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
-      </div>
-    </div>
-
     <div class="table-responsive">
       <table class="table">
         <thead>
           <tr>
             <th>Name</th>
             <th>Status</th>
-            <th>Remaining Quantity</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -104,56 +37,141 @@
           <tr *ngFor="let category of categories">
             <td>{{ category.name }}</td>
             <td>
-              <span [class.badge-active]="category.status === 'A'"
-                    [class.badge-inactive]="category.status === 'I'">
+              <span [class]="'status-badge ' + (category.status === 'A' ? 'active' : 'inactive')">
                 {{ category.status === 'A' ? 'Active' : 'Inactive' }}
               </span>
             </td>
-            <td>{{ category.remainingQuantity }}</td>
-            <td class="actions">
-              <button class="btn-icon" (click)="editCategory(category)">
+            <td>
+              <button class="btn btn-icon" (click)="editCategory(category)" title="Edit">
                 <i class="fas fa-edit"></i>
               </button>
-              <button class="btn-icon delete" (click)="deleteCategory(category.id!)">
+              <button class="btn btn-icon" (click)="deleteCategory(category.id!)" title="Delete">
                 <i class="fas fa-trash"></i>
               </button>
             </td>
+          </tr>
+          <tr *ngIf="categories.length === 0">
+            <td colspan="3" class="text-center">No categories found</td>
           </tr>
         </tbody>
       </table>
     </div>
     
-    <div class="pagination-container">
-      <div class="pagination-info">
+    <div class="pagination-container" *ngIf="totalPages > 0">
+      <div class="page-info">
         Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalElements }} entries
       </div>
-      <div class="pagination">
-        <button 
-          class="btn-page" 
-          [disabled]="currentPage === 0"
-          (click)="onPageChange(currentPage - 1)"
-        >
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        
-        <ng-container *ngFor="let page of getPageNumbers()">
+      <div class="pagination-controls">
+        <div class="items-per-page">
+          <label>Show entries:</label>
+          <select class="form-control" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+          </select>
+        </div>
+        <div class="pagination">
           <button 
             class="btn-page" 
-            [class.active]="page === currentPage + 1"
-            (click)="onPageChange(page - 1)"
+            [disabled]="currentPage === 0"
+            (click)="onPageChange(currentPage - 1)"
           >
-            {{ page }}
+            <i class="fas fa-chevron-left"></i>
           </button>
-        </ng-container>
-        
-        <button 
-          class="btn-page" 
-          [disabled]="currentPage === totalPages - 1"
-          (click)="onPageChange(currentPage + 1)"
-        >
-          <i class="fas fa-chevron-right"></i>
-        </button>
+          
+          <ng-container *ngIf="totalPages <= 7">
+            <button 
+              *ngFor="let page of [].constructor(totalPages); let i = index"
+              class="btn-page" 
+              [class.active]="currentPage === i"
+              (click)="onPageChange(i)"
+            >
+              {{ i + 1 }}
+            </button>
+          </ng-container>
+
+          <ng-container *ngIf="totalPages > 7">
+            <!-- First page -->
+            <button 
+              class="btn-page" 
+              [class.active]="currentPage === 0"
+              (click)="onPageChange(0)"
+            >
+              1
+            </button>
+
+            <!-- Ellipsis if needed -->
+            <span class="ellipsis" *ngIf="currentPage > 2">...</span>
+
+            <!-- Pages around current page -->
+            <button 
+              *ngFor="let page of getVisiblePages()"
+              class="btn-page" 
+              [class.active]="currentPage === page"
+              (click)="onPageChange(page)"
+            >
+              {{ page + 1 }}
+            </button>
+
+            <!-- Ellipsis if needed -->
+            <span class="ellipsis" *ngIf="currentPage < totalPages - 3">...</span>
+
+            <!-- Last page -->
+            <button 
+              class="btn-page" 
+              [class.active]="currentPage === totalPages - 1"
+              (click)="onPageChange(totalPages - 1)"
+            >
+              {{ totalPages }}
+            </button>
+          </ng-container>
+
+          <button 
+            class="btn-page" 
+            [disabled]="currentPage === totalPages - 1"
+            (click)="onPageChange(currentPage + 1)"
+          >
+            <i class="fas fa-chevron-right"></i>
+          </button>
+        </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="dialog-backdrop" *ngIf="isDialogOpen" (click)="closeDialog()"></div>
+<div class="dialog" *ngIf="isDialogOpen" [@dialogAnimation]>
+  <div class="dialog-header">
+    <h2>{{ isEditing ? 'Edit' : 'Create' }} Category</h2>
+    <button class="close-button" (click)="closeDialog()">×</button>
+  </div>
+  <div class="dialog-content">
+    <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Category Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          class="form-control" 
+          formControlName="name" 
+          [class.is-invalid]="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched"
+        >
+        <div class="invalid-feedback" *ngIf="categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched">
+          Category name is required
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" class="form-control" formControlName="status">
+          <option value="A">Active</option>
+          <option value="I">Inactive</option>
+        </select>
+      </div>
+      <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" (click)="closeDialog()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="categoryForm.invalid || isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+          {{ isEditing ? 'Update' : 'Create' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>

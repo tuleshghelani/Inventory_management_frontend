@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
-import { Customer } from '../../models/customer.model';
+import { Customer, CustomerSearchRequest } from '../../models/customer.model';
 import { ToastrService } from 'ngx-toastr';
 import { RouterModule } from '@angular/router';
 import { CustomerModalComponent } from '../customer-modal/customer-modal.component';
@@ -46,18 +46,44 @@ export class CustomerComponent implements OnInit {
 
   private initializeForm(): void {
     this.searchForm = this.fb.group({
-      search: ['']
+      search: [''],
+      startDate: [''],
+      endDate: ['']
     });
+  }
+
+  private formatDateForApi(dateStr: string, isStartDate: boolean): string {
+    if (!dateStr) return '';
+    
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const time = isStartDate ? '00:00:00' : '23:59:59';
+
+    return `${day}-${month}-${year} ${time}`;
   }
 
   loadCustomers(): void {
     this.isLoading = true;
-    const params = {
+    const formValues = this.searchForm.value;
+    
+    const params: CustomerSearchRequest = {
       currentPage: this.currentPage,
       perPageRecord: this.pageSize,
-      search: this.searchForm.get('search')?.value
+      search: formValues.search || ''
     };
-  
+
+    // Add dates if they are selected
+    if (formValues.startDate) {
+      params.startDate = this.formatDateForApi(formValues.startDate, true);
+    }
+    if (formValues.endDate) {
+      params.endDate = this.formatDateForApi(formValues.endDate, false);
+    }
+
     this.customerService.searchCustomers(params).subscribe({
       next: (response) => {
         if (response.success) {
@@ -133,5 +159,11 @@ export class CustomerComponent implements OnInit {
         // this.loadCustomers();
       }
     });
+  }
+
+  resetForm(): void {
+    this.searchForm.reset();
+    this.currentPage = 0;
+    this.loadCustomers();
   }
 }

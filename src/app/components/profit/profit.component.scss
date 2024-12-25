@@ -1,13 +1,18 @@
 .profit-container {
-    padding: 20px;
+    padding: 2rem;
     background-color: var(--background);
+    // width: 100%;
 
     .card {
         background: white;
-        border-radius: 8px;
+        border-radius: 0;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin-bottom: 20px;
         padding: 20px;
+
+        &:first-child {
+            margin-top: 0;
+        }
 
         h2 {
             margin-bottom: 20px;
@@ -55,53 +60,15 @@
         }
     }
 
-    .table {
+    .table-responsive {
         width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-        background-color: white;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 0;
+        overflow-x: auto;
+    }
 
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--supporting);
-        }
-
-        th {
-            background-color: var(--secondary);
-            color: white;
-            font-weight: 600;
-        }
-
-        tbody tr {
-            &:hover {
-                background-color: rgba(174, 198, 207, 0.1);
-            }
-        }
-
-        .actions {
-            white-space: nowrap;
-            
-            .btn-icon {
-                padding: 6px 10px;
-                margin: 0 2px;
-                border: none;
-                border-radius: 4px;
-                background: none;
-                cursor: pointer;
-                transition: all 0.3s ease;
-
-                &:hover {
-                    background-color: var(--supporting);
-                }
-
-                i {
-                    font-size: 14px;
-                    color: var(--secondary);
-                }
-            }
-        }
+    table {
+        width: 100%;
+        margin-bottom: 0;
     }
 
     .text-success {
@@ -152,13 +119,19 @@
             }
         }
     }
+
+    @media (max-width: 768px) {
+        .card {
+            padding: 15px;
+        }
+    }
 }
 
 .form-control {
     padding: 10px;
     border: 1px solid var(--supporting);
     border-radius: 4px;
-    width: 100%;
+    // width: 100%;
     color: var(--text-primary);
     
     &:focus {

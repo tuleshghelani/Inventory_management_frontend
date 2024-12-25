@@ -2,13 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SaleService } from '../../services/sale.service';
-import { Sale } from '../../models/sale.model';
+import { Sale, SaleSearchRequest } from '../../models/sale.model';
 import { ToastrService } from 'ngx-toastr';
+import { SnackbarService } from '../../shared/services/snackbar.service';
+import { DateUtils } from '../../shared/utils/date-utils';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-sale',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
   templateUrl: './sale.component.html',
   styleUrl: './sale.component.scss'
 })
@@ -29,7 +32,8 @@ export class SaleComponent implements OnInit {
   constructor(
     private saleService: SaleService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private snackbar: SnackbarService,
+    private dateUtils: DateUtils
   ) {
     this.initializeForm();
   }
@@ -40,17 +44,51 @@ export class SaleComponent implements OnInit {
 
   private initializeForm(): void {
     this.searchForm = this.fb.group({
-      search: ['']
+      search: [''],
+      startDate: [''],
+      endDate: ['']
     });
+  }
+
+  onSearch(): void {
+    this.currentPage = 0;
+    this.loadSales();
+  }
+
+  private formatDateForApi(dateStr: string, isStartDate: boolean): string {
+    if (!dateStr) return '';
+    
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return '';
+
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const time = isStartDate ? '00:00:00' : '23:59:59';
+
+    return `${day}-${month}-${year} ${time}`;
   }
 
   loadSales(): void {
     this.isLoading = true;
-    const params = {
+    const formValues = this.searchForm.value;
+    
+    const startDate = formValues.startDate ? this.formatDateForApi(formValues.startDate, true) : '';
+    const endDate = formValues.endDate ? this.formatDateForApi(formValues.endDate, false) : '';
+    
+    const params: SaleSearchRequest = {
       currentPage: this.currentPage,
       perPageRecord: this.pageSize,
-      search: this.searchForm.get('search')?.value
+      search: formValues.search || ''
     };
+
+    // Only add dates if they are not empty
+    if (startDate) {
+      params.startDate = startDate;
+    }
+    if (endDate) {
+      params.endDate = endDate;
+    }
 
     this.saleService.searchSales(params).subscribe({
       next: (response) => {
@@ -62,15 +100,10 @@ export class SaleComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.toastr.error('Failed to load sales');
+        this.snackbar.error('Failed to load sales');
         this.isLoading = false;
       }
     });
-  }
-
-  onSearch(): void {
-    this.currentPage = 0;
-    this.loadSales();
   }
 
   onPageChange(page: number): void {
@@ -109,5 +142,36 @@ export class SaleComponent implements OnInit {
     }
 
     return pageNumbers;
+  }
+
+  deleteSale(id: number): void {
+    if (confirm('Are you sure you want to delete this sale? This action cannot be undone.')) {
+      this.isLoading = true;
+      this.saleService.deleteSale(id).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.snackbar.success('Sale deleted successfully');
+            this.loadSales();
+          } else {
+            this.snackbar.error(response.message || 'Failed to delete sale');
+            this.isLoading = false;
+          }
+        },
+        error: (error) => {
+          this.snackbar.error(error?.error?.message || 'Failed to delete sale');
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  formatDate(date: string): string {
+    return this.dateUtils.formatDate(date);
+  }
+
+  resetForm(): void {
+    this.searchForm.reset();
+    this.currentPage = 0;
+    this.loadSales();
   }
 }

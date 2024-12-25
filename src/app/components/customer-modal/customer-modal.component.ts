@@ -1,11 +1,11 @@
-import { Component, Output, EventEmitter, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
+import { Customer } from '../../models/customer.model';
 import { ToastrService } from 'ngx-toastr';
 import { ModalService } from '../../services/modal.service';
 import { map } from 'rxjs/operators';
-import { Customer } from '../../models/customer.model';
 
 @Component({
   selector: 'app-customer-modal',
@@ -15,7 +15,6 @@ import { Customer } from '../../models/customer.model';
   styleUrls: ['./customer-modal.component.scss']
 })
 export class CustomerModalComponent implements OnInit {
-  @Input() customer?: Customer;
   @Output() customerSaved = new EventEmitter<boolean>();
   
   customerForm!: FormGroup;
@@ -24,6 +23,7 @@ export class CustomerModalComponent implements OnInit {
   display$ = this.modalService.modalState$.pipe(
     map(state => state.isOpen && state.modalType === 'customer')
   );
+  currentCustomer: Customer | null = null;
   isEditing = false;
 
   constructor(
@@ -31,16 +31,22 @@ export class CustomerModalComponent implements OnInit {
     private customerService: CustomerService,
     private toastr: ToastrService,
     private modalService: ModalService
-  ) {}
+  ) {
+    this.initForm();
+  }
 
   ngOnInit() {
-    this.initForm();
     this.modalService.modalState$.subscribe(state => {
-      if (state.isOpen && state.data) {
-        this.isEditing = true;
-        this.patchForm(state.data);
-      } else {
-        this.isEditing = false;
+      if (state.isOpen && state.modalType === 'customer') {
+        if (state.data) {
+          this.currentCustomer = state.data;
+          this.isEditing = true;
+          this.patchForm(state.data);
+        } else {
+          this.currentCustomer = null;
+          this.isEditing = false;
+          this.initForm();
+        }
       }
     });
   }
@@ -52,12 +58,11 @@ export class CustomerModalComponent implements OnInit {
       .slice(0, 16);
 
     this.customerForm = this.fb.group({
-      id: [null],
       name: ['', Validators.required],
       mobile: ['', []],
       email: ['', [Validators.email]],
       gst: ['', [Validators.pattern('^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$')]],
-      address: ['',[]],
+      address: ['', []],
       remainingPaymentAmount: [0, [Validators.required, Validators.min(0)]],
       nextActionDate: [localISOString],
       remarks: [''],
@@ -71,7 +76,6 @@ export class CustomerModalComponent implements OnInit {
         .toISOString().slice(0, 16) : '';
 
     this.customerForm.patchValue({
-      id: customer.id,
       name: customer.name,
       mobile: customer.mobile,
       email: customer.email,
@@ -102,9 +106,9 @@ export class CustomerModalComponent implements OnInit {
         }).replace(/\//g, '-').replace(',', '');
       }
 
-      const request = this.isEditing ?
-        this.customerService.updateCustomer(this.customer!.id, formData) :
-        this.customerService.createCustomer(formData);
+      const request = this.isEditing && this.currentCustomer
+        ? this.customerService.updateCustomer(this.currentCustomer.id, formData)
+        : this.customerService.createCustomer(formData);
 
       request.subscribe({
         next: (response) => {
@@ -130,5 +134,18 @@ export class CustomerModalComponent implements OnInit {
     this.modalService.close();
     this.customerForm.reset();
     this.isSubmitted = false;
+    this.currentCustomer = null;
+    this.isEditing = false;
+  }
+
+  getFieldError(fieldName: string): string {
+    const control = this.customerForm.get(fieldName);
+    if (control?.errors && (control.dirty || control.touched || this.isSubmitted)) {
+      if (control.errors['required']) return `${fieldName} is required`;
+      if (control.errors['email']) return 'Invalid email format';
+      if (control.errors['pattern']) return 'Invalid format';
+      if (control.errors['min']) return `${fieldName} must be greater than or equal to ${control.errors['min'].min}`;
+    }
+    return '';
   }
 } 

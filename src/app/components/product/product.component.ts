@@ -1,15 +1,37 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { Product } from '../../models/product.model';
 import { Category } from '../../models/category.model';
 import { ToastrService } from 'ngx-toastr';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { LoaderComponent } from '../../shared/components/loader/loader.component';
+import { CommonModule } from '@angular/common';
+import { SnackbarService } from '../../shared/services/snackbar.service';
 
 @Component({
   selector: 'app-product',
   templateUrl: './product.component.html',
-  styleUrls: ['./product.component.scss']
+  styleUrls: ['./product.component.scss'],
+  standalone: true,
+  imports: [
+    LoaderComponent,
+    FormsModule,
+    ReactiveFormsModule,
+    CommonModule
+  ],
+  animations: [
+    trigger('dialogAnimation', [
+      transition(':enter', [
+        style({ transform: 'translate(-50%, -48%) scale(0.95)', opacity: 0 }),
+        animate('200ms ease-out', style({ transform: 'translate(-50%, -50%) scale(1)', opacity: 1 }))
+      ]),
+      transition(':leave', [
+        animate('150ms ease-in', style({ transform: 'translate(-50%, -48%) scale(0.95)', opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class ProductComponent implements OnInit {
   products: Product[] = [];
@@ -28,12 +50,13 @@ export class ProductComponent implements OnInit {
   totalElements = 0;
   startIndex = 0;
   endIndex = 0;
+  isDialogOpen = false;
 
   constructor(
     private productService: ProductService,
     private categoryService: CategoryService,
     private fb: FormBuilder,
-    private toastr: ToastrService
+    private snackbarService: SnackbarService
   ) {
     this.initializeForms();
   }
@@ -47,8 +70,9 @@ export class ProductComponent implements OnInit {
     this.productForm = this.fb.group({
       name: ['', Validators.required],
       categoryId: ['', Validators.required],
-      description: ['', Validators.required],
+      description: [null],
       minimumStock: [0, [Validators.required, Validators.min(0)]],
+      amount: [0, [Validators.required, Validators.min(0)]],
       status: ['A', Validators.required]
     });
 
@@ -65,13 +89,16 @@ export class ProductComponent implements OnInit {
         this.categories = response.data;
       },
       error: () => {
-        this.toastr.error('Failed to load categories');
+        this.snackbarService.error('Failed to load categories');
       }
     });
   }
 
   loadProducts(): void {
-    this.isLoading = true;
+    if (!this.isLoading) {
+      this.isLoading = true;
+    }
+    
     const searchParams = {
       ...this.searchForm.value,
       size: this.pageSize,
@@ -88,7 +115,7 @@ export class ProductComponent implements OnInit {
         this.isLoading = false;
       },
       error: () => {
-        this.toastr.error('Failed to load products');
+        this.snackbarService.error('Failed to load products');
         this.isLoading = false;
       }
     });
@@ -98,19 +125,23 @@ export class ProductComponent implements OnInit {
     if (this.productForm.valid) {
       this.isLoading = true;
       const product = this.productForm.value;
-
+      let tempIsEditing = this.isEditing;
       const request = this.isEditing
         ? this.productService.updateProduct(this.editingId!, product)
         : this.productService.createProduct(product);
 
       request.subscribe({
         next: (response) => {
-          this.toastr.success(response.message);
+          this.snackbarService.success(response.message);
           this.resetForm();
-          this.loadProducts();
+          this.isLoading = false;
+          console.log('this.isEditing', this.isEditing);
+          if(tempIsEditing) {
+            this.closeDialog();
+          }
         },
         error: (error) => {
-          this.toastr.error(error.message || 'Operation failed');
+          this.snackbarService.error(error.message || 'Operation failed');
           this.isLoading = false;
         }
       });
@@ -125,19 +156,24 @@ export class ProductComponent implements OnInit {
       categoryId: product.categoryId,
       description: product.description,
       minimumStock: product.minimumStock,
+      amount: product.amount,
       status: product.status
     });
+    this.isDialogOpen = true;
   }
 
   deleteProduct(id: number): void {
     if (confirm('Are you sure you want to delete this product?')) {
+      this.isLoading = true;
       this.productService.deleteProduct(id).subscribe({
         next: () => {
-          this.toastr.success('Product deleted successfully');
+          this.snackbarService.success('Product deleted successfully');
           this.loadProducts();
+          // this.isLoading = false;
         },
         error: () => {
-          this.toastr.error('Failed to delete product');
+          this.snackbarService.error('Failed to delete product');
+          this.isLoading = false;
         }
       });
     }
@@ -151,6 +187,7 @@ export class ProductComponent implements OnInit {
 
   onSearch(): void {
     this.currentPage = 0;
+    this.isLoading = true;
     this.loadProducts();
   }
 
@@ -190,5 +227,21 @@ export class ProductComponent implements OnInit {
     }
 
     return pageNumbers;
+  }
+
+  openCreateDialog(): void {
+    this.isEditing = false;
+    this.editingId = undefined;
+    this.productForm.reset({ status: 'A' });
+    this.isDialogOpen = true;
+  }
+
+  closeDialog(): void {
+    if (!this.productForm.dirty) {
+      this.isLoading = false;
+    }
+    this.isDialogOpen = false;
+    this.resetForm();
+    this.loadProducts();
   }
 }

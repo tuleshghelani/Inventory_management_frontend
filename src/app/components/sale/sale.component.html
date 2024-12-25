@@ -2,20 +2,55 @@
     <div class="search-section card">
       <h2>Search Sales</h2>
       <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
-        <div class="search-controls">
-          <div class="form-group">
-            <input 
-              type="text" 
-              formControlName="search" 
-              class="form-control" 
-              placeholder="Search by invoice number..."
-            >
+        <div class="search-wrapper">
+          <div class="search-controls">
+            <div class="form-group">
+              <label for="search">Invoice Number</label>
+              <input 
+                type="text" 
+                id="search"
+                formControlName="search" 
+                class="form-control" 
+                placeholder="Search by invoice number..."
+              >
+            </div>
+            <div class="form-group">
+              <label for="startDate">Start Date</label>
+              <input 
+                type="date" 
+                id="startDate"
+                formControlName="startDate" 
+                class="form-control" 
+                placeholder="Start Date"
+              >
+            </div>
+            <div class="form-group">
+              <label for="endDate">End Date</label>
+              <input 
+                type="date" 
+                id="endDate"
+                formControlName="endDate" 
+                class="form-control" 
+                placeholder="End Date"
+              >
+            </div>
+            <div class="button-group">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Search
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="resetForm()">
+                <i class="fas fa-undo"></i> Reset
+              </button>
+            </div>
           </div>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-search"></i> Search
-          </button>
         </div>
       </form>
+    </div>
+  
+    <div class="action-buttons">
+      <button routerLink="/combined-purchase-sale" class="btn btn-primary">
+        <i class="fas fa-cart-plus"></i> Create Combined Sale
+      </button>
     </div>
   
     <div class="sales-list card">
@@ -47,7 +82,8 @@
               <th>Unit Price</th>
               <th>Other Expenses</th>
               <th>Total Amount</th>
-              <th>Sale Date</th>  
+              <th>Sale Date</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -59,7 +95,16 @@
               <td>{{ sale.unitPrice }}</td>
               <td>{{ sale.otherExpenses }}</td>
               <td>{{ sale.totalAmount }}</td>
-              <td>{{ sale.saleDate }}</td>
+              <td>{{ sale.saleDate |  date:'medium' }}</td>
+              <td class="actions">
+                <button 
+                  class="btn-icon delete" 
+                  (click)="deleteSale(sale.id!)"
+                  title="Delete Sale"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>

@@ -9,6 +9,11 @@ import { AddPurchaseComponent } from './components/add-purchase/add-purchase.com
 import { SaleComponent } from './components/sale/sale.component';
 import { ProfitComponent } from './components/profit/profit.component';
 import { CustomerComponent } from './components/customer/customer.component';
+import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
+import { PowderCoatingProcessComponent } from './components/powder-coating/powder-coating-process/powder-coating-process.component';
+import { AddPowderCoatingProcessComponent } from './components/powder-coating/add-powder-coating-process/add-powder-coating-process.component';
+import { TransportComponent } from './components/Transports/transport/transport.component';
+import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -45,6 +50,41 @@ const routes: Routes = [
   {
     path: 'customer',
     component: CustomerComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'combined-purchase-sale',
+    component: AddCombinedPurchaseSaleComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'powder-coating-process',
+    component: PowderCoatingProcessComponent,
+    canActivate: [AuthGuard]
+  },  
+  {
+    path: 'powder-coating-process/create',
+    component: AddPowderCoatingProcessComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'powder-coating-process/edit/:id',
+    component: AddPowderCoatingProcessComponent,
+    title: 'Edit Powder Coating Process'
+  },
+  {
+    path: 'transport/create',
+    component: TransportComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'transport',
+    component: TransportListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'transport/edit/:id',
+    component: TransportComponent,
     canActivate: [AuthGuard]
   },
   {

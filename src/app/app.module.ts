@@ -15,14 +15,19 @@ import { ProductComponent } from './components/product/product.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { AppRoutingModule } from './app-routing.module';
+import { LoaderComponent } from './shared/components/loader/loader.component';
+import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
+import { TransportComponent } from './components/Transports/transport/transport.component';
+import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
     
+
+
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     HeaderComponent,
-    CategoryComponent,
-    ProductComponent,
+    // ProductComponent,
     // PurchaseComponent,
     // SalesComponent
   ],

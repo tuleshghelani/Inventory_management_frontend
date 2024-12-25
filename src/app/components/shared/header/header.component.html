@@ -5,12 +5,32 @@
     </div>
     
     <ul class="nav-links" *ngIf="isAuthenticated">
-      <li><a routerLink="/category" routerLinkActive="active">Category</a></li>
-      <li><a routerLink="/product" routerLinkActive="active">Product</a></li>
-      <li><a routerLink="/purchase" routerLinkActive="active">Purchase</a></li>
-      <li><a routerLink="/sale" routerLinkActive="active">Sale</a></li>
-      <li><a routerLink="/profit" routerLinkActive="active">Profit</a></li>
-      <li><a routerLink="/customer" routerLinkActive="active">Customer</a></li>
+      <li class="dropdown">
+        <a (click)="toggleMasterMenu($event)" [class.active]="isMasterActive()">
+          <i class="fas fa-th-large"></i> Master
+          <i class="fas fa-chevron-down"></i>
+        </a>
+        <ul class="dropdown-menu" [class.show]="showMasterMenu">
+          <li><a routerLink="/category" routerLinkActive="active">Category</a></li>
+          <li><a routerLink="/product" routerLinkActive="active">Product</a></li>
+          <li><a routerLink="/customer" routerLinkActive="active">Customer</a></li>
+        </ul>
+      </li>
+      
+      <li class="dropdown">
+        <a (click)="toggleTransactionMenu($event)" [class.active]="isTransactionActive()">
+          <i class="fas fa-exchange-alt"></i> Transactions
+          <i class="fas fa-chevron-down"></i>
+        </a>
+        <ul class="dropdown-menu" [class.show]="showTransactionMenu">
+          <li><a routerLink="/purchase" routerLinkActive="active">Purchase</a></li>
+          <li><a routerLink="/sale" routerLinkActive="active">Sale</a></li>
+          <li><a routerLink="/profit" routerLinkActive="active">Profit</a></li>
+        </ul>
+      </li>
+      
+      <li><a routerLink="/powder-coating-process" routerLinkActive="active">Process</a></li>
+      <li><a routerLink="/transport" routerLinkActive="active">Transport</a></li>
     </ul>
 
     <div class="nav-actions" *ngIf="isAuthenticated">

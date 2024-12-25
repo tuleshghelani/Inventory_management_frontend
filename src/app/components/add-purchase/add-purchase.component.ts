@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product.service';
 import { PurchaseService } from '../../services/purchase.service';
-import { ToastrService } from 'ngx-toastr';
+import { SnackbarService } from '../../shared/services/snackbar.service';
+import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { RouterModule } from '@angular/router';
+import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
+import { CacheService } from '../../shared/services/cache.service';
 
 @Component({
   selector: 'app-add-purchase',
@@ -12,79 +15,156 @@ import { RouterModule } from '@angular/router';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    FormsModule,
-    RouterModule
+    RouterModule,
+    LoaderComponent,
+    SearchableSelectComponent
   ],
   templateUrl: './add-purchase.component.html',
-  styleUrl: './add-purchase.component.scss'
+  styleUrls: ['./add-purchase.component.scss']
 })
 export class AddPurchaseComponent implements OnInit {
-  purchaseForm: FormGroup;
+  purchaseForm!: FormGroup;
   products: any[] = [];
   loading = false;
+  isLoadingProducts = false;
 
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
     private purchaseService: PurchaseService,
-    private toastr: ToastrService
+    private snackbar: SnackbarService,
+    private cacheService: CacheService
   ) {
-    this.purchaseForm = this.fb.group({
-      productId: ['', Validators.required],
-      quantity: ['', [Validators.required, Validators.min(1)]],
-      unitPrice: ['', [Validators.required, Validators.min(0)]],
-      purchaseDate: [''],
-      invoiceNumber: ['', Validators.required],
-      otherExpenses: ['', [Validators.required, Validators.min(0)]]
-    });
+    this.initForm();
   }
 
   ngOnInit() {
-    this.fetchProducts();
+    this.loadProducts();
   }
 
-  fetchProducts() {
+  private loadProducts(): void {
+    this.isLoadingProducts = true;
     this.productService.getProducts({ status: 'A' }).subscribe({
       next: (response) => {
         if (response.success) {
           this.products = response.data;
         }
+        this.isLoadingProducts = false;
       },
       error: (error) => {
-        this.toastr.error('Failed to fetch products');
+        this.snackbar.error('Failed to load products');
+        this.isLoadingProducts = false;
       }
     });
+  }
+
+  refreshProducts(): void {
+    this.isLoadingProducts = true;
+    this.productService.refreshProducts().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+          this.snackbar.success('Products refreshed successfully');
+        }
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to refresh products');
+        this.isLoadingProducts = false;
+      }
+    });
+  }
+
+  private initForm() {
+    // Get current date in local timezone
+    const now = new Date();
+    const localISOString = new Date(now.getTime() - (now.getTimezoneOffset() * 60000))
+      .toISOString()
+      .slice(0, 16);
+
+    this.purchaseForm = this.fb.group({
+      productId: ['', Validators.required],
+      quantity: ['', [Validators.required, Validators.min(1)]],
+      unitPrice: ['', [Validators.required, Validators.min(0.01)]],
+      purchaseDate: [localISOString, Validators.required],
+      invoiceNumber: ['', Validators.required],
+      otherExpenses: [0, [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.purchaseForm.get(fieldName);
+    return field ? field.invalid && field.touched : false;
+  }
+
+  getFieldError(fieldName: string): string {
+    const field = this.purchaseForm.get(fieldName);
+    if (field?.errors && field.touched) {
+      return `${fieldName} is required`;
+    }
+    if (field?.errors && field.errors['min']) {
+      if (fieldName === 'quantity') return 'Quantity must be greater than 0';
+        if (fieldName === 'unitPrice') return 'Unit price must be greater than 0';
+      if (fieldName === 'otherExpenses') return 'Other expenses must be greater than or equal to 0';
+    }
+    return '';
+  }
+
+  resetForm() {
+    this.initForm();
   }
 
   onSubmit() {
     if (this.purchaseForm.valid) {
       this.loading = true;
-      const formData = this.purchaseForm.value;
+      const formData = { ...this.purchaseForm.value };
       
+      // Only format the date if it's a valid date string
+      if (formData.purchaseDate && isNaN(new Date(formData.purchaseDate).getTime())) {
+        this.snackbar.error('Invalid purchase date');
+        this.loading = false;
+        return;
+      }
+
       if (formData.purchaseDate) {
-        const date = new Date(formData.purchaseDate);
-        formData.purchaseDate = date.toLocaleString('en-GB', {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        }).replace(/\//g, '-').replace(',', '');
+        try {
+          const date = new Date(formData.purchaseDate);
+          formData.purchaseDate = date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          }).replace(/\//g, '-').replace(',', '');
+        } catch (error) {
+          this.snackbar.error('Invalid date format');
+          this.loading = false;
+          return;
+        }
       }
 
       this.purchaseService.createPurchase(formData).subscribe({
         next: (response: any) => {
-          if (response.success) {
-            this.toastr.success(response.message);
-            this.purchaseForm.reset();
+          if (response?.success) {
+            this.snackbar.success('Purchase created successfully');
+            this.resetForm();
+            this.loading = false;
           }
         },
         error: (error) => {
-          this.toastr.error('Failed to create purchase');
+          this.snackbar.error(error?.error?.message || 'Failed to create purchase');
+          this.loading = false;
         },
         complete: () => {
           this.loading = false;
+        }
+      });
+    } else {
+      Object.keys(this.purchaseForm.controls).forEach(key => {
+        const control = this.purchaseForm.get(key);
+        if (control?.invalid) {
+          control.markAsTouched();
         }
       });
     }
