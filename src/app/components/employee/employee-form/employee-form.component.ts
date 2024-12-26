@@ -44,13 +44,12 @@ export class EmployeeFormComponent implements OnInit {
 
   private initializeForm(): void {
     this.employeeForm = this.fb.group({
-      name: ['', [Validators.required]],
-      mobileNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      email: ['', [Validators.required, Validators.email]],
-      address: ['', [Validators.required]],
-      designation: ['', [Validators.required]],
-      department: ['', [Validators.required]],
-      joiningDate: ['', [Validators.required]],
+      name: [null, [Validators.required]],
+      mobileNumber: [null, []],
+      email: [null, [Validators.email]],
+      address: [null, []],
+      designation: [null, []],
+      department: [null, []],
       status: ['A']
     });
   }
@@ -67,7 +66,6 @@ export class EmployeeFormComponent implements OnInit {
     if (this.employeeForm.valid) {
       this.isLoading = true;
       const formData = { ...this.employeeForm.value };
-      formData.joiningDate = this.formatDateForApi(formData.joiningDate);
 
       const request = this.isEditMode
         ? this.employeeService.updateEmployee(this.employeeId!, formData)
@@ -96,9 +94,29 @@ export class EmployeeFormComponent implements OnInit {
   }
 
   private loadEmployee(): void {
+    if (!this.employeeId) return;
+    
     this.isLoading = true;
-    // Implement employee loading logic here when you have the API endpoint
-    this.isLoading = false;
+    this.employeeService.getEmployeeDetail(this.employeeId).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.employeeForm.patchValue({
+            name: response.data.name,
+            mobileNumber: response.data.mobileNumber,
+            email: response.data.email,
+            address: response.data.address,
+            designation: response.data.designation,
+            department: response.data.department,
+            status: response.data.status
+          });
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.snackbar.error(error?.error?.message || 'Failed to load employee details');
+        this.isLoading = false;
+      }
+    });
   }
 
   isFieldInvalid(fieldName: string): boolean {

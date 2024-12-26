@@ -60,7 +60,7 @@
       }
 
       .form-control {
-        width: 100%;
+        // width: 100%;
         padding: 0.75rem;
         border: 1px solid var(--supporting);
         border-radius: 8px;
@@ -89,6 +89,15 @@
         color: #dc3545;
         font-size: 0.875rem;
         margin-top: 0.25rem;
+      }
+
+      select.form-control {
+        appearance: none;
+        background-image: url("data:image/svg+xml,...");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+        padding-right: 2.5rem;
       }
     }
 

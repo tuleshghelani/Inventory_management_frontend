@@ -6,7 +6,6 @@ export interface Employee {
   address: string;
   designation: string;
   department: string;
-  joiningDate: string;
   status: string;
   createdAt: string;
 }

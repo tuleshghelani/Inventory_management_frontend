@@ -29,7 +29,7 @@
 
         <div class="form-group">
           <label for="mobileNumber">
-            <i class="fas fa-phone"></i> Mobile Number <span class="required">*</span>
+            <i class="fas fa-phone"></i> Mobile Number 
           </label>
           <input 
             type="text" 
@@ -47,7 +47,7 @@
       <div class="form-row">
         <div class="form-group">
           <label for="email">
-            <i class="fas fa-envelope"></i> Email <span class="required">*</span>
+            <i class="fas fa-envelope"></i> Email 
           </label>
           <input 
             type="email" 
@@ -63,7 +63,7 @@
 
         <div class="form-group">
           <label for="designation">
-            <i class="fas fa-briefcase"></i> Designation <span class="required">*</span>
+            <i class="fas fa-briefcase"></i> Designation 
           </label>
           <input 
             type="text" 
@@ -81,7 +81,7 @@
       <div class="form-row">
         <div class="form-group">
           <label for="department">
-            <i class="fas fa-building"></i> Department <span class="required">*</span>
+            <i class="fas fa-building"></i> Department 
           </label>
           <input 
             type="text" 
@@ -96,25 +96,27 @@
         </div>
 
         <div class="form-group">
-          <label for="joiningDate">
-            <i class="fas fa-calendar"></i> Joining Date <span class="required">*</span>
+          <label for="status">
+            <i class="fas fa-toggle-on"></i> Status
           </label>
-          <input 
-            type="datetime-local" 
-            id="joiningDate"
-            formControlName="joiningDate"
+          <select 
+            id="status"
+            formControlName="status"
             class="form-control"
-            [class.is-invalid]="isFieldInvalid('joiningDate')"
+            [class.is-invalid]="isFieldInvalid('status')"
           >
-          <div class="invalid-feedback" *ngIf="isFieldInvalid('joiningDate')">
-            {{ getFieldError('joiningDate') }}
+            <option value="A">Active</option>
+            <option value="I">Inactive</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="isFieldInvalid('status')">
+            {{ getFieldError('status') }}
           </div>
         </div>
       </div>
 
       <div class="form-group">
         <label for="address">
-          <i class="fas fa-map-marker-alt"></i> Address <span class="required">*</span>
+          <i class="fas fa-map-marker-alt"></i> Address 
         </label>
         <textarea 
           id="address"

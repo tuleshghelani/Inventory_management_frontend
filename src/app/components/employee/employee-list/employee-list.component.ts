@@ -110,8 +110,8 @@ export class EmployeeListComponent implements OnInit {
             this.loadEmployees();
           }
         },
-        error: () => {
-          this.snackbar.error('Failed to delete employee');
+        error: (error) => {
+          this.snackbar.error(error?.error?.message || 'Failed to delete employee');
           this.isLoading = false;
         }
       });

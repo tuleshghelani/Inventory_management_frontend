@@ -16,6 +16,8 @@ import { TransportComponent } from './components/Transports/transport/transport.
 import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
 import { EmployeeListComponent } from './components/employee/employee-list/employee-list.component';
 import { EmployeeFormComponent } from './components/employee/employee-form/employee-form.component';
+import { EmployeeOrderListComponent } from './components/employee-order/employee-order-list/employee-order-list.component';
+import { EmployeeOrderFormComponent } from './components/employee-order/employee-order-form/employee-order-form.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -102,6 +104,21 @@ const routes: Routes = [
   {
     path: 'employee/edit/:id',
     component: EmployeeFormComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'employee-order',
+    component: EmployeeOrderListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'employee-order/create',
+    component: EmployeeOrderFormComponent,
+    canActivate: [AuthGuard]
+  },  
+  {
+    path: 'employee-order/edit/:id',
+    component: EmployeeOrderFormComponent,
     canActivate: [AuthGuard]
   },
   {
