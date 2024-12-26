@@ -71,21 +71,41 @@ export class CustomerModalComponent implements OnInit {
   }
 
   private patchForm(customer: Customer) {
-    const nextActionDate = customer.nextActionDate ? 
-      new Date(customer.nextActionDate.replace(/(\d{2})-(\d{2})-(\d{4})/, '$3-$2-$1'))
-        .toISOString().slice(0, 16) : '';
+    if (!customer) return;
 
-    this.customerForm.patchValue({
-      name: customer.name,
-      mobile: customer.mobile,
-      email: customer.email,
-      gst: customer.gst,
-      address: customer.address,
-      remainingPaymentAmount: customer.remainingPaymentAmount,
-      nextActionDate: nextActionDate,
-      remarks: customer.remarks,
-      status: customer.status
-    });
+    try {
+      let nextActionDate = '';
+      
+      if (customer.nextActionDate) {
+        try {
+          // Parse the UTC date string
+          const utcDate = new Date(customer.nextActionDate);
+          
+          // Add 5:30 hours for IST
+          const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000));
+          
+          // Format for datetime-local input
+          nextActionDate = istDate.toISOString().slice(0, 16);
+        } catch (error) {
+          console.error('Error parsing date:', error);
+        }
+      }
+
+      this.customerForm.patchValue({
+        name: customer.name || '',
+        mobile: customer.mobile || '',
+        email: customer.email || '',
+        gst: customer.gst || '',
+        address: customer.address || '',
+        remainingPaymentAmount: customer.remainingPaymentAmount || 0,
+        nextActionDate: nextActionDate,
+        remarks: customer.remarks || '',
+        status: customer.status || 'A'
+      });
+    } catch (error) {
+      console.error('Error in patchForm:', error);
+      this.initForm();
+    }
   }
 
   onSubmit() {

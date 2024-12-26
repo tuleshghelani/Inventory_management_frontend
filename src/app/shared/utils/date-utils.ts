@@ -26,4 +26,26 @@ export class DateUtils {
       return dateString;
     }
   }
+
+  formatDateForApi(dateStr: string, isStartDate: boolean = false): string {
+    if (!dateStr) return '';
+    
+    try {
+      // Create date object and adjust for IST
+      const date = new Date(dateStr);
+      const istDate = new Date(date.getTime() - (5.5 * 60 * 60 * 1000));
+      
+      if (isNaN(istDate.getTime())) return '';
+
+      const day = istDate.getDate().toString().padStart(2, '0');
+      const month = (istDate.getMonth() + 1).toString().padStart(2, '0');
+      const year = istDate.getFullYear();
+      const time = isStartDate ? '00:00:00' : '23:59:59';
+
+      return `${day}-${month}-${year} ${time}`;
+    } catch (error) {
+      console.error('Error formatting date for API:', error);
+      return '';
+    }
+  }
 } 
