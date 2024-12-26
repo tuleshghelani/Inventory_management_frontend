@@ -26,10 +26,12 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   @Input() placeholder: string = 'Select an option';
   @Input() defaultOption: { label: string; value: any } | null = null;
   @Input() searchPlaceholder: string = 'Search...';
+  @Input() multiple = false;
 
   searchText: string = '';
   isOpen: boolean = false;
   selectedValue: any = '';
+  selectedValues: any[] = [];
   filteredOptions: any[] = [];
   
   onChange: any = () => {};
@@ -40,7 +42,11 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   }
 
   writeValue(value: any): void {
-    this.selectedValue = value;
+    if (this.multiple) {
+      this.selectedValues = value || [];
+    } else {
+      this.selectedValue = value;
+    }
   }
 
   registerOnChange(fn: any): void {
@@ -71,13 +77,39 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   }
 
   selectOption(option: any) {
-    this.selectedValue = option[this.valueKey];
-    this.onChange(this.selectedValue);
+    if (this.multiple) {
+      const value = option[this.valueKey];
+      const index = this.selectedValues.indexOf(value);
+      
+      if (index === -1) {
+        this.selectedValues = [...this.selectedValues, value];
+      } else {
+        this.selectedValues = this.selectedValues.filter(v => v !== value);
+      }
+      
+      this.onChange(this.selectedValues);
+    } else {
+      this.selectedValue = option[this.valueKey];
+      this.onChange(this.selectedValue);
+      this.isOpen = false;
+    }
     this.onTouch();
-    this.isOpen = false;
+  }
+
+  isSelected(option: any): boolean {
+    const value = option[this.valueKey];
+    return this.multiple 
+      ? this.selectedValues.includes(value)
+      : this.selectedValue === value;
   }
 
   getSelectedLabel(): string {
+    if (this.multiple) {
+      return this.selectedValues.length 
+        ? `${this.selectedValues.length} selected`
+        : this.placeholder;
+    }
+    
     if (!this.selectedValue && this.defaultOption) {
       return this.defaultOption.label;
     }

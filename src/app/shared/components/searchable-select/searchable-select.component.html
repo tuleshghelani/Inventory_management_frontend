@@ -9,7 +9,7 @@
       <input 
         type="text" 
         class="search-input" 
-        placeholder="Search..." 
+        [placeholder]="searchPlaceholder" 
         [value]="searchText"
         (input)="onSearch($event)"
         (click)="$event.stopPropagation()"
@@ -20,19 +20,16 @@
     <div class="options-container">
       <div 
         class="option" 
-        *ngIf="defaultOption"
-        (click)="selectOption(defaultOption)"
-        [class.selected]="!selectedValue"
-      >
-        {{ defaultOption.label }}
-      </div>
-      <div 
-        class="option" 
         *ngFor="let option of filteredOptions"
         (click)="selectOption(option)"
-        [class.selected]="option[valueKey] === selectedValue"
+        [class.selected]="isSelected(option)"
       >
-        {{ option[labelKey] }}
+        <div class="option-content">
+          <div class="checkbox" *ngIf="multiple">
+            <i class="fas fa-check" *ngIf="isSelected(option)"></i>
+          </div>
+          <span>{{ option[labelKey] }}</span>
+        </div>
       </div>
       <div class="no-results" *ngIf="filteredOptions.length === 0">
         No results found
