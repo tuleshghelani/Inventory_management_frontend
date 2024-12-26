@@ -105,13 +105,43 @@
         transition: all 0.2s ease;
         font-size: 0.9rem;
         
+        .option-content {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .checkbox {
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--supporting);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            i {
+              color: var(--primary);
+              font-size: 0.7rem;
+            }
+          }
+        }
+        
         &:hover {
           background-color: var(--background);
         }
         
         &.selected {
-          background-color: rgba(253, 120, 35, 0.1);
+          background-color: rgba(var(--primary-rgb), 0.1);
           color: var(--primary);
+
+          .checkbox {
+            background-color: var(--primary);
+            border-color: var(--primary);
+
+            i {
+              color: white;
+            }
+          }
         }
       }
       

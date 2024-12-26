@@ -106,6 +106,23 @@ export class EmployeeOrderFormComponent implements OnInit {
     });
   }
 
+  refreshProducts(): void {
+    this.isLoadingProducts = true;
+    this.productService.refreshProducts().subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.products = response.data;
+          this.snackbar.success('Products refreshed successfully');
+        }
+        this.isLoadingProducts = false;
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to refresh products');
+        this.isLoadingProducts = false;
+      }
+    });
+  }
+
   public loadEmployees(): void {
     this.isLoadingEmployees = true;
     this.employeeService.getAllEmployees().subscribe({
@@ -135,7 +152,7 @@ export class EmployeeOrderFormComponent implements OnInit {
         next: (response) => {
           if (response.success) {
             this.snackbar.success(response.message);
-            this.router.navigate(['/employee-orders']);
+            this.router.navigate(['/employee-order']);
           }
         },
         error: (error) => {

@@ -142,29 +142,6 @@ export class EmployeeOrderListComponent implements OnInit {
   }
 
   getPageNumbers(): number[] {
-    const pageNumbers: number[] = [];
-    const currentPage = this.currentPage + 1;
-
-    if (this.totalPages <= 5) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 5; i++) {
-          pageNumbers.push(i);
-        }
-      } else if (currentPage >= this.totalPages - 2) {
-        for (let i = this.totalPages - 4; i <= this.totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-          pageNumbers.push(i);
-        }
-      }
-    }
-
-    return pageNumbers;
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
 } 
