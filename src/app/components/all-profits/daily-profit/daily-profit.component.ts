@@ -1,0 +1,103 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { ProfitService } from '../../../services/profit.service';
+
+interface DailyProfit {
+  date: string;
+  totalExpenses: number;
+  grossProfit: number;
+  netProfit: number;
+}
+
+@Component({
+  selector: 'app-daily-profit',
+  templateUrl: './daily-profit.component.html',
+  styleUrls: ['./daily-profit.component.scss'],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, LoaderComponent],
+  standalone: true
+})
+export class DailyProfitComponent implements OnInit {
+  profits: any;
+  currentPage = 0;
+  pageSize = 5;
+  searchForm: FormGroup;
+  pageSizeOptions = [5, 10, 25, 50];
+  totalElements = 0;
+  startIndex = 0;
+  endIndex = 0;
+  isLoading = false;
+
+  constructor(
+    private profitService: ProfitService,
+    private fb: FormBuilder
+  ) {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth());
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+
+    this.searchForm = this.fb.group({
+      startDate: [this.formatDateForInput(firstDay)],
+      endDate: [this.formatDateForInput(lastDay)]
+    });
+  }
+
+  private formatDateForInput(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  private formatDateForApi(dateStr: string, isStartDate: boolean): string {
+    const date = new Date(dateStr);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    const time = isStartDate ? '00:00:00' : '23:59:59';
+
+    return `${day}-${month}-${year} ${time}`;
+  }
+
+  ngOnInit(): void {
+    this.loadProfits();
+  }
+
+  loadProfits(): void {
+    this.isLoading = true;
+    const formValues = this.searchForm.value;
+    
+    const params = {
+      startDate: this.formatDateForApi(formValues.startDate, true),
+      endDate: this.formatDateForApi(formValues.endDate, false)
+    };
+
+    this.profitService.getDailyProfits(params).subscribe({
+      next: (response) => {
+        this.profits = response.data;
+        this.totalElements = response.data.totalElements;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading profits:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  onSearch(): void {
+    this.loadProfits();
+  }
+
+  resetForm(): void {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+    this.searchForm.patchValue({
+      startDate: this.formatDateForInput(firstDay),
+      endDate: this.formatDateForInput(lastDay)
+    });
+    
+    this.loadProfits();
+  }
+}

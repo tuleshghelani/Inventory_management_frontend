@@ -20,4 +20,8 @@ export class ProfitService {
   searchProfits(params: ProfitSearchRequest): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/search`, params);
   }
+
+  getDailyProfits(params: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/daily`, params);
+  }
 } 

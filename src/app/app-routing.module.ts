@@ -18,6 +18,7 @@ import { EmployeeListComponent } from './components/employee/employee-list/emplo
 import { EmployeeFormComponent } from './components/employee/employee-form/employee-form.component';
 import { EmployeeOrderListComponent } from './components/employee-order/employee-order-list/employee-order-list.component';
 import { EmployeeOrderFormComponent } from './components/employee-order/employee-order-form/employee-order-form.component';
+import { DailyProfitComponent } from './components/all-profits/daily-profit/daily-profit.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -121,6 +122,11 @@ const routes: Routes = [
     component: EmployeeOrderFormComponent,
     canActivate: [AuthGuard]
   },
+  {
+    path: 'daily-profit',
+    component: DailyProfitComponent,
+    canActivate: [AuthGuard]
+  },  
   {
     path: '**',
     redirectTo: '/login',
