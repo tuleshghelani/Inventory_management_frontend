@@ -4,6 +4,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ProfitService } from '../../../services/profit.service';
+import { SnackbarService } from '../../../shared/services/snackbar.service';
 
 interface DailyProfit {
   date: string;
@@ -32,11 +33,12 @@ export class DailyProfitComponent implements OnInit {
 
   constructor(
     private profitService: ProfitService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private snackbar: SnackbarService
   ) {
     const today = new Date();
-    const firstDay = new Date(today.getFullYear(), today.getMonth());
-    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
     this.searchForm = this.fb.group({
       startDate: [this.formatDateForInput(firstDay)],
@@ -73,12 +75,17 @@ export class DailyProfitComponent implements OnInit {
 
     this.profitService.getDailyProfits(params).subscribe({
       next: (response) => {
-        this.profits = response.data;
-        this.totalElements = response.data.totalElements;
+        if (response.success) {
+          this.profits = response.data;
+          this.totalElements = response.data.totalElements;
+          this.updatePaginationIndexes();
+        } else {
+          this.snackbar.error(response?.message || 'Failed to load profits');
+        }
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading profits:', error);
+        this.snackbar.error(error?.error?.message || 'Failed to load profits');
         this.isLoading = false;
       }
     });
@@ -99,5 +106,10 @@ export class DailyProfitComponent implements OnInit {
     });
     
     this.loadProfits();
+  }
+
+  private updatePaginationIndexes(): void {
+    this.startIndex = this.currentPage * this.pageSize;
+    this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalElements);
   }
 }

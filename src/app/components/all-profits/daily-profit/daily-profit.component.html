@@ -47,7 +47,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let profit of profits?.content; let i = index">
-                        <td>{{ i + 1 }}</td>
+                        <td>{{ startIndex + i + 1 }}</td>
                         <td>{{ profit.date | date:'mediumDate' }}</td>
                         <td>{{ profit.totalExpenses | number:'1.2-2' }}</td>
                         <td [ngClass]="{'text-success': profit.grossProfit > 0, 'text-danger': profit.grossProfit < 0}">
