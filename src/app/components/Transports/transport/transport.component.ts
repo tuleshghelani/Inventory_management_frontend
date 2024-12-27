@@ -10,6 +10,7 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { Transport, TransportSummary } from '../../../models/transport.model';
 import { TransportService } from '../../../services/transport.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
+import { PriceService } from '../../../services/price.service';
 
 @Component({
   selector: 'app-transport',
@@ -47,7 +48,8 @@ export class TransportComponent implements OnInit {
     private productService: ProductService,
     private customerService: CustomerService,
     private transportService: TransportService,
-    private snackbar: SnackbarService
+    private snackbar: SnackbarService,
+    private priceService: PriceService
   ) {
     this.initializeForm();
     this.route.params.subscribe(params => {
@@ -62,6 +64,19 @@ export class TransportComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadCustomers();
+    
+    // Setup customer change handler
+    // this.transportForm.get('customerId')?.valueChanges.subscribe(() => {
+    //   const bags = this.transportForm.get('bags') as FormArray;
+    //   bags.controls.forEach(bag => {
+    //     const items = bag.get('items') as FormArray;
+    //     items.controls.forEach(item => {
+    //       if (item.get('productId')?.value) {
+    //         this.setupPriceFetching(item);
+    //       }
+    //     });
+    //   });
+    // });
   }
 
   private initializeForm(): void {
@@ -94,7 +109,8 @@ export class TransportComponent implements OnInit {
   }
 
   addItem(bagIndex: number): void {
-    const itemGroup = this.fb.group({
+    const items = this.getBagItems(bagIndex);
+    const newItem = this.fb.group({
       productId: ['', [Validators.required]],
       quantity: ['', [Validators.required, Validators.min(1)]],
       remarks: [''],
@@ -110,8 +126,13 @@ export class TransportComponent implements OnInit {
       saleDiscountPrice: [0, [Validators.required, Validators.min(0.01)]]
     });
 
-    this.getBagItems(bagIndex).push(itemGroup);
-    this.setupDiscountCalculations(bagIndex, this.getBagItems(bagIndex).length - 1);
+    // Setup price fetching when product changes
+    newItem.get('productId')?.valueChanges.subscribe(() => {
+      this.setupPriceFetching(newItem);
+    });
+
+    items.push(newItem);
+    this.setupDiscountCalculations(bagIndex, items.length - 1);
   }
 
   private setupDiscountCalculations(bagIndex: number, itemIndex: number): void {
@@ -538,5 +559,29 @@ export class TransportComponent implements OnInit {
       return `${fieldName} must be greater than ${control.errors?.['min'].min}`;
     }
     return '';
+  }
+
+  private setupPriceFetching(item: AbstractControl): void {
+    const productControl = item.get('productId');
+    const customerId = this.transportForm.get('customerId')?.value;
+
+    if (productControl && customerId) {
+      this.priceService.getLatestPrices({
+        productId: productControl.value,
+        customerId: customerId
+      }).subscribe({
+        next: (response) => {
+          if (response.success) {
+            item.patchValue({
+              purchaseUnitPrice: response.data.lastPurchasePrice || 0,
+              saleUnitPrice: response.data.lastSalePrice || 0
+            }, { emitEvent: true }); // Trigger calculations
+          }
+        },
+        error: () => {
+          this.snackbar.error('Failed to fetch latest prices');
+        }
+      });
+    }
   }
 }
