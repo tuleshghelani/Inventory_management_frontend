@@ -38,6 +38,9 @@ export class PowderCoatingProcessComponent implements OnInit {
   isLoadingProducts = false;
   customers: any[] = [];
   isLoadingCustomers = false;
+  selectedProcesses: Set<number> = new Set();
+  selectedCustomerId?: number;
+  isGeneratingPdf = false;
 
   // Pagination
   currentPage = 0;
@@ -166,8 +169,6 @@ export class PowderCoatingProcessComponent implements OnInit {
     return pageNumbers;
   }
 
-  
-
   refreshProducts(): void {
     this.isLoadingProducts = true;
     this.productService.refreshProducts().subscribe({
@@ -240,9 +241,55 @@ export class PowderCoatingProcessComponent implements OnInit {
     });
   }
 
-  
-
   openReturnModal(processId: number): void {
     this.modalService.open('return', processId);
+  }
+
+  toggleProcessSelection(process: any): void {
+    if (this.selectedProcesses.size === 0) {
+      this.selectedCustomerId = process.customerId;
+      this.selectedProcesses.add(process.id);
+    } else if (this.selectedCustomerId !== process.customerId) {
+      this.snackbar.error('You can select records of only one customer');
+      return;
+    } else {
+      if (this.selectedProcesses.has(process.id)) {
+        this.selectedProcesses.delete(process.id);
+        if (this.selectedProcesses.size === 0) {
+          this.selectedCustomerId = undefined;
+        }
+      } else {
+        this.selectedProcesses.add(process.id);
+      }
+    }
+  }
+
+  generatePdf(): void {
+    if (!this.selectedCustomerId || this.selectedProcesses.size === 0) {
+      this.snackbar.error('Please select at least one process');
+      return;
+    }
+
+    this.isGeneratingPdf = true;
+    const data = {
+      customerId: this.selectedCustomerId,
+      processIds: Array.from(this.selectedProcesses)
+    };
+
+    this.powderCoatingService.generatePdf(data).subscribe({
+      next: (response) => {
+        const url = window.URL.createObjectURL(response.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = response.filename;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.isGeneratingPdf = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to generate PDF');
+        this.isGeneratingPdf = false;
+      }
+    });
   }
 }

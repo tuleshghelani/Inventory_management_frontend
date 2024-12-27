@@ -87,10 +87,24 @@
       </div>
     </div>
 
+    <div class="table-actions">
+      <button 
+        class="btn btn-primary" 
+        [disabled]="selectedProcesses.size === 0 || isGeneratingPdf"
+        (click)="generatePdf()"
+      >
+        <i class="fas" [ngClass]="isGeneratingPdf ? 'fa-spinner fa-spin' : 'fa-file-pdf'"></i>
+        {{ isGeneratingPdf ? 'Generating...' : 'Generate PDF' }}
+      </button>
+    </div>
+
     <div class="table-responsive">
       <table class="table">
         <thead>
           <tr>
+            <th class="select-column">
+              <!-- Header checkbox if needed -->
+            </th>
             <th>#</th>
             <th>Product</th>
             <th>Customer</th>
@@ -105,6 +119,15 @@
         </thead>
         <tbody>
           <tr *ngFor="let process of processes; let i = index">
+            <td class="select-column">
+              <div class="checkbox-wrapper">
+                <input 
+                  type="checkbox"
+                  [checked]="selectedProcesses.has(process.id)"
+                  (change)="toggleProcessSelection(process)"
+                >
+              </div>
+            </td>
             <td>{{ startIndex + i + 1 }}</td>
             <td>{{ process.productName }}</td>
             <td>{{ process.customerName }}</td>
