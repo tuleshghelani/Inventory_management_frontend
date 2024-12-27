@@ -69,8 +69,29 @@ export class AddPowderCoatingProcessComponent implements OnInit {
       customerId: ['', [Validators.required]],
       productId: ['', [Validators.required]],
       quantity: ['', [Validators.required, Validators.min(1)]],
+      totalBags: ['', [Validators.required, Validators.min(1)]],
+      unitPrice: ['', [Validators.required, Validators.min(0.01)]],
+      totalAmount: [{ value: '', disabled: true }],
+      remarks: [''],
       status: ['A']
     });
+
+    // Setup total amount calculation
+    ['quantity', 'unitPrice'].forEach(field => {
+      this.processForm.get(field)?.valueChanges.subscribe(() => {
+        this.calculateTotalAmount();
+      });
+    });
+  }
+
+  private calculateTotalAmount(): void {
+    const quantity = Number(this.processForm.get('quantity')?.value) || 0;
+    const unitPrice = Number(this.processForm.get('unitPrice')?.value) || 0;
+    const totalAmount = quantity * unitPrice;
+    
+    this.processForm.patchValue({
+      totalAmount: totalAmount.toFixed(2)
+    }, { emitEvent: false });
   }
 
   loadProducts(): void {
@@ -166,6 +187,9 @@ export class AddPowderCoatingProcessComponent implements OnInit {
             customerId: response.data.customerId,
             productId: response.data.productId,
             quantity: response.data.quantity,
+            totalBags: response.data.totalBags,
+            unitPrice: response.data.unitPrice,
+            totalAmount: response.data.totalAmount,
             status: response.data.status
           });
         } else {
@@ -197,8 +221,8 @@ export class AddPowderCoatingProcessComponent implements OnInit {
           }
           this.loading = false;
         },
-        error: () => {
-          this.snackbar.error(`Failed to ${this.isEditMode ? 'update' : 'create'} process`);
+        error: (error: any) => {
+          this.snackbar.error(error?.error?.message || `Failed to ${this.isEditMode ? 'update' : 'create'} process`);
           this.loading = false;
         }
       });

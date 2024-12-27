@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { PowderCoatingResponse, PowderCoatingSearchRequest, PowderCoatingReturnResponse, PowderCoatingReturnRequest } from '../models/powder-coating.model';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -57,5 +58,19 @@ export class PowderCoatingService {
 
   createReturn(data: PowderCoatingReturnRequest): Observable<any> {
     return this.http.post(`${this.apiUrl}/return`, data);
+  }
+
+  generatePdf(data: { customerId: number; processIds: number[] }): Observable<{ blob: Blob; filename: string }> {
+    return this.http.post(`${this.apiUrl}/generate-pdf`, data, {
+      responseType: 'blob',
+      observe: 'response'
+    }).pipe(
+      map(response => {
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition?.split('filename=')[1]?.replace(/"/g, '') || 'estimate.pdf';
+        const blob = new Blob([response.body!], { type: 'application/pdf' });
+        return { blob, filename };
+      })
+    );
   }
 } 

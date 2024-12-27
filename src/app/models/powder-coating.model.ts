@@ -6,6 +6,8 @@ export interface PowderCoatingProcess {
   customerName: string;
   quantity: number;
   remainingQuantity: number;
+  totalBags?: number;
+  totalAmount?: number;
   createdAt: string;
   showReturns?: boolean;
   returns?: PowderCoatingReturn[];

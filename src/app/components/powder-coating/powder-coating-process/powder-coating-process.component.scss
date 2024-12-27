@@ -323,3 +323,31 @@
     }
   }
 }
+
+.table-actions {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.select-column {
+  width: 40px;
+  text-align: center;
+  
+  .checkbox-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      
+      &:disabled {
+        cursor: not-allowed;
+      }
+    }
+  }
+}

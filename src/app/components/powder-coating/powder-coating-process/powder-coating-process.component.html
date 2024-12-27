@@ -96,6 +96,8 @@
             <th>Customer</th>
             <th>Total Quantity</th>
             <th>Remaining Quantity</th>
+            <th>Total Bags</th>
+            <th>Total Amount</th>
             <th>Status</th>
             <th>Created At</th>
             <th>Actions</th>
@@ -108,6 +110,8 @@
             <td>{{ process.customerName }}</td>
             <td>{{ process.quantity }}</td>
             <td>{{ process.remainingQuantity }}</td>
+            <td>{{ process.totalBags }}</td>
+            <td>{{ process.totalAmount }}</td>
             <td>
               <span [class]="'status-badge ' + (process.quantity === process.remainingQuantity ? 'active' : 'completed')  ">
                 {{ 0 === process.remainingQuantity ? 'Completed' : 'Active' }}
