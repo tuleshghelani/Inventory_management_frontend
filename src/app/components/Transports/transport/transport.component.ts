@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../services/product.service';
 import { CustomerService } from '../../../services/customer.service';
@@ -96,9 +96,70 @@ export class TransportComponent implements OnInit {
     const itemGroup = this.fb.group({
       productId: ['', [Validators.required]],
       quantity: ['', [Validators.required, Validators.min(1)]],
-      remarks: ['']
+      remarks: [''],
+      // Purchase fields
+      purchaseUnitPrice: [0, [Validators.required, Validators.min(0.01)]],
+      purchaseDiscount: [0, [Validators.required, Validators.min(0)]],
+      purchaseDiscountAmount: [0, [Validators.required, Validators.min(0)]],
+      purchaseDiscountPrice: [0, [Validators.required, Validators.min(0.01)]],
+      // Sale fields
+      saleUnitPrice: [0, [Validators.required, Validators.min(0.01)]],
+      saleDiscount: [0, [Validators.required, Validators.min(0)]],
+      saleDiscountAmount: [0, [Validators.required, Validators.min(0)]],
+      saleDiscountPrice: [0, [Validators.required, Validators.min(0.01)]]
     });
+
     this.getBagItems(bagIndex).push(itemGroup);
+    this.setupDiscountCalculations(bagIndex, this.getBagItems(bagIndex).length - 1);
+  }
+
+  private setupDiscountCalculations(bagIndex: number, itemIndex: number): void {
+    const itemGroup = this.getBagItems(bagIndex).at(itemIndex);
+    
+    // Setup purchase discount calculation
+    ['quantity', 'purchaseUnitPrice', 'purchaseDiscount', 'purchaseDiscountAmount'].forEach(field => {
+      itemGroup.get(field)?.valueChanges.subscribe(() => {
+        this.calculateDiscount(bagIndex, itemIndex, 'purchase');
+      });
+    });
+
+    // Setup sale discount calculation
+    ['quantity', 'saleUnitPrice', 'saleDiscount', 'saleDiscountAmount'].forEach(field => {
+      itemGroup.get(field)?.valueChanges.subscribe(() => {
+        this.calculateDiscount(bagIndex, itemIndex, 'sale');
+      });
+    });
+  }
+
+  private calculateDiscount(bagIndex: number, itemIndex: number, type: 'purchase' | 'sale'): void {
+    const itemGroup = this.getBagItems(bagIndex).at(itemIndex);
+    const prefix = type === 'purchase' ? 'purchase' : 'sale';
+
+    const values = {
+      quantity: itemGroup.get('quantity')?.value || 0,
+      unitPrice: itemGroup.get(`${prefix}UnitPrice`)?.value || 0,
+      discountPercentage: itemGroup.get(`${prefix}Discount`)?.value || 0,
+      discountAmount: itemGroup.get(`${prefix}DiscountAmount`)?.value || 0,
+      finalPrice: 0
+    };
+
+    const totalPrice = values.quantity * values.unitPrice;
+    
+    if (values.discountAmount > 0) {
+      values.finalPrice = totalPrice - values.discountAmount;
+      values.discountPercentage = (values.discountAmount / totalPrice) * 100;
+    } else if (values.discountPercentage > 0) {
+      values.discountAmount = (totalPrice * values.discountPercentage) / 100;
+      values.finalPrice = totalPrice - values.discountAmount;
+    } else {
+      values.finalPrice = totalPrice;
+    }
+
+    itemGroup.patchValue({
+      [`${prefix}DiscountAmount`]: values.discountAmount,
+      [`${prefix}Discount`]: values.discountPercentage,
+      [`${prefix}DiscountPrice`]: values.finalPrice
+    }, { emitEvent: false });
   }
 
   removeItem(bagIndex: number, itemIndex: number): void {
@@ -259,61 +320,51 @@ export class TransportComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const validation = this.validateForm();
-    
-    if (validation.isValid) {
-      this.loading = true;
-      const formData = this.transportForm.value;
-
-      // Add transportId for update operation
-      if (this.isEditMode && this.transportId) {
-        formData.id = this.transportId;
-        this.transportService.updateTransport(formData).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.snackbar.success('Transport updated successfully');
-              this.resetForm();
-            }
-            this.loading = false;
-            if(this.isEditMode) {
-              this.router.navigate(['/transport']);
-            }
-          },
-          error: (error) => {
-            this.snackbar.error(error?.error?.message || 'Failed to update transport');
-            this.loading = false;
-          }
-        });
-      } else {
-        this.transportService.createTransport(formData).subscribe({
-          next: (response) => {
-            if (response.success) {
-              this.snackbar.success('Transport created successfully');
-              this.resetForm();
-            }
-            this.loading = false;
-          },
-          error: (error) => {
-            this.snackbar.error(error?.error?.message || 'Failed to create transport');
-            this.loading = false;
-          }
-        });
-      }
-    } else {
-      validation.errors.forEach(error => {
-        this.snackbar.error(error);
-      });
+    if (this.transportForm.invalid) {
       this.markFormGroupTouched(this.transportForm);
+      return;
     }
+
+    const formValue = this.transportForm.value;
+    // Transform the data to match the required format
+    const payload = {
+      customerId: formValue.customerId,
+      bags: formValue.bags.map((bag: any) => ({
+        weight: bag.weight,
+        items: bag.items.map((item: any) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+          remarks: item.remarks || '',
+          purchaseUnitPrice: item.purchaseUnitPrice,
+          purchaseDiscount: item.purchaseDiscount,
+          purchaseDiscountAmount: item.purchaseDiscountAmount,
+          purchaseDiscountPrice: item.purchaseDiscountPrice,
+          saleUnitPrice: item.saleUnitPrice,
+          saleDiscount: item.saleDiscount,
+          saleDiscountAmount: item.saleDiscountAmount,
+          saleDiscountPrice: item.saleDiscountPrice
+        }))
+      }))
+    };
+
+    // Submit the payload
+    this.transportService.createTransport(payload).subscribe({
+      next: (response) => {
+        this.snackbar.success('Transport created successfully');
+        this.router.navigate(['/transports']);
+      },
+      error: (error) => {
+        this.snackbar.error('Failed to create transport');
+      }
+    });
   }
 
-  private markFormGroupTouched(formGroup: FormGroup | FormArray): void {
+  private markFormGroupTouched(formGroup: FormGroup | FormArray) {
     Object.values(formGroup.controls).forEach(control => {
       if (control instanceof FormGroup || control instanceof FormArray) {
         this.markFormGroupTouched(control);
       } else {
         control.markAsTouched();
-        control.updateValueAndValidity();
       }
     });
   }
@@ -431,5 +482,21 @@ export class TransportComponent implements OnInit {
 
     // Trigger change detection
     this.transportForm.updateValueAndValidity();
+  }
+
+  calculateTotalWeight(): number {
+    return this.bags.controls.reduce((total, bag) => {
+      return total + (bag.get('weight')?.value || 0);
+    }, 0);
+  }
+
+  private getErrorMessage(control: AbstractControl, fieldName: string): string {
+    if (control.hasError('required')) {
+      return `${fieldName} is required`;
+    }
+    if (control.hasError('min')) {
+      return `${fieldName} must be greater than ${control.errors?.['min'].min}`;
+    }
+    return '';
   }
 }
