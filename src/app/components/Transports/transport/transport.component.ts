@@ -7,7 +7,7 @@ import { CustomerService } from '../../../services/customer.service';
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
-import { Transport } from '../../../models/transport.model';
+import { Transport, TransportSummary } from '../../../models/transport.model';
 import { TransportService } from '../../../services/transport.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 
@@ -38,6 +38,7 @@ export class TransportComponent implements OnInit {
   deleteItemIndices: { bagIndex: number; itemIndex: number } | null = null;
   transportId: number | null = null;
   isEditMode = false;
+  transportSummary: TransportSummary | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -448,37 +449,49 @@ export class TransportComponent implements OnInit {
 
     // Add bags and their items
     data.bags.forEach((bag: any) => {
+      // First create and add the bag
       const bagGroup = this.fb.group({
         weight: [bag.weight, [Validators.required, Validators.min(0.01)]],
         items: this.fb.array([])
       });
+      this.bags.push(bagGroup); // Add bag first
+      const currentBagIndex = this.bags.length - 1;
 
-      const items = JSON.parse(bag.items);
-      const itemsArray = bagGroup.get('items') as FormArray;
-
-      items.forEach((item: any) => {
-        // Convert productId to number by removing quotes and using parseInt
-        const productId = parseInt(item.productId.toString().replace(/"/g, ''), 10);
-        
-        // Find the product in the products array
-        const product = this.products.find(p => p.id === productId);
-        
-        if (!product) {
-          console.warn(`Product with ID ${productId} not found`);
-        }
-
-        // Create form group with product selection
+      // Then add items to the bag
+      bag.items.forEach((item: any) => {
         const itemGroup = this.fb.group({
-          productId: [productId, [Validators.required]],
+          productId: [item.productId, [Validators.required]],
           quantity: [item.quantity, [Validators.required, Validators.min(1)]],
-          remarks: [item.remarks || '']
+          remarks: [item.remarks || ''],
+          // Purchase fields
+          purchaseUnitPrice: [item.purchase.unitPrice, [Validators.required, Validators.min(0.01)]],
+          purchaseDiscount: [item.purchase.discount, [Validators.required, Validators.min(0)]],
+          purchaseDiscountAmount: [item.purchase.discountAmount, [Validators.required, Validators.min(0)]],
+          purchaseDiscountPrice: [item.purchase.discountPrice, [Validators.required, Validators.min(0.01)]],
+          // Sale fields
+          saleUnitPrice: [item.sale.unitPrice, [Validators.required, Validators.min(0.01)]],
+          saleDiscount: [item.sale.discount, [Validators.required, Validators.min(0)]],
+          saleDiscountAmount: [item.sale.discountAmount, [Validators.required, Validators.min(0)]],
+          saleDiscountPrice: [item.sale.discountPrice, [Validators.required, Validators.min(0.01)]]
         });
 
+        const itemsArray = this.getBagItems(currentBagIndex);
         itemsArray.push(itemGroup);
+        
+        // Setup calculations after item is added
+        this.setupDiscountCalculations(currentBagIndex, itemsArray.length - 1);
       });
-
-      this.bags.push(bagGroup);
     });
+
+    // Add summary data
+    this.transportSummary = {
+      totalBags: data.totalBags,
+      totalWeight: data.totalWeight,
+      totalSaleAmount: data.summary.totalSaleAmount,
+      totalProfit: data.summary.totalProfit,
+      totalPurchaseAmount: data.summary.totalPurchaseAmount,
+      createdAt: new Date(data.createdAt)
+    };
 
     // Trigger change detection
     this.transportForm.updateValueAndValidity();

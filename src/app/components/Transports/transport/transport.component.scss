@@ -320,3 +320,64 @@
 .sale-section {
   // margin: 0.75rem 0;
 }
+
+.transport-summary {
+  margin-bottom: 2rem;
+
+  .summary-card {
+    background: white;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+
+    .summary-header {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .created-at {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+    }
+
+    .summary-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      padding: 1.5rem;
+
+      .summary-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        label {
+          color: var(--text-secondary);
+          font-size: 0.9rem;
+        }
+
+        span {
+          font-size: 1.2rem;
+          font-weight: 500;
+          color: var(--text-primary);
+        }
+
+        &.profit span {
+          color: var(--success);
+        }
+      }
+    }
+  }
+}

@@ -16,4 +16,13 @@ export interface Transport {
   createdAt?: string;
   updatedAt?: string;
   status?: string;
+}
+
+export interface TransportSummary {
+  totalBags: number;
+  totalWeight: number;
+  totalSaleAmount: number;
+  totalProfit: number;
+  totalPurchaseAmount: number;
+  createdAt: Date;
 } 
