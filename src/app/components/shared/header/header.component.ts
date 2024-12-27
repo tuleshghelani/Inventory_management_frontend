@@ -12,6 +12,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isAuthenticated: boolean = false;
   showMasterMenu: boolean = false;
   showTransactionMenu: boolean = false;
+  isMobileMenuOpen: boolean = false;
   private authSubscription: Subscription;
 
   constructor(
@@ -38,10 +39,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     const target = event.target as HTMLElement;
-    if (!target.closest('.dropdown')) {
+    if (!target.closest('.dropdown') && !target.closest('.mobile-menu-toggle')) {
       this.showMasterMenu = false;
       this.showTransactionMenu = false;
+      if (!target.closest('.nav-links')) {
+        this.isMobileMenuOpen = false;
+      }
     }
+  }
+
+  toggleMobileMenu(): void {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
   toggleMasterMenu(event: Event): void {
@@ -60,20 +68,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   isMasterActive(): boolean {
     const currentUrl = this.router.url;
-    return currentUrl.includes('/category') || currentUrl.includes('/product');
+    return ['/category', '/product', '/customer', '/employee'].some(path => 
+      currentUrl.includes(path)
+    );
   }
 
   isTransactionActive(): boolean {
     const currentUrl = this.router.url;
-    return currentUrl.includes('/purchase') || 
-           currentUrl.includes('/sale') || 
-           currentUrl.includes('/profit');
+    return ['/purchase', '/sale', '/profit', '/daily-profit'].some(path => 
+      currentUrl.includes(path)
+    );
   }
 
   logout(): void {
     this.authService.logout();
-    this.router.navigate(['/login']).then(() => {
-      window.location.reload();
-    });
+    this.router.navigate(['/login']);
   }
 }
