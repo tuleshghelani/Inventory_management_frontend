@@ -100,36 +100,22 @@
 
   .table-responsive {
     overflow-x: auto;
-    margin-bottom: 1rem;
-
+    
     table {
-      width: 100%;
-      border-collapse: collapse;
+      min-width: 1200px;
       
       th, td {
-        padding: 1rem;
-        text-align: left;
-        border-bottom: 1px solid var(--supporting);
-      }
-
-      th {
-        // background-color: var(--background);
-        font-weight: 600;
-      }
-
-      .status-badge {
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.875rem;
-
-        &.active {
-          background-color: var(--accent2);
-          color: white;
+        white-space: nowrap;
+        min-width: 120px;
+        
+        &.select-column {
+          width: 40px;
+          min-width: 40px;
         }
-
-        &.completed {
-          background-color: var(--text-secondary);
-          color: white;
+        
+        &.actions-cell {
+          width: 120px;
+          min-width: 120px;
         }
       }
     }
@@ -325,7 +311,7 @@
 }
 
 .table-actions {
-  margin-bottom: 1rem;
+  margin: 1rem 0;
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
@@ -338,11 +324,6 @@
     
     i {
       font-size: 1rem;
-    }
-    
-    &:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
     }
   }
 }
@@ -364,6 +345,43 @@
       &:disabled {
         cursor: not-allowed;
       }
+    }
+  }
+}
+
+.checkbox-wrapper {
+  input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--primary);
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    margin: 0;
+    
+    &:checked {
+      background-color: var(--primary);
+      
+      &::after {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+    }
+    
+    &:disabled {
+      border-color: var(--border-color);
+      background-color: var(--background-light);
+      cursor: not-allowed;
+      opacity: 0.5;
     }
   }
 }

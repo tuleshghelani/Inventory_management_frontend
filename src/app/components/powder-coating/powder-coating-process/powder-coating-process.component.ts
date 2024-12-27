@@ -96,6 +96,8 @@ export class PowderCoatingProcessComponent implements OnInit {
 
   loadProcesses(): void {
     this.isLoading = true;
+    this.selectedCustomerId = undefined;
+    this.selectedProcesses.clear();
     const params = {
       ...this.searchForm.value,
       currentPage: this.currentPage,
@@ -245,13 +247,21 @@ export class PowderCoatingProcessComponent implements OnInit {
     this.modalService.open('return', processId);
   }
 
-  toggleProcessSelection(process: any): void {
+  isCheckboxDisabled(process: any): boolean {
+    return this.selectedCustomerId !== undefined && 
+           this.selectedCustomerId !== process.customerId;
+  }
+
+  toggleProcessSelection(process: any, event: Event): void {
+    if (this.isCheckboxDisabled(process)) {
+      event.preventDefault();
+      this.snackbar.error('You can select records of only one customer');
+      return;
+    }
+
     if (this.selectedProcesses.size === 0) {
       this.selectedCustomerId = process.customerId;
       this.selectedProcesses.add(process.id);
-    } else if (this.selectedCustomerId !== process.customerId) {
-      this.snackbar.error('You can select records of only one customer');
-      return;
     } else {
       if (this.selectedProcesses.has(process.id)) {
         this.selectedProcesses.delete(process.id);

@@ -87,10 +87,10 @@
       </div>
     </div>
 
-    <div class="table-actions">
+    <div class="table-actions" *ngIf="selectedProcesses.size > 0">
       <button 
         class="btn btn-primary" 
-        [disabled]="selectedProcesses.size === 0 || isGeneratingPdf"
+        [disabled]="isGeneratingPdf"
         (click)="generatePdf()"
       >
         <i class="fas" [ngClass]="isGeneratingPdf ? 'fa-spinner fa-spin' : 'fa-file-pdf'"></i>
@@ -103,7 +103,9 @@
         <thead>
           <tr>
             <th class="select-column">
-              <!-- Header checkbox if needed -->
+              <div class="checkbox-wrapper">
+                <input type="checkbox" disabled>
+              </div>
             </th>
             <th>#</th>
             <th>Product</th>
@@ -114,7 +116,7 @@
             <th>Total Amount</th>
             <th>Status</th>
             <th>Created At</th>
-            <th>Actions</th>
+            <th class="actions-cell">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -124,7 +126,8 @@
                 <input 
                   type="checkbox"
                   [checked]="selectedProcesses.has(process.id)"
-                  (change)="toggleProcessSelection(process)"
+                  [disabled]="isCheckboxDisabled(process)"
+                  (click)="toggleProcessSelection(process, $event)"
                 >
               </div>
             </td>
