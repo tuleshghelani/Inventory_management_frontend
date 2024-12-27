@@ -119,15 +119,21 @@ export class TransportComponent implements OnInit {
     
     // Setup purchase discount calculation
     ['quantity', 'purchaseUnitPrice', 'purchaseDiscount', 'purchaseDiscountAmount'].forEach(field => {
-      itemGroup.get(field)?.valueChanges.subscribe(() => {
-        this.calculateDiscount(bagIndex, itemIndex, 'purchase');
+      itemGroup.get(field)?.valueChanges.subscribe((value) => {
+        // Only calculate if the field is not null/undefined
+        if (value !== null && value !== undefined) {
+          this.calculateDiscount(bagIndex, itemIndex, 'purchase');
+        }
       });
     });
 
     // Setup sale discount calculation
     ['quantity', 'saleUnitPrice', 'saleDiscount', 'saleDiscountAmount'].forEach(field => {
-      itemGroup.get(field)?.valueChanges.subscribe(() => {
-        this.calculateDiscount(bagIndex, itemIndex, 'sale');
+      itemGroup.get(field)?.valueChanges.subscribe((value) => {
+        // Only calculate if the field is not null/undefined
+        if (value !== null && value !== undefined) {
+          this.calculateDiscount(bagIndex, itemIndex, 'sale');
+        }
       });
     });
   }
@@ -137,24 +143,38 @@ export class TransportComponent implements OnInit {
     const prefix = type === 'purchase' ? 'purchase' : 'sale';
 
     const values = {
-      quantity: itemGroup.get('quantity')?.value || 0,
-      unitPrice: itemGroup.get(`${prefix}UnitPrice`)?.value || 0,
-      discountPercentage: itemGroup.get(`${prefix}Discount`)?.value || 0,
-      discountAmount: itemGroup.get(`${prefix}DiscountAmount`)?.value || 0,
+      quantity: Number(itemGroup.get('quantity')?.value) || 0,
+      unitPrice: Number(itemGroup.get(`${prefix}UnitPrice`)?.value) || 0,
+      discountPercentage: Number(itemGroup.get(`${prefix}Discount`)?.value),
+      discountAmount: Number(itemGroup.get(`${prefix}DiscountAmount`)?.value),
       finalPrice: 0
     };
 
     const totalPrice = values.quantity * values.unitPrice;
-    
-    if (values.discountAmount > 0) {
-      values.finalPrice = totalPrice - values.discountAmount;
-      values.discountPercentage = (values.discountAmount / totalPrice) * 100;
-    } else if (values.discountPercentage > 0) {
-      values.discountAmount = (totalPrice * values.discountPercentage) / 100;
-      values.finalPrice = totalPrice - values.discountAmount;
-    } else {
+
+    // Reset logic
+    if (values.discountPercentage === 0 && values.discountAmount === 0) {
       values.finalPrice = totalPrice;
     }
+    // Handle discount amount changes
+    else if (itemGroup.get(`${prefix}DiscountAmount`)?.dirty) {
+      values.finalPrice = totalPrice - values.discountAmount;
+      values.discountPercentage = totalPrice > 0 ? (values.discountAmount / totalPrice) * 100 : 0;
+    }
+    // Handle discount percentage changes
+    else if (itemGroup.get(`${prefix}Discount`)?.dirty) {
+      values.discountAmount = (totalPrice * values.discountPercentage) / 100;
+      values.finalPrice = totalPrice - values.discountAmount;
+    }
+    // Default case
+    else {
+      values.finalPrice = totalPrice;
+    }
+
+    // Ensure non-negative values
+    values.finalPrice = Math.max(0, values.finalPrice);
+    values.discountAmount = Math.max(0, values.discountAmount);
+    values.discountPercentage = Math.max(0, values.discountPercentage);
 
     itemGroup.patchValue({
       [`${prefix}DiscountAmount`]: values.discountAmount,
@@ -329,6 +349,7 @@ export class TransportComponent implements OnInit {
     const formValue = this.transportForm.value;
     // Transform the data to match the required format
     const payload = {
+      id: this.isEditMode ? this.transportId : undefined,
       customerId: formValue.customerId,
       bags: formValue.bags.map((bag: any) => ({
         weight: bag.weight,
@@ -348,14 +369,18 @@ export class TransportComponent implements OnInit {
       }))
     };
 
-    // Submit the payload
-    this.transportService.createTransport(payload).subscribe({
+    // Choose appropriate API call based on mode
+    const apiCall = this.isEditMode ? 
+      this.transportService.updateTransport(payload) :
+      this.transportService.createTransport(payload);
+
+    apiCall.subscribe({
       next: (response) => {
-        this.snackbar.success('Transport created successfully');
-        this.router.navigate(['/transports']);
+        this.snackbar.success(`Transport ${this.isEditMode ? 'updated' : 'created'} successfully`);
+        this.router.navigate(['/transport']);
       },
       error: (error) => {
-        this.snackbar.error('Failed to create transport');
+        this.snackbar.error(error?.error?.message || `Failed to ${this.isEditMode ? 'update' : 'create'} transport`);
       }
     });
   }
@@ -451,6 +476,7 @@ export class TransportComponent implements OnInit {
     data.bags.forEach((bag: any) => {
       // First create and add the bag
       const bagGroup = this.fb.group({
+        id: [bag.id],
         weight: [bag.weight, [Validators.required, Validators.min(0.01)]],
         items: this.fb.array([])
       });
@@ -460,6 +486,7 @@ export class TransportComponent implements OnInit {
       // Then add items to the bag
       bag.items.forEach((item: any) => {
         const itemGroup = this.fb.group({
+          id: [item.id],
           productId: [item.productId, [Validators.required]],
           quantity: [item.quantity, [Validators.required, Validators.min(1)]],
           remarks: [item.remarks || ''],

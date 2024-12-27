@@ -1,5 +1,3 @@
-
-
 .transport-list-container {
   padding: 20px;
   
@@ -95,6 +93,15 @@
 
       &:hover {
         color: var(--primary);
+      }
+
+      &.delete {
+        color: var(--danger);
+        margin-left: 0.5rem;
+
+        &:hover {
+          background-color: var(--danger-light);
+        }
       }
     }
   }

@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { TransportService } from '../../../services/transport.service';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-transport-list',
@@ -14,7 +15,8 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
     ReactiveFormsModule,
     RouterModule,
     LoaderComponent,
-    FormsModule
+    FormsModule,
+    ConfirmModalComponent
   ],
   templateUrl: './transport-list.component.html',
   styleUrls: ['./transport-list.component.scss']
@@ -32,6 +34,10 @@ export class TransportListComponent implements OnInit {
   totalElements = 0;
   startIndex = 0;
   endIndex = 0;
+
+  // Add these properties
+  showDeleteModal = false;
+  transportToDelete: number | null = null;
 
   constructor(
     private transportService: TransportService,
@@ -151,5 +157,39 @@ export class TransportListComponent implements OnInit {
     this.searchForm.reset();
     this.currentPage = 0;
     this.loadTransports();
+  }
+
+  // Add these methods
+  onDeleteTransport(id: number): void {
+    this.transportToDelete = id;
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete(): void {
+    if (this.transportToDelete) {
+      this.isLoading = true;
+      this.transportService.deleteTransport(this.transportToDelete).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.snackbar.success('Transport deleted successfully');
+            this.loadTransports();
+          } else {
+            this.snackbar.error(response.message || 'Failed to delete transport');
+          }
+          this.cancelDelete();
+          this.isLoading = false;
+        },
+        error: () => {
+          this.snackbar.error('Failed to delete transport');
+          this.cancelDelete();
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.transportToDelete = null;
   }
 }
