@@ -42,7 +42,7 @@
 }
 
 .form-content {
-  padding: 2rem;
+  padding: 1.25rem;
   position: relative;
 }
 
@@ -54,7 +54,7 @@
 }
 
 .customer-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .customer-select-group {
@@ -64,13 +64,13 @@
 }
 
 .bags-section {
-  margin-top: 2rem;
+  margin-top: 1rem;
 
   .bags-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 
     h3 {
       margin: 0;
@@ -82,15 +82,15 @@
 .bag-card {
   background: #f8f9fa;
   border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
   border: 1px solid #dee2e6;
 
   .bag-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 
     h4 {
       margin: 0;
@@ -99,7 +99,7 @@
   }
 
   .bag-weight {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -108,7 +108,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 
     h5 {
       margin: 0;
@@ -119,8 +119,8 @@
   .item-row {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem;
+    gap: 0.75rem;
+    padding: 0.75rem;
     background: white;
     border-radius: 8px;
     margin-bottom: 1rem;
@@ -147,8 +147,8 @@
       .section-title {
         color: var(--primary);
         font-size: 1rem;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.25rem;
         border-bottom: 1px solid var(--border-color);
         display: flex;
         align-items: center;
@@ -162,7 +162,7 @@
       .price-details {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 1rem;
+        gap: 0.75rem;
         
         @media (max-width: 1200px) {
           grid-template-columns: repeat(2, 1fr);
@@ -199,11 +199,11 @@
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 
   label {
     display: block;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
     color: var(--text-primary);
     font-weight: 500;
     display: flex;
@@ -217,6 +217,12 @@
     .required {
       color: #dc3545;
     }
+  }
+
+  input, select {
+    padding: 0.4rem 0.75rem;
+    height: auto;
+    font-size: 0.9rem;
   }
 }
 
@@ -280,9 +286,9 @@
 
 .customer-weight-row {
   display: flex;
-  gap: 2rem;
+  gap: 1rem;
   align-items: flex-start;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 
   .customer-select {
     flex: 2;
@@ -319,8 +325,8 @@
 .basic-info-row {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
 
   @media (max-width: 992px) {
     grid-template-columns: 2fr 1fr;
@@ -333,11 +339,21 @@
 
 .purchase-section,
 .sale-section {
-  // margin: 0.75rem 0;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+
+  .section-title {
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .price-details {
+    gap: 0.75rem;
+  }
 }
 
 .transport-summary {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 
   .summary-card {
     background: white;
@@ -348,7 +364,7 @@
     .summary-header {
       background: var(--primary);
       color: white;
-      padding: 1rem;
+      padding: 0.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -370,13 +386,13 @@
     .summary-content {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1rem;
-      padding: 1.5rem;
+      gap: 0.75rem;
+      padding: 1rem;
 
       .summary-item {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.25rem;
 
         label {
           color: var(--text-secondary);
@@ -394,5 +410,46 @@
         }
       }
     }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 992px) {
+  .price-details {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .form-content {
+    padding: 1rem;
+  }
+
+  .customer-weight-row {
+    flex-direction: column;
+    gap: 0.75rem;
+
+    .customer-select,
+    .total-weight {
+      width: 100%;
+    }
+  }
+
+  .basic-info-row {
+    grid-template-columns: 1fr;
+  }
+
+  .price-details {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bag-card {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .price-details {
+    grid-template-columns: 1fr;
   }
 }

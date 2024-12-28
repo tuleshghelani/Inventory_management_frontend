@@ -58,12 +58,13 @@ export class CustomerModalComponent implements OnInit {
       .slice(0, 16);
 
     this.customerForm = this.fb.group({
-      name: ['', Validators.required],
-      mobile: ['', []],
-      email: ['', [Validators.email]],
+      name: ['', [Validators.required]],
+      mobile: [''],
+      email: [''],
       gst: ['', [Validators.pattern('^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$')]],
-      address: ['', []],
-      remainingPaymentAmount: [0, [Validators.required, Validators.min(0)]],
+      address: ['', [Validators.required]],
+      coatingUnitPrice: [0, [Validators.required, Validators.min(0.00)]],
+      remainingPaymentAmount: [0],
       nextActionDate: [localISOString],
       remarks: [''],
       status: ['A']
@@ -78,13 +79,8 @@ export class CustomerModalComponent implements OnInit {
       
       if (customer.nextActionDate) {
         try {
-          // Parse the UTC date string
           const utcDate = new Date(customer.nextActionDate);
-          
-          // Add 5:30 hours for IST
           const istDate = new Date(utcDate.getTime() + (5.5 * 60 * 60 * 1000));
-          
-          // Format for datetime-local input
           nextActionDate = istDate.toISOString().slice(0, 16);
         } catch (error) {
           console.error('Error parsing date:', error);
@@ -97,6 +93,7 @@ export class CustomerModalComponent implements OnInit {
         email: customer.email || '',
         gst: customer.gst || '',
         address: customer.address || '',
+        coatingUnitPrice: customer.coatingUnitPrice || 0,
         remainingPaymentAmount: customer.remainingPaymentAmount || 0,
         nextActionDate: nextActionDate,
         remarks: customer.remarks || '',

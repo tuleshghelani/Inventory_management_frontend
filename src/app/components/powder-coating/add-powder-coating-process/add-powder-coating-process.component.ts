@@ -11,6 +11,7 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { PowderCoatingReturn } from '../../../models/powder-coating.model';
 import { ReturnModalComponent } from '../return-modal/return-modal.component';
 import { ModalService } from '../../../services/modal.service';
+import { ApiResponse } from '../../../models/api.model';
 
 @Component({
   selector: 'app-add-powder-coating-process',
@@ -59,6 +60,7 @@ export class AddPowderCoatingProcessComponent implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
     this.loadCustomers();
+    this.setupCustomerChange();
     if (this.isEditMode) {
       this.loadProcess();
     }
@@ -282,5 +284,35 @@ export class AddPowderCoatingProcessComponent implements OnInit {
     } else {
       this.snackbar.error('Unable to open return modal');
     }
+  }
+
+  private setupCustomerChange(): void {
+    this.processForm.get('customerId')?.valueChanges.subscribe(customerId => {
+      if (customerId) {
+        this.customerService.getCustomerCoatingPrice(customerId).subscribe({
+          next: (response: any) => {
+            if (response.success) {
+              this.processForm.patchValue({
+                unitPrice: response.data?.coatingUnitPrice || 0
+              });
+            } else {
+              this.processForm.patchValue({
+                unitPrice: 0
+              });
+            }
+          },
+          error: () => {
+            this.snackbar.error('Failed to get customer coating price');
+            this.processForm.patchValue({
+              unitPrice: 0
+            });
+          }
+        });
+      } else {
+        this.processForm.patchValue({
+          unitPrice: 0
+        });
+      }
+    });
   }
 }

@@ -9,6 +9,7 @@ export interface Customer {
   nextActionDate: string;
   remarks: string;
   status: string;
+  coatingUnitPrice?: number;
   createdAt: string;
   updatedAt: string;
 }

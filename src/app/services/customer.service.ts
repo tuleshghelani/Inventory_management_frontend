@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { CustomerResponse, CustomerSearchRequest } from '../models/customer.model';
 import { CacheService } from '../shared/services/cache.service';
 import { EncryptionService } from '../shared/services/encryption.service';
+import { ApiResponse } from '../models/api.model';
 
 @Injectable({
   providedIn: 'root'
@@ -57,5 +58,12 @@ export class CustomerService {
   refreshCustomers(): Observable<any> {
     localStorage.removeItem(this.CACHE_KEY);
     return this.getCustomers({ status: 'A' });
+  }
+
+  getCustomerCoatingPrice(customerId: number) {
+    return this.http.post<ApiResponse<{ id: number; coatingUnitPrice: number }>>(
+      `${this.apiUrl}/coating-price`,
+      { id: customerId }
+    );
   }
 } 
