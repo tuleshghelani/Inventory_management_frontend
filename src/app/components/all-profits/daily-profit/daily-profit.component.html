@@ -58,6 +58,17 @@
                         </td>
                     </tr>
                 </tbody>
+                <tfoot>
+                    <tr class="totals-row">
+                        <td colspan="3" class="text-end"><strong>Totals:</strong></td>
+                        <td [ngClass]="{'text-success': getTotalGrossProfit() > 0, 'text-danger': getTotalGrossProfit() < 0}">
+                            <strong>{{ getTotalGrossProfit() | number:'1.2-2' }}</strong>
+                        </td>
+                        <td [ngClass]="{'text-success': getTotalNetProfit() > 0, 'text-danger': getTotalNetProfit() < 0}">
+                            <strong>{{ getTotalNetProfit() | number:'1.2-2' }}</strong>
+                        </td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>

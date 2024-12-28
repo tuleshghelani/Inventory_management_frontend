@@ -192,4 +192,20 @@ export class TransportListComponent implements OnInit {
     this.showDeleteModal = false;
     this.transportToDelete = null;
   }
+
+  onPrintTransport(id: number): void {
+    this.transportService.generatePdf(id).subscribe({
+      next: (response) => {
+        const url = window.URL.createObjectURL(response.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = response.filename;
+        link.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.snackbar.error('Failed to generate PDF');
+      }
+    });
+  }
 }

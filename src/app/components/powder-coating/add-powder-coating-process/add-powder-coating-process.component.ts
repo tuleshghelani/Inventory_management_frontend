@@ -70,7 +70,7 @@ export class AddPowderCoatingProcessComponent implements OnInit {
       productId: ['', [Validators.required]],
       quantity: ['', [Validators.required, Validators.min(1)]],
       totalBags: ['', [Validators.required, Validators.min(1)]],
-      unitPrice: ['', [Validators.required, Validators.min(0.01)]],
+      unitPrice: [0, [Validators.required, Validators.min(0)]],
       totalAmount: [{ value: '', disabled: true }],
       remarks: [''],
       status: ['A']

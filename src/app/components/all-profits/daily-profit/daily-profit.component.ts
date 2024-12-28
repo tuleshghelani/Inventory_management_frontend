@@ -112,4 +112,12 @@ export class DailyProfitComponent implements OnInit {
     this.startIndex = this.currentPage * this.pageSize;
     this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalElements);
   }
+
+  getTotalGrossProfit(): number {
+    return this.profits?.content.reduce((sum: number, profit: any) => sum + profit.grossProfit, 0) || 0;
+  }
+
+  getTotalNetProfit(): number {
+    return this.profits?.content.reduce((sum: number, profit: any) => sum + profit.netProfit, 0) || 0;
+  }
 }

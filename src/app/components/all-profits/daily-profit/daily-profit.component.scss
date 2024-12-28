@@ -127,6 +127,18 @@
             padding: 15px;
         }
     }
+
+    .totals-row {
+        background-color: var(--background);
+        
+        td {
+            padding: 12px 8px;
+            
+            &.text-end {
+                text-align: right;
+            }
+        }
+    }
 }
 
 .form-control {

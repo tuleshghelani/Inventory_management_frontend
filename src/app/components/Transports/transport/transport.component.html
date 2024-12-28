@@ -1,10 +1,21 @@
 <div class="transport-container">
   <div class="form-card">
     <div class="card-header">
-      <h2 class="form-title">
-        <i class="fas fa-truck"></i> 
-        {{ isEditMode ? 'Edit Transport Entry' : 'Create Transport Entry' }}
-      </h2>
+      <div class="header-content">
+        <h2 class="form-title">
+          <i class="fas fa-truck"></i> 
+          {{ isEditMode ? 'Edit Transport Entry' : 'Create Transport Entry' }}
+        </h2>
+        <button 
+          *ngIf="isEditMode && transportId"
+          class="btn btn-primary print-btn" 
+          (click)="onPrint()"
+          [disabled]="loading || isPrinting"
+        >
+          <i class="fas" [ngClass]="isPrinting ? 'fa-spinner fa-spin' : 'fa-print'"></i>
+          {{ isPrinting ? 'Printing...' : 'Print' }}
+        </button>
+      </div>
     </div>
     
     <div class="form-content">

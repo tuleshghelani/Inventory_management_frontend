@@ -24,6 +24,21 @@
     align-items: center;
     gap: 0.5rem;
   }
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .print-btn {
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      
+      i {
+        margin-right: 6px;
+      }
+    }
+  }
 }
 
 .form-content {
@@ -109,7 +124,7 @@
     background: white;
     border-radius: 8px;
     margin-bottom: 1rem;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--primary);
     position: relative;
 
     .basic-info-section {

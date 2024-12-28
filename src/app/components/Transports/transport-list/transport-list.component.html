@@ -88,6 +88,9 @@
               <button class="btn-icon" [routerLink]="['/transport/edit', transport.id]" title="Edit Transport">
                 <i class="fas fa-edit"></i>
               </button>
+              <button class="btn-icon print" (click)="onPrintTransport(transport.id)" title="Print Transport">
+                <i class="fas fa-print"></i>
+              </button>
               <button class="btn-icon delete" (click)="onDeleteTransport(transport.id)" title="Delete Transport">
                 <i class="fas fa-trash"></i>
               </button>

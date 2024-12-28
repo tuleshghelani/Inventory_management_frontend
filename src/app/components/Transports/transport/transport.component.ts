@@ -40,6 +40,7 @@ export class TransportComponent implements OnInit {
   transportId: number | null = null;
   isEditMode = false;
   transportSummary: TransportSummary | null = null;
+  isPrinting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -583,5 +584,26 @@ export class TransportComponent implements OnInit {
         }
       });
     }
+  }
+
+  onPrint(): void {
+    if (!this.transportId || this.isPrinting || this.loading) return;
+    
+    this.isPrinting = true;
+    this.transportService.generatePdf(this.transportId).subscribe({
+      next: (response) => {
+        const url = window.URL.createObjectURL(response.blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = response.filename;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.isPrinting = false;
+      },
+      error: () => {
+        this.snackbar.error('Failed to generate PDF');
+        this.isPrinting = false;
+      }
+    });
   }
 }

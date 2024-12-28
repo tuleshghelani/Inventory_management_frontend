@@ -103,6 +103,15 @@
           background-color: var(--danger-light);
         }
       }
+
+      &.print {
+        color: var(--primary);
+        margin-left: 0.5rem;
+
+        &:hover {
+          background-color: rgba(var(--primary-rgb), 0.1);
+        }
+      }
     }
   }
 }
