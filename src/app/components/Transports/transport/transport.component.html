@@ -162,7 +162,7 @@
                             [options]="products"
                             [class.is-invalid]="isFieldInvalid(item.get('productId'))"
                           ></app-searchable-select>
-                          <button type="button" class="btn-icon refresh">
+                          <button type="button" class="btn-icon refresh" (click)="refreshProducts()">
                             <i class="fas fa-sync-alt"></i>
                           </button>
                         </div>

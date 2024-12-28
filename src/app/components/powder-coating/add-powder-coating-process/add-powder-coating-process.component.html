@@ -30,6 +30,15 @@
                   [placeholder]="'Select Customer'"
                   [class.is-invalid]="isFieldInvalid('customerId')"
                 ></app-searchable-select>
+                <button 
+                  type="button" 
+                  class="btn-icon refresh" 
+                  (click)="refreshCustomers()" 
+                  [disabled]="isLoadingCustomers"
+                  title="Refresh Customers"
+                >
+                  <i class="fas" [ngClass]="isLoadingCustomers ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+                </button>
               </div>
             </div>
 
@@ -46,6 +55,15 @@
                   [placeholder]="'Select Product'"
                   [class.is-invalid]="isFieldInvalid('productId')"
                 ></app-searchable-select>
+                <button 
+                  type="button" 
+                  class="btn-icon refresh" 
+                  (click)="refreshProducts()" 
+                  [disabled]="isLoadingProducts"
+                  title="Refresh Products"
+                >
+                  <i class="fas" [ngClass]="isLoadingProducts ? 'fa-spinner fa-spin' : 'fa-sync-alt'"></i>
+                </button>
               </div>
             </div>
 
