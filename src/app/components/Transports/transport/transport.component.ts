@@ -251,7 +251,7 @@ export class TransportComponent implements OnInit {
           this.products = response.data;
           // If in edit mode, populate the form after products are loaded
           if (this.isEditMode && this.transportId) {
-            this.loadTransportDetail();
+            // this.loadTransportDetail();
           }
         }
         this.isLoadingProducts = false;
