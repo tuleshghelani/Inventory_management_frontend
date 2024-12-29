@@ -62,7 +62,7 @@ export class CustomerModalComponent implements OnInit {
       mobile: [''],
       email: [''],
       gst: ['', [Validators.pattern('^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$')]],
-      address: ['', [Validators.required]],
+      address: [''],
       coatingUnitPrice: [0, [Validators.required, Validators.min(0.00)]],
       remainingPaymentAmount: [0],
       nextActionDate: [localISOString],

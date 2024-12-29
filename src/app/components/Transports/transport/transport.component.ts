@@ -116,15 +116,15 @@ export class TransportComponent implements OnInit {
       quantity: ['', [Validators.required, Validators.min(1)]],
       remarks: [''],
       // Purchase fields
-      purchaseUnitPrice: [0, [Validators.required, Validators.min(0.01)]],
+      purchaseUnitPrice: [0, [Validators.required, Validators.min(0)]],
       purchaseDiscount: [0, [Validators.required, Validators.min(0)]],
       purchaseDiscountAmount: [0, [Validators.required, Validators.min(0)]],
-      purchaseDiscountPrice: [0, [Validators.required, Validators.min(0.01)]],
+      purchaseDiscountPrice: [0, [Validators.required, Validators.min(0)]],
       // Sale fields
-      saleUnitPrice: [0, [Validators.required, Validators.min(0.01)]],
+      saleUnitPrice: [0, [Validators.required, Validators.min(0)]],
       saleDiscount: [0, [Validators.required, Validators.min(0)]],
       saleDiscountAmount: [0, [Validators.required, Validators.min(0)]],
-      saleDiscountPrice: [0, [Validators.required, Validators.min(0.01)]]
+      saleDiscountPrice: [0, [Validators.required, Validators.min(0)]]
     });
 
     // Setup price fetching when product changes
@@ -513,15 +513,15 @@ export class TransportComponent implements OnInit {
           quantity: [item.quantity, [Validators.required, Validators.min(1)]],
           remarks: [item.remarks || ''],
           // Purchase fields
-          purchaseUnitPrice: [item.purchase.unitPrice, [Validators.required, Validators.min(0.01)]],
+          purchaseUnitPrice: [item.purchase.unitPrice, [Validators.required, Validators.min(0)]],
           purchaseDiscount: [item.purchase.discount, [Validators.required, Validators.min(0)]],
           purchaseDiscountAmount: [item.purchase.discountAmount, [Validators.required, Validators.min(0)]],
-          purchaseDiscountPrice: [item.purchase.discountPrice, [Validators.required, Validators.min(0.01)]],
+          purchaseDiscountPrice: [item.purchase.discountPrice, [Validators.required, Validators.min(0)]],
           // Sale fields
-          saleUnitPrice: [item.sale.unitPrice, [Validators.required, Validators.min(0.01)]],
+          saleUnitPrice: [item.sale.unitPrice, [Validators.required, Validators.min(0)]],
           saleDiscount: [item.sale.discount, [Validators.required, Validators.min(0)]],
           saleDiscountAmount: [item.sale.discountAmount, [Validators.required, Validators.min(0)]],
-          saleDiscountPrice: [item.sale.discountPrice, [Validators.required, Validators.min(0.01)]]
+          saleDiscountPrice: [item.sale.discountPrice, [Validators.required, Validators.min(0)]]
         });
 
         const itemsArray = this.getBagItems(currentBagIndex);
