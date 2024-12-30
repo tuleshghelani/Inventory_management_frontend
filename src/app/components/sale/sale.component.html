@@ -55,26 +55,12 @@
   
     <div class="sales-list card">
       <h2>Sales</h2>
-      
-      <div class="table-controls">
-        <div class="page-size-selector">
-          <label>Show entries:</label>
-          <select 
-            class="form-control" 
-            [(ngModel)]="pageSize" 
-            (change)="onPageSizeChange()"
-          >
-            <option *ngFor="let size of pageSizeOptions" [value]="size">
-              {{ size }}
-            </option>
-          </select>
-        </div>
-      </div>
   
       <div class="table-responsive">
         <table class="table">
           <thead>
             <tr>
+              <th>#</th>
               <th>Invoice No.</th>
               <th>Product</th>
               <th>Category</th>
@@ -87,7 +73,8 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let sale of sales">
+            <tr *ngFor="let sale of sales; let index = index">
+              <td>{{ startIndex + index + 1 }}</td>
               <td>{{ sale.invoiceNumber }}</td>
               <td>{{ sale.productName }}</td>
               <td>{{ sale.categoryName }}</td>
@@ -110,37 +97,14 @@
         </table>
       </div>
       
-      <div class="pagination-container">
-        <div class="pagination-info">
-          Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalElements }} entries
-        </div>
-        <div class="pagination">
-          <button 
-            class="btn-page" 
-            [disabled]="currentPage === 0"
-            (click)="onPageChange(currentPage - 1)"
-          >
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          
-          <ng-container *ngFor="let page of getPageNumbers()">
-            <button 
-              class="btn-page" 
-              [class.active]="page === currentPage + 1"
-              (click)="onPageChange(page - 1)"
-            >
-              {{ page }}
-            </button>
-          </ng-container>
-          
-          <button 
-            class="btn-page" 
-            [disabled]="currentPage === totalPages - 1"
-            (click)="onPageChange(currentPage + 1)"
-          >
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </div>
-      </div>
+      <app-pagination
+        *ngIf="totalPages > 0"
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalElements]="totalElements"
+        [pageSizeOptions]="pageSizeOptions"
+        (pageChange)="onPageChange($event)"
+        (pageSizeChange)="onPageSizeChange($event)"
+      ></app-pagination>
     </div>
   </div>

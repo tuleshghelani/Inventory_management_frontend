@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ProfitService } from '../../services/profit.service';
 import { LoaderComponent } from '../../shared/components/loader/loader.component';
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
 interface ProfitResponse {
   success: boolean;
@@ -30,27 +31,29 @@ interface Profit {
 
 @Component({
   selector: 'app-profit',
-  templateUrl: './profit.component.html',
-  styleUrls: ['./profit.component.scss'],
+  standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
+    CommonModule,
+    ReactiveFormsModule,
     FormsModule,
-    LoaderComponent
+    LoaderComponent,
+    PaginationComponent
   ],
-  standalone: true
+  templateUrl: './profit.component.html',
+  styleUrls: ['./profit.component.scss']
 })
 export class ProfitComponent implements OnInit {
   profits: any;
   currentPage = 0;
-  pageSize = 5;
+  pageSize = 10;
   searchTerm = '';
   searchForm: FormGroup;
-  pageSizeOptions = [5, 10, 25, 50];
+  pageSizeOptions = [5, 10, 25, 50, 100];
+  totalPages = 0;
   totalElements = 0;
+  isLoading = false;
   startIndex = 0;
   endIndex = 0;
-  isLoading = false;
 
   constructor(
     private profitService: ProfitService,
@@ -106,7 +109,6 @@ export class ProfitComponent implements OnInit {
       next: (response) => {
         this.profits = response.data;
         this.totalElements = response.data.totalElements;
-        this.updatePaginationIndexes();
         this.isLoading = false;
       },
       error: (error) => {
@@ -116,7 +118,13 @@ export class ProfitComponent implements OnInit {
     });
   }
 
-  onPageSizeChange() {
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadProfits();
+  }
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadProfits();
   }
@@ -145,8 +153,10 @@ export class ProfitComponent implements OnInit {
     this.profitService.searchProfits(params).subscribe({
       next: (response) => {
         this.profits = response.data;
+        this.totalPages = response.data.totalPages;
         this.totalElements = response.data.totalElements;
-        this.updatePaginationIndexes();
+        this.startIndex = this.currentPage * this.pageSize;
+        this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalElements);
         this.isLoading = false;
       },
       error: (error) => {
@@ -154,57 +164,6 @@ export class ProfitComponent implements OnInit {
         this.isLoading = false;
       }
     });
-  }
-
-  loadPage(page: number) {
-    if (page >= 0 && page < this.profits?.totalPages) {
-      this.currentPage = page;
-      this.loadProfits();
-    }
-  }
-
-  getPageNumbers(): number[] {
-    const totalPages = this.profits?.totalPages || 0;
-    const currentPage = this.currentPage + 1;
-    const pageRange = 2; // Show 2 pages before and after current page
-
-    let startPage = Math.max(1, currentPage - pageRange);
-    let endPage = Math.min(totalPages, currentPage + pageRange);
-
-    // Adjust range to show 5 pages when possible
-    if (endPage - startPage + 1 < 5) {
-      if (currentPage < totalPages - pageRange) {
-        endPage = Math.min(startPage + 4, totalPages);
-      } else {
-        startPage = Math.max(1, endPage - 4);
-      }
-    }
-
-    const pages: number[] = [];
-    
-    // Add first page
-    if (startPage > 1) {
-      pages.push(1);
-      if (startPage > 2) pages.push(-1); // Add ellipsis
-    }
-    
-    // Add pages in range
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
-    
-    // Add last page
-    if (endPage < totalPages) {
-      if (endPage < totalPages - 1) pages.push(-1); // Add ellipsis
-      pages.push(totalPages);
-    }
-
-    return pages;
-  }
-
-  private updatePaginationIndexes() {
-    this.startIndex = this.currentPage * this.pageSize;
-    this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalElements);
   }
 
   resetForm(): void {

@@ -8,6 +8,7 @@ import { LoaderComponent } from '../../../shared/components/loader/loader.compon
 import { SearchableSelectComponent } from '../../../shared/components/searchable-select/searchable-select.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { DateUtils } from '../../../shared/utils/date-utils';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-employee-order-list',
@@ -19,7 +20,8 @@ import { DateUtils } from '../../../shared/utils/date-utils';
     RouterModule,
     LoaderComponent,
     SearchableSelectComponent,
-    RouterLink
+    RouterLink,
+    PaginationComponent
   ],
   templateUrl: './employee-order-list.component.html',
   styleUrls: ['./employee-order-list.component.scss']
@@ -118,7 +120,8 @@ export class EmployeeOrderListComponent implements OnInit {
     this.loadEmployeeOrders();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadEmployeeOrders();
   }

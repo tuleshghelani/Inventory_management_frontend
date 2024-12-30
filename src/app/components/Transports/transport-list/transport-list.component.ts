@@ -6,6 +6,7 @@ import { TransportService } from '../../../services/transport.service';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-transport-list',
@@ -16,7 +17,8 @@ import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/
     RouterModule,
     LoaderComponent,
     FormsModule,
-    ConfirmModalComponent
+    ConfirmModalComponent,
+    PaginationComponent
   ],
   templateUrl: './transport-list.component.html',
   styleUrls: ['./transport-list.component.scss']
@@ -29,7 +31,7 @@ export class TransportListComponent implements OnInit {
   // Pagination properties
   currentPage = 0;
   pageSize = 10;
-  pageSizeOptions = [5, 10, 25, 50];
+  pageSizeOptions = [5, 10, 25, 50, 100];
   totalPages = 0;
   totalElements = 0;
   startIndex = 0;
@@ -110,13 +112,12 @@ export class TransportListComponent implements OnInit {
   }
 
   onPageChange(page: number): void {
-    if (page >= 0 && page < this.totalPages) {
-      this.currentPage = page;
-      this.loadTransports();
-    }
+    this.currentPage = page;
+    this.loadTransports();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadTransports();
   }

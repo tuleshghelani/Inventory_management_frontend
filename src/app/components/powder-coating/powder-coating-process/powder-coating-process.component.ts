@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router';
 import { CustomerService } from '../../../services/customer.service';
 import { ReturnModalComponent } from '../return-modal/return-modal.component';
 import { ModalService } from '../../../services/modal.service';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-powder-coating-process',
@@ -23,7 +24,8 @@ import { ModalService } from '../../../services/modal.service';
     SearchableSelectComponent,
     FormsModule,
     RouterLink,
-    ReturnModalComponent
+    ReturnModalComponent,
+    PaginationComponent
   ],
   templateUrl: './powder-coating-process.component.html',
   styleUrls: ['./powder-coating-process.component.scss']
@@ -138,7 +140,8 @@ export class PowderCoatingProcessComponent implements OnInit {
     this.loadProcesses();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadProcesses();
   }

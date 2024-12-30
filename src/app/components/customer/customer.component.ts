@@ -8,13 +8,15 @@ import { ToastrService } from 'ngx-toastr';
 import { RouterModule } from '@angular/router';
 import { CustomerModalComponent } from '../customer-modal/customer-modal.component';
 import { ModalService } from '../../services/modal.service';
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-customer',
   templateUrl: './customer.component.html',
   styleUrls: ['./customer.component.scss'],
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, CustomerModalComponent]
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, 
+    CustomerModalComponent, PaginationComponent]
 })
 export class CustomerComponent implements OnInit {
   customers: Customer[] = [];
@@ -90,7 +92,6 @@ export class CustomerComponent implements OnInit {
           this.customers = response.data.content;
           this.totalPages = response.data.totalPages;
           this.totalElements = response.data.totalElements;
-          this.updatePaginationIndexes();
         }
         this.isLoading = false;
       },
@@ -111,42 +112,10 @@ export class CustomerComponent implements OnInit {
     this.loadCustomers();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadCustomers();
-  }
-
-  getPageNumbers(): number[] {
-    const pageNumbers: number[] = [];
-    const totalPages = this.totalPages;
-    const currentPage = this.currentPage + 1;
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 5; i++) {
-          pageNumbers.push(i);
-        }
-      } else if (currentPage >= totalPages - 2) {
-        for (let i = totalPages - 4; i <= totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-          pageNumbers.push(i);
-        }
-      }
-    }
-
-    return pageNumbers;
-  }
-
-  private updatePaginationIndexes(): void {
-    this.startIndex = this.currentPage * this.pageSize;
-    this.endIndex = Math.min(this.startIndex + this.pageSize, this.totalElements);
   }
 
   // Update the openCustomerModal method

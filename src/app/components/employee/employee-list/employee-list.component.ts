@@ -7,6 +7,7 @@ import { EmployeeService } from '../../../services/employee.service';
 import { FormsModule } from '@angular/forms';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-employee-list',
@@ -18,7 +19,8 @@ import { SnackbarService } from '../../../shared/services/snackbar.service';
     FormsModule,
     LoaderComponent,
     RouterLink,
-    RouterModule
+    RouterModule,
+    PaginationComponent
   ],
   templateUrl: './employee-list.component.html',
   styleUrls: ['./employee-list.component.scss']
@@ -95,7 +97,8 @@ export class EmployeeListComponent implements OnInit {
     this.loadEmployees();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadEmployees();
   }
@@ -116,33 +119,6 @@ export class EmployeeListComponent implements OnInit {
         }
       });
     }
-  }
-
-  getPageNumbers(): number[] {
-    const pageNumbers: number[] = [];
-    const currentPage = this.currentPage + 1;
-
-    if (this.totalPages <= 5) {
-      for (let i = 1; i <= this.totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 5; i++) {
-          pageNumbers.push(i);
-        }
-      } else if (currentPage >= this.totalPages - 2) {
-        for (let i = this.totalPages - 4; i <= this.totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-          pageNumbers.push(i);
-        }
-      }
-    }
-
-    return pageNumbers;
   }
 
   onPageChange(page: number): void {

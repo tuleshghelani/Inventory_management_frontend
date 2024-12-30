@@ -43,25 +43,6 @@
 
     <div class="profits-list card">
         <h2>Profits</h2>
-        
-        <div class="table-controls">
-            <div class="page-size-selector">
-                <label>Show entries:</label>
-                <select 
-                    class="form-control" 
-                    [(ngModel)]="pageSize" 
-                    (change)="onPageSizeChange()"
-                >
-                    <option *ngFor="let size of pageSizeOptions" [value]="size">
-                        {{ size }}
-                    </option>
-                </select>
-            </div>
-            <!-- <button class="btn btn-primary">
-                <i class="fas fa-download"></i> Export
-            </button> -->
-        </div>
-
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -109,42 +90,16 @@
             </table>
         </div>
         
-        <div class="pagination-container">
-            <div class="pagination-info">
-                Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ profits?.totalElements }} entries
-            </div>
-            <div class="pagination">
-                <button 
-                    class="btn-page" 
-                    [disabled]="currentPage === 0"
-                    (click)="loadPage(currentPage - 1)"
-                >
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                
-                <ng-container *ngFor="let page of getPageNumbers()">
-                    <ng-container *ngIf="page !== -1; else ellipsis">
-                        <button 
-                            class="btn-page" 
-                            [class.active]="page === currentPage + 1"
-                            (click)="loadPage(page - 1)"
-                        >
-                            {{ page }}
-                        </button>
-                    </ng-container>
-                    <ng-template #ellipsis>
-                        <span class="ellipsis">...</span>
-                    </ng-template>
-                </ng-container>
-                
-                <button 
-                    class="btn-page" 
-                    [disabled]="currentPage === profits?.totalPages - 1"
-                    (click)="loadPage(currentPage + 1)"
-                >
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
+        <div class="table-controls">
+            <app-pagination
+                *ngIf="totalPages > 0"
+                [currentPage]="currentPage"
+                [pageSize]="pageSize"
+                [totalElements]="totalElements"
+                [pageSizeOptions]="pageSizeOptions"
+                (pageChange)="onPageChange($event)"
+                (pageSizeChange)="onPageSizeChange($event)"
+            ></app-pagination>
         </div>
     </div>
 </div>

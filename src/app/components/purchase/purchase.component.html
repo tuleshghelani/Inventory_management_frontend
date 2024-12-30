@@ -64,21 +64,6 @@
     <button routerLink="/purchase/create" class="btn btn-primary">Add Purchase</button>
   <div class="purchases-list card">
     <h2>Purchases</h2>
-    
-    <div class="table-controls">
-      <div class="page-size-selector">
-        <label>Show entries:</label>
-        <select 
-          class="form-control" 
-          [(ngModel)]="pageSize" 
-          (change)="onPageSizeChange()"
-        >
-          <option *ngFor="let size of pageSizeOptions" [value]="size">
-            {{ size }}
-          </option>
-        </select>
-      </div>
-    </div>
 
     <div class="table-responsive">
       <table class="table">
@@ -129,38 +114,15 @@
       </table>
     </div>
     
-    <div class="pagination-container">
-      <div class="pagination-info">
-        Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalElements }} entries
-      </div>
-      <div class="pagination">
-        <button 
-          class="btn-page" 
-          [disabled]="currentPage === 0"
-          (click)="onPageChange(currentPage - 1)"
-        >
-          <i class="fas fa-chevron-left"></i>
-        </button>
-        
-        <ng-container *ngFor="let page of getPageNumbers()">
-          <button 
-            class="btn-page" 
-            [class.active]="page === currentPage + 1"
-            (click)="onPageChange(page - 1)"
-          >
-            {{ page }}
-          </button>
-        </ng-container>
-        
-        <button 
-          class="btn-page" 
-          [disabled]="currentPage === totalPages - 1"
-          (click)="onPageChange(currentPage + 1)"
-        >
-          <i class="fas fa-chevron-right"></i>
-        </button>
-      </div>
-    </div>
+    <app-pagination
+      *ngIf="totalPages > 0"
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalElements]="totalElements"
+      [pageSizeOptions]="pageSizeOptions"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
   </div>
 </div>
 

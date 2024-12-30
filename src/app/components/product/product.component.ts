@@ -9,6 +9,8 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { CommonModule } from '@angular/common';
 import { SnackbarService } from '../../shared/services/snackbar.service';
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-product',
@@ -19,7 +21,9 @@ import { SnackbarService } from '../../shared/services/snackbar.service';
     LoaderComponent,
     FormsModule,
     ReactiveFormsModule,
-    CommonModule
+    CommonModule,
+    PaginationComponent,
+    RouterModule
   ],
   animations: [
     trigger('dialogAnimation', [
@@ -198,37 +202,10 @@ export class ProductComponent implements OnInit {
     this.loadProducts();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadProducts();
-  }
-
-  getPageNumbers(): number[] {
-    const pageNumbers: number[] = [];
-    const totalPages = this.totalPages;
-    const currentPage = this.currentPage + 1;
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 5; i++) {
-          pageNumbers.push(i);
-        }
-      } else if (currentPage >= totalPages - 2) {
-        for (let i = totalPages - 4; i <= totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-          pageNumbers.push(i);
-        }
-      }
-    }
-
-    return pageNumbers;
   }
 
   openCreateDialog(): void {

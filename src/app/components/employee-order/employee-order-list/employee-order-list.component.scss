@@ -68,46 +68,6 @@
   // Reference to employee-list.component.scss for pagination styles
 //   @include paginationStyles();
 
-  .pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-
-    .pagination-info {
-      color: var(--text-secondary);
-    }
-
-    .pagination {
-      display: flex;
-      gap: 5px;
-
-      .btn-page {
-        padding: 6px 12px;
-        border: 1px solid var(--supporting);
-        background: white;
-        cursor: pointer;
-        border-radius: 4px;
-        color: var(--text-primary);
-        transition: all 0.3s ease;
-
-        &:hover:not(:disabled) {
-          background-color: var(--supporting);
-        }
-
-        &.active {
-          background-color: var(--primary);
-          color: white;
-          border-color: var(--primary);
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-      }
-    }
-  }
 }
 
 @media (max-width: 768px) {
@@ -129,16 +89,6 @@
     .table-responsive {
       margin: 0 -15px;
       padding: 0 15px;
-    }
-  }
-
-  .pagination-container {
-    flex-direction: column;
-    gap: 15px;
-    align-items: center;
-    
-    .pagination-info {
-      text-align: center;
     }
   }
 } 

@@ -14,6 +14,7 @@ import { ProductService } from '../../services/product.service';
 import { SearchableSelectComponent } from '../../shared/components/searchable-select/searchable-select.component';
 import { DateUtils } from '../../shared/utils/date-utils';
 import { CacheService } from '../../shared/services/cache.service';
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-purchase',
@@ -26,7 +27,8 @@ import { CacheService } from '../../shared/services/cache.service';
     MatDialogModule,
     SaleModalComponent,
     LoaderComponent,
-    SearchableSelectComponent
+    SearchableSelectComponent,
+    PaginationComponent
   ],
   templateUrl: './purchase.component.html',
   styleUrls: ['./purchase.component.scss']
@@ -109,37 +111,10 @@ export class PurchaseComponent implements OnInit {
     this.loadPurchases();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadPurchases();
-  }
-
-  getPageNumbers(): number[] {
-    const pageNumbers: number[] = [];
-    const totalPages = this.totalPages;
-    const currentPage = this.currentPage + 1;
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 5; i++) {
-          pageNumbers.push(i);
-        }
-      } else if (currentPage >= totalPages - 2) {
-        for (let i = totalPages - 4; i <= totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-          pageNumbers.push(i);
-        }
-      }
-    }
-
-    return pageNumbers;
   }
 
   openSaleModal(purchase: Purchase) {

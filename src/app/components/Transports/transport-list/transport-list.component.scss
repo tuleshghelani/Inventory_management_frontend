@@ -37,81 +37,11 @@
 
   .table-controls {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-
-    .page-size-selector {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-
-      select {
-        width: auto;
-        padding: 5px 10px;
-      }
-    }
-  }
-
-  .pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
-
-    .pagination {
-      display: flex;
-      gap: 5px;
-
-      .btn-page {
-        padding: 5px 10px;
-        border: 1px solid #ddd;
-        background: white;
-        cursor: pointer;
-
-        &.active {
-          background: var(--primary);
-          color: white;
-          border-color: var(--primary);
-        }
-
-        &:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-      }
-    }
-  }
-
-  .actions {
-    .btn-icon {
-      padding: 5px 10px;
-      border: none;
-      background: none;
-      cursor: pointer;
-      color: #666;
-
-      &:hover {
-        color: var(--primary);
-      }
-
-      &.delete {
-        color: var(--danger);
-        margin-left: 0.5rem;
-
-        &:hover {
-          background-color: var(--danger-light);
-        }
-      }
-
-      &.print {
-        color: var(--primary);
-        margin-left: 0.5rem;
-
-        &:hover {
-          background-color: rgba(var(--primary-rgb), 0.1);
-        }
-      }
+    justify-content: center;
+    margin-top: 1rem;
+    
+    app-pagination {
+      width: 100%;
     }
   }
 }

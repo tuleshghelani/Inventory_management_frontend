@@ -57,83 +57,15 @@
       </table>
     </div>
     
-    <div class="pagination-container" *ngIf="totalPages > 0">
-      <div class="page-info">
-        Showing {{ startIndex + 1 }} to {{ endIndex }} of {{ totalElements }} entries
-      </div>
-      <div class="pagination-controls">
-        <div class="items-per-page">
-          <label>Show entries:</label>
-          <select class="form-control" [(ngModel)]="pageSize" (change)="onPageSizeChange()">
-            <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
-          </select>
-        </div>
-        <div class="pagination">
-          <button 
-            class="btn-page" 
-            [disabled]="currentPage === 0"
-            (click)="onPageChange(currentPage - 1)"
-          >
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          
-          <ng-container *ngIf="totalPages <= 7">
-            <button 
-              *ngFor="let page of [].constructor(totalPages); let i = index"
-              class="btn-page" 
-              [class.active]="currentPage === i"
-              (click)="onPageChange(i)"
-            >
-              {{ i + 1 }}
-            </button>
-          </ng-container>
-
-          <ng-container *ngIf="totalPages > 7">
-            <!-- First page -->
-            <button 
-              class="btn-page" 
-              [class.active]="currentPage === 0"
-              (click)="onPageChange(0)"
-            >
-              1
-            </button>
-
-            <!-- Ellipsis if needed -->
-            <span class="ellipsis" *ngIf="currentPage > 2">...</span>
-
-            <!-- Pages around current page -->
-            <button 
-              *ngFor="let page of getVisiblePages()"
-              class="btn-page" 
-              [class.active]="currentPage === page"
-              (click)="onPageChange(page)"
-            >
-              {{ page + 1 }}
-            </button>
-
-            <!-- Ellipsis if needed -->
-            <span class="ellipsis" *ngIf="currentPage < totalPages - 3">...</span>
-
-            <!-- Last page -->
-            <button 
-              class="btn-page" 
-              [class.active]="currentPage === totalPages - 1"
-              (click)="onPageChange(totalPages - 1)"
-            >
-              {{ totalPages }}
-            </button>
-          </ng-container>
-
-          <button 
-            class="btn-page" 
-            [disabled]="currentPage === totalPages - 1"
-            (click)="onPageChange(currentPage + 1)"
-          >
-            <i class="fas fa-chevron-right"></i>
-          </button>
-        </div>
-      </div>
-    </div>
+    <app-pagination
+      *ngIf="totalPages > 0"
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalElements]="totalElements"
+      [pageSizeOptions]="pageSizeOptions"
+      (pageChange)="onPageChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+    ></app-pagination>
   </div>
 </div>
 

@@ -8,6 +8,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { LoaderComponent } from '../../shared/components/loader/loader.component';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { PaginationComponent } from '../../shared/components/pagination/pagination.component';
 
 @Component({
   selector: 'app-category',
@@ -17,7 +18,8 @@ import { CommonModule } from '@angular/common';
     ReactiveFormsModule,
     RouterModule,
     LoaderComponent,
-    FormsModule
+    FormsModule,
+    PaginationComponent
   ],
   templateUrl: './category.component.html',
   styleUrls: ['./category.component.scss'],
@@ -199,53 +201,9 @@ export class CategoryComponent implements OnInit {
     this.loadCategories();
   }
 
-  onPageSizeChange(): void {
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
     this.currentPage = 0;
     this.loadCategories();
-  }
-
-  getPageNumbers(): number[] {
-    const pageNumbers: number[] = [];
-    const totalPages = this.totalPages;
-    const currentPage = this.currentPage + 1;
-
-    if (totalPages <= 5) {
-      for (let i = 1; i <= totalPages; i++) {
-        pageNumbers.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 5; i++) {
-          pageNumbers.push(i);
-        }
-      } else if (currentPage >= totalPages - 2) {
-        for (let i = totalPages - 4; i <= totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        for (let i = currentPage - 2; i <= currentPage + 2; i++) {
-          pageNumbers.push(i);
-        }
-      }
-    }
-
-    return pageNumbers;
-  }
-
-  getVisiblePages(): number[] {
-    const pages: number[] = [];
-    const totalPages = this.totalPages;
-    const currentPage = this.currentPage;
-
-    if (totalPages <= 7) {
-      return Array.from({ length: totalPages }, (_, i) => i);
-    }
-
-    // Always include current page and 1 page before and after
-    for (let i = Math.max(1, currentPage - 1); i <= Math.min(currentPage + 1, totalPages - 2); i++) {
-      pages.push(i);
-    }
-
-    return pages;
   }
 }
