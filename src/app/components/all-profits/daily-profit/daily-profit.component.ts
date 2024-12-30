@@ -25,7 +25,7 @@ export class DailyProfitComponent implements OnInit {
   currentPage = 0;
   pageSize = 5;
   searchForm: FormGroup;
-  pageSizeOptions = [5, 10, 25, 50];
+  pageSizeOptions = [1, 5, 10, 25, 50];
   totalElements = 0;
   startIndex = 0;
   endIndex = 0;
@@ -119,5 +119,33 @@ export class DailyProfitComponent implements OnInit {
 
   getTotalNetProfit(): number {
     return this.profits?.content.reduce((sum: number, profit: any) => sum + profit.netProfit, 0) || 0;
+  }
+
+  getPageNumbers(): number[] {
+    const totalPages = this.profits?.totalPages || 0;
+    const currentPage = this.currentPage + 1;
+    const maxPages = 5;
+    
+    let startPage = Math.max(1, currentPage - Math.floor(maxPages / 2));
+    let endPage = startPage + maxPages - 1;
+    
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - maxPages + 1);
+    }
+    
+    const pages: number[] = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  }
+
+  loadPage(page: number): void {
+    if (page >= 0 && page < this.profits?.totalPages) {
+      this.currentPage = page;
+      this.loadProfits(); // Assuming you have this method to fetch profits
+    }
   }
 }

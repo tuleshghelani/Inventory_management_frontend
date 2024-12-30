@@ -66,6 +66,35 @@
     }
   }
 
+  .table-wrapper {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .table-container {
+    position: relative;
+    min-height: 200px;
+    background: white;
+
+    app-loader {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+    }
+
+    .table-responsive {
+      position: relative;
+      width: 100%;
+      
+      &.loading {
+        opacity: 0.6;
+        pointer-events: none;
+      }
+    }
+  }
+
   .table-responsive {
     position: relative;
     min-height: 200px;

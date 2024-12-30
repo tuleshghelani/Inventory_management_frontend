@@ -1,6 +1,4 @@
 <div class="employee-container">
-  <app-loader [show]="isLoading"></app-loader>
-  
   <div class="search-section card">
     <h2>Search Employees</h2>
     <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
@@ -49,53 +47,59 @@
       </div>
     </div>
 
-    <div class="table-responsive">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Email</th>
-            <th>Designation</th>
-            <th>Department</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let employee of employees">
-            <td>{{employee.name}}</td>
-            <td>{{employee.mobileNumber}}</td>
-            <td>{{employee.email}}</td>
-            <td>{{employee.designation}}</td>
-            <td>{{employee.department}}</td>
-            <td>
-              <span class="status-badge" [ngClass]="{'active': employee.status === 'A', 'inactive': employee.status !== 'A'}">
-                {{employee.status === 'A' ? 'Active' : 'Inactive'}}
-              </span>
-            </td>
-            <td class="actions">
-              <button 
-                class="btn-icon edit" 
-                [routerLink]="['/employee/edit', employee.id]"
-                title="Edit Employee"
-              >
-                <i class="fas fa-edit"></i>
-              </button>
-              <button 
-                class="btn-icon delete" 
-                (click)="deleteEmployee(employee.id)"
-                title="Delete Employee"
-              >
-                <i class="fas fa-trash"></i>
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="!employees?.length">
-            <td colspan="8" class="text-center">No employees found</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="table-wrapper">
+      <div class="table-container">
+        <app-loader [show]="isLoading"></app-loader>
+        
+        <div class="table-responsive" [class.loading]="isLoading">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Designation</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let employee of employees">
+                <td>{{employee.name}}</td>
+                <td>{{employee.mobileNumber}}</td>
+                <td>{{employee.email}}</td>
+                <td>{{employee.designation}}</td>
+                <td>{{employee.department}}</td>
+                <td>
+                  <span class="status-badge" [ngClass]="{'active': employee.status === 'A', 'inactive': employee.status !== 'A'}">
+                    {{employee.status === 'A' ? 'Active' : 'Inactive'}}
+                  </span>
+                </td>
+                <td class="actions">
+                  <button 
+                    class="btn-icon edit" 
+                    [routerLink]="['/employee/edit', employee.id]"
+                    title="Edit Employee"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button 
+                    class="btn-icon delete" 
+                    (click)="deleteEmployee(employee.id)"
+                    title="Delete Employee"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="!employees?.length">
+                <td colspan="8" class="text-center">No employees found</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <div class="pagination-container" *ngIf="totalPages > 0">

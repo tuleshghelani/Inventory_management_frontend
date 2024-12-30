@@ -165,7 +165,41 @@ export class ProfitComponent implements OnInit {
 
   getPageNumbers(): number[] {
     const totalPages = this.profits?.totalPages || 0;
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const currentPage = this.currentPage + 1;
+    const pageRange = 2; // Show 2 pages before and after current page
+
+    let startPage = Math.max(1, currentPage - pageRange);
+    let endPage = Math.min(totalPages, currentPage + pageRange);
+
+    // Adjust range to show 5 pages when possible
+    if (endPage - startPage + 1 < 5) {
+      if (currentPage < totalPages - pageRange) {
+        endPage = Math.min(startPage + 4, totalPages);
+      } else {
+        startPage = Math.max(1, endPage - 4);
+      }
+    }
+
+    const pages: number[] = [];
+    
+    // Add first page
+    if (startPage > 1) {
+      pages.push(1);
+      if (startPage > 2) pages.push(-1); // Add ellipsis
+    }
+    
+    // Add pages in range
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    // Add last page
+    if (endPage < totalPages) {
+      if (endPage < totalPages - 1) pages.push(-1); // Add ellipsis
+      pages.push(totalPages);
+    }
+
+    return pages;
   }
 
   private updatePaginationIndexes() {

@@ -172,3 +172,10 @@
         }
     }
 } 
+
+.pagination {
+  .pagination-dots {
+    padding: 0 5px;
+    color: var(--text-secondary);
+  }
+} 

@@ -123,13 +123,18 @@
                 </button>
                 
                 <ng-container *ngFor="let page of getPageNumbers()">
-                    <button 
-                        class="btn-page" 
-                        [class.active]="page === currentPage + 1"
-                        (click)="loadPage(page - 1)"
-                    >
-                        {{ page }}
-                    </button>
+                    <ng-container *ngIf="page !== -1; else ellipsis">
+                        <button 
+                            class="btn-page" 
+                            [class.active]="page === currentPage + 1"
+                            (click)="loadPage(page - 1)"
+                        >
+                            {{ page }}
+                        </button>
+                    </ng-container>
+                    <ng-template #ellipsis>
+                        <span class="ellipsis">...</span>
+                    </ng-template>
                 </ng-container>
                 
                 <button 
