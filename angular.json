@@ -41,8 +41,8 @@
               "src/styles.scss"
             ],
             "scripts": [
-            ],
-            "baseHref": "https://admin.jkindustriesrajkot.com/",
+            ]
+            ,"baseHref": "https://admin.jkindustriesrajkot.com/",
             "deployUrl": "https://admin.jkindustriesrajkot.com/"
           },
           "configurations": {
