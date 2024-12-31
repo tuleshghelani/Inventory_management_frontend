@@ -86,7 +86,9 @@ export class AuthService {
 
   private handleAuthError(): void {
     this.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']).then(() => {
+      window.location.reload();
+    });
   }
 
   logout(): void {
