@@ -34,13 +34,16 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets"
+              "src/assets",
+              "src/CNAME"
             ],
             "styles": [
               "src/styles.scss"
             ],
             "scripts": [
-            ]
+            ],
+            "baseHref": "https://admin.jkindustriesrajkot.com/",
+            "deployUrl": "https://admin.jkindustriesrajkot.com/"
           },
           "configurations": {
             "production": {
