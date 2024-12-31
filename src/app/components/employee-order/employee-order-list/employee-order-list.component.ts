@@ -78,8 +78,8 @@ export class EmployeeOrderListComponent implements OnInit {
       currentPage: this.currentPage,
       perPageRecord: this.pageSize,
       ...formValues,
-      startDate: formValues.startDate ? this.dateUtils.formatDate(formValues.startDate) : null,
-      endDate: formValues.endDate ? this.dateUtils.formatDate(formValues.endDate) : null
+      startDate: formValues.startDate ? this.dateUtils.formatDateForApi(formValues.startDate, true) : null,
+      endDate: formValues.endDate ? this.dateUtils.formatDateForApi(formValues.endDate, true) : null
     };
 
     this.employeeOrderService.searchEmployeeOrders(params).subscribe({

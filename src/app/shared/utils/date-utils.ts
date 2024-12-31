@@ -20,7 +20,7 @@ export class DateUtils {
         minute: '2-digit',
         second: '2-digit',
         hour12: false
-      }).replace(/\//g, '-');
+      }).replace(/\//g, '-').replace(',', '');
     } catch (error) {
       console.error('Error formatting date:', error);
       return dateString;
