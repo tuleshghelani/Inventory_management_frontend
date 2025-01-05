@@ -200,13 +200,18 @@
 
                       <div class="form-group quantity-input">
                         <label>Quantity <span class="required">*</span></label>
-                        <input 
-                          type="number" 
-                          formControlName="quantity" 
-                          class="form-control"
-                          [class.is-invalid]="isFieldInvalid(item.get('quantity'))"
-                          min="1"
-                        >
+                        <div class="quantity-group">
+                          <input 
+                            type="number" 
+                            formControlName="quantity" 
+                            class="form-control"
+                            [class.is-invalid]="isFieldInvalid(item.get('quantity'))"
+                            min="1"
+                          >
+                          <div class="total-quantity" *ngIf="item.get('totalQuantity')?.value !== item.get('quantity')?.value">
+                            Total: {{ item.get('totalQuantity')?.value }}
+                          </div>
+                        </div>
                         <div class="invalid-feedback" *ngIf="isFieldInvalid(item.get('quantity'))">
                           Please enter a valid quantity
                         </div>

@@ -101,7 +101,7 @@
         }
 
         input {
-          height: 38px;
+          // height: 38px;
         }
       }
 
@@ -170,7 +170,7 @@
         }
 
         input {
-          height: 38px;
+          // height: 38px;
         }
 
         &.total-bag-weight input {
@@ -548,5 +548,18 @@
 @media (max-width: 576px) {
   .price-details {
     grid-template-columns: 1fr;
+  }
+}
+
+.quantity-group {
+  position: relative;
+  
+  .total-quantity {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
   }
 }

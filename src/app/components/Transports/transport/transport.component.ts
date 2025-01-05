@@ -126,6 +126,8 @@ export class TransportComponent implements OnInit {
     const newItem = this.fb.group({
       productId: ['', [Validators.required]],
       quantity: ['', [Validators.required, Validators.min(1)]],
+      originalQuantity: [''],
+      totalQuantity: [''],
       remarks: [''],
       // Purchase fields
       purchaseUnitPrice: [0, [Validators.required, Validators.min(0)]],
@@ -177,6 +179,7 @@ export class TransportComponent implements OnInit {
     const numberOfBags = bag.get('numberOfBags')?.value || 1;
     const itemGroup = this.getBagItems(bagIndex).at(itemIndex);
     const prefix = type === 'purchase' ? 'purchase' : 'sale';
+    
 
     const values = {
       quantity: (Number(itemGroup.get('quantity')?.value) || 0) * numberOfBags,
@@ -389,9 +392,11 @@ export class TransportComponent implements OnInit {
       customerId: formValue.customerId,
       bags: formValue.bags.map((bag: any) => ({
         weight: bag.weight,
+        numberOfBags: bag.numberOfBags,
+        totalBagWeight: bag.totalBagWeight,
         items: bag.items.map((item: any) => ({
           productId: item.productId,
-          quantity: item.quantity,
+          quantity: item.totalQuantity,
           remarks: item.remarks || '',
           purchaseUnitPrice: item.purchaseUnitPrice,
           purchaseDiscount: item.purchaseDiscount,
@@ -515,6 +520,7 @@ export class TransportComponent implements OnInit {
         id: [bag.id],
         weight: [bag.weight, [Validators.required, Validators.min(0.01)]],
         numberOfBags: [bag.numberOfBags, [Validators.required, Validators.min(1)]],
+        totalBagWeight: [bag.totalBagWeight],
         items: this.fb.array([])
       });
       this.bags.push(bagGroup); // Add bag first
@@ -627,6 +633,7 @@ export class TransportComponent implements OnInit {
       id: [''],
       weight: [0.01, [Validators.required, Validators.min(0.01)]],
       numberOfBags: [1, [Validators.required, Validators.min(1)]],
+      totalBagWeight: [0],
       items: this.fb.array([])
     });
   }
@@ -676,7 +683,17 @@ export class TransportComponent implements OnInit {
     // Update all items in the bag
     const items = this.getBagItems(bagIndex);
     items.controls.forEach((item, itemIndex) => {
-      // Recalculate purchase and sale discounts
+      // Update the displayed quantity (original quantity * number of bags)
+      const originalQuantity = item.get('quantity')?.value || 0;
+      const totalQuantity = originalQuantity * numberOfBags;
+      
+      // Store both original and total quantities
+      item.patchValue({
+        originalQuantity: originalQuantity,
+        totalQuantity: totalQuantity
+      }, { emitEvent: false });
+
+      // Recalculate purchase and sale discounts with new total quantity
       this.calculateDiscount(bagIndex, itemIndex, 'purchase');
       this.calculateDiscount(bagIndex, itemIndex, 'sale');
     });

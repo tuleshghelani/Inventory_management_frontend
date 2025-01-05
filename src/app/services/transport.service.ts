@@ -57,4 +57,33 @@ export class TransportService {
       })
     );
   }
+}
+
+interface TransportPayload {
+  customerId: string;
+  bags: {
+    id?: string;
+    weight: number;
+    numberOfBags: number;
+    totalBagWeight: number;
+    items: {
+      id?: string;
+      productId: string;
+      quantity: number;
+      totalQuantity: number;
+      remarks?: string;
+      purchase: {
+        unitPrice: number;
+        discount: number;
+        discountAmount: number;
+        discountPrice: number;
+      };
+      sale: {
+        unitPrice: number;
+        discount: number;
+        discountAmount: number;
+        discountPrice: number;
+      };
+    }[];
+  }[];
 } 
