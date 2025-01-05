@@ -397,10 +397,12 @@ export class TransportComponent implements OnInit {
       id: this.isEditMode ? this.transportId : undefined,
       customerId: formValue.customerId,
       bags: formValue.bags.map((bag: any) => ({
+        id: bag.id,
         weight: bag.weight,
         numberOfBags: bag.numberOfBags,
         totalBagWeight: bag.totalBagWeight,
         items: bag.items.map((item: any) => ({
+          id: item.id,
           productId: item.productId,
           quantity: item.totalQuantity,
           remarks: item.remarks || '',
@@ -538,6 +540,7 @@ export class TransportComponent implements OnInit {
           id: [item.id],
           productId: [item.productId, [Validators.required]],
           quantity: [item.quantity, [Validators.required, Validators.min(1)]],
+          totalQuantity: [item.totalQuantity, [Validators.required, Validators.min(1)]],
           remarks: [item.remarks || ''],
           // Purchase fields
           purchaseUnitPrice: [item.purchase.unitPrice, [Validators.required, Validators.min(0)]],
