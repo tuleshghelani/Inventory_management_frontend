@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, AbstractControl, FormControl } from '@angular/forms';
 import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../../services/product.service';
 import { CustomerService } from '../../../services/customer.service';
@@ -11,6 +11,15 @@ import { Transport, TransportSummary } from '../../../models/transport.model';
 import { TransportService } from '../../../services/transport.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { PriceService } from '../../../services/price.service';
+
+interface BagFormGroup extends FormGroup {
+  controls: {
+    id: FormControl<string | null>;
+    weight: FormControl<number | null>;
+    numberOfBags: FormControl<number | null>;
+    items: FormArray;
+  };
+}
 
 @Component({
   selector: 'app-transport',
@@ -92,12 +101,15 @@ export class TransportComponent implements OnInit {
   }
 
   addBag(): void {
-    const bagGroup = this.fb.group({
-      weight: ['', [Validators.required, Validators.min(0.01)]],
-      items: this.fb.array([])
-    });
+    const bagGroup = this.createBagFormGroup();
     this.bags.push(bagGroup);
-    this.addItem(this.bags.length - 1); // Add first item automatically
+    
+    // Setup weight and number of bags change handlers
+    const bagIndex = this.bags.length - 1;
+    this.setupBagCalculations(bagIndex);
+    
+    // Add initial item
+    this.addItem(bagIndex);
   }
 
   removeBag(bagIndex: number): void {
@@ -161,11 +173,13 @@ export class TransportComponent implements OnInit {
   }
 
   private calculateDiscount(bagIndex: number, itemIndex: number, type: 'purchase' | 'sale'): void {
+    const bag = this.bags.at(bagIndex) as BagFormGroup;
+    const numberOfBags = bag.get('numberOfBags')?.value || 1;
     const itemGroup = this.getBagItems(bagIndex).at(itemIndex);
     const prefix = type === 'purchase' ? 'purchase' : 'sale';
 
     const values = {
-      quantity: Number(itemGroup.get('quantity')?.value) || 0,
+      quantity: (Number(itemGroup.get('quantity')?.value) || 0) * numberOfBags,
       unitPrice: Number(itemGroup.get(`${prefix}UnitPrice`)?.value) || 0,
       discountPercentage: Number(itemGroup.get(`${prefix}Discount`)?.value),
       discountAmount: Number(itemGroup.get(`${prefix}DiscountAmount`)?.value),
@@ -500,6 +514,7 @@ export class TransportComponent implements OnInit {
       const bagGroup = this.fb.group({
         id: [bag.id],
         weight: [bag.weight, [Validators.required, Validators.min(0.01)]],
+        numberOfBags: [bag.numberOfBags, [Validators.required, Validators.min(1)]],
         items: this.fb.array([])
       });
       this.bags.push(bagGroup); // Add bag first
@@ -548,7 +563,7 @@ export class TransportComponent implements OnInit {
 
   calculateTotalWeight(): number {
     return this.bags.controls.reduce((total, bag) => {
-      return total + (bag.get('weight')?.value || 0);
+      return total + this.calculateTotalBagWeight(this.bags.controls.indexOf(bag));
     }, 0);
   }
 
@@ -604,6 +619,66 @@ export class TransportComponent implements OnInit {
         this.snackbar.error('Failed to generate PDF');
         this.isPrinting = false;
       }
+    });
+  }
+
+  private createBagFormGroup(): FormGroup {
+    return this.fb.group({
+      id: [''],
+      weight: [0.01, [Validators.required, Validators.min(0.01)]],
+      numberOfBags: [1, [Validators.required, Validators.min(1)]],
+      items: this.fb.array([])
+    });
+  }
+
+  getBagTitle(bagIndex: number): string {
+    const bag = this.bags.at(bagIndex) as FormGroup;
+    const numberOfBags = bag.get('numberOfBags')?.value || 1;
+    
+    let startNumber = this.calculateStartNumber(bagIndex);
+    let endNumber = startNumber + numberOfBags - 1;
+    
+    return numberOfBags === 1 ? 
+      `Bag #${startNumber}` : 
+      `Bags #${startNumber}-${endNumber}`;
+  }
+
+  private calculateStartNumber(bagIndex: number): number {
+    let startNumber = 1;
+    for (let i = 0; i < bagIndex; i++) {
+      const bag = this.bags.at(i) as FormGroup;
+      startNumber += bag.get('numberOfBags')?.value || 1;
+    }
+    return startNumber;
+  }
+
+  calculateTotalBagWeight(bagIndex: number): number {
+    const bag = this.bags.at(bagIndex) as FormGroup;
+    const weight = bag.get('weight')?.value || 0;
+    const numberOfBags = bag.get('numberOfBags')?.value || 1;
+    return weight * numberOfBags;
+  }
+
+  private setupBagCalculations(bagIndex: number): void {
+    const bag = this.bags.at(bagIndex) as FormGroup;
+    
+    ['weight', 'numberOfBags'].forEach(field => {
+      bag.get(field)?.valueChanges.subscribe(() => {
+        this.updateBagCalculations(bagIndex);
+      });
+    });
+  }
+
+  private updateBagCalculations(bagIndex: number): void {
+    const bag = this.bags.at(bagIndex) as FormGroup;
+    const numberOfBags = bag.get('numberOfBags')?.value || 1;
+    
+    // Update all items in the bag
+    const items = this.getBagItems(bagIndex);
+    items.controls.forEach((item, itemIndex) => {
+      // Recalculate purchase and sale discounts
+      this.calculateDiscount(bagIndex, itemIndex, 'purchase');
+      this.calculateDiscount(bagIndex, itemIndex, 'sale');
     });
   }
 }

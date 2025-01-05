@@ -94,7 +94,45 @@
           <div class="bags-list" *ngIf="bags.length > 0">
             <div class="bag-card" *ngFor="let bag of bags.controls; let bagIndex = index" [formGroupName]="bagIndex">
               <div class="bag-header">
-                <h4>Bag #{{ bagIndex + 1 }}</h4>
+                <h4>{{ getBagTitle(bagIndex) }}</h4>
+                <div class="bag-controls">
+                  <div class="form-group number-of-bags">
+                    <label>
+                      <i class="fas fa-shopping-bag"></i> Number of Bags
+                    </label>
+                    <input 
+                      type="number" 
+                      formControlName="numberOfBags" 
+                      class="form-control"
+                      min="1"
+                      [class.is-invalid]="isFieldInvalid(bag.get('numberOfBags'))"
+                    >
+                  </div>
+                  <div class="form-group bag-weight">
+                    <label>
+                      <i class="fas fa-weight"></i> Bag Weight (kg)
+                    </label>
+                    <input 
+                      type="number" 
+                      formControlName="weight" 
+                      class="form-control"
+                      [class.is-invalid]="isFieldInvalid(bag.get('weight'))"
+                      min="0.01"
+                      step="0.01"
+                    >
+                  </div>
+                  <div class="form-group total-bag-weight">
+                    <label>
+                      <i class="fas fa-balance-scale"></i> Total Bag Weight
+                    </label>
+                    <input 
+                      type="number" 
+                      [value]="calculateTotalBagWeight(bagIndex)"
+                      class="form-control"
+                      readonly
+                    >
+                  </div>
+                </div>
                 <button 
                   type="button" 
                   class="btn btn-danger remove-bag-btn" 
@@ -105,7 +143,7 @@
                 </button>
               </div>
 
-              <div class="bag-weight">
+              <!-- <div class="bag-weight">
                 <div class="form-group">
                   <label>
                     <i class="fas fa-weight"></i> Weight (kg) <span class="required">*</span>
@@ -122,7 +160,7 @@
                     {{ getCustomErrorMessage(bag.get('weight'), 'weight') }}
                   </div>
                 </div>
-              </div>
+              </div> -->
 
               <div class="items-section" formArrayName="items">
                 <div class="items-header">
