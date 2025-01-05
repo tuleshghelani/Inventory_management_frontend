@@ -557,9 +557,13 @@ export class TransportComponent implements OnInit {
         const itemsArray = this.getBagItems(currentBagIndex);
         itemsArray.push(itemGroup);
         
-        // Setup calculations after item is added
+        // Setup all calculations after item is added
+        this.setupItemCalculations(currentBagIndex, itemsArray.length - 1);
         this.setupDiscountCalculations(currentBagIndex, itemsArray.length - 1);
       });
+
+      // Setup bag calculations after all items are added
+      this.setupBagCalculations(currentBagIndex);
     });
 
     // Add summary data
@@ -678,6 +682,10 @@ export class TransportComponent implements OnInit {
   private setupBagCalculations(bagIndex: number): void {
     const bag = this.bags.at(bagIndex) as FormGroup;
     
+    // Initial calculation for all items
+    this.updateBagCalculations(bagIndex);
+    
+    // Setup listeners for future changes
     ['weight', 'numberOfBags'].forEach(field => {
       bag.get(field)?.valueChanges.subscribe(() => {
         this.updateBagCalculations(bagIndex);
@@ -689,20 +697,23 @@ export class TransportComponent implements OnInit {
     const bag = this.bags.at(bagIndex) as FormGroup;
     const numberOfBags = bag.get('numberOfBags')?.value || 1;
     
+    // Update total bag weight
+    const totalBagWeight = this.calculateTotalBagWeight(bagIndex);
+    bag.patchValue({ totalBagWeight }, { emitEvent: false });
+    
     // Update all items in the bag
     const items = this.getBagItems(bagIndex);
     items.controls.forEach((item, itemIndex) => {
-      // Update the displayed quantity (original quantity * number of bags)
       const originalQuantity = item.get('quantity')?.value || 0;
       const totalQuantity = originalQuantity * numberOfBags;
       
-      // Store both original and total quantities
+      // Update quantities
       item.patchValue({
         originalQuantity: originalQuantity,
         totalQuantity: totalQuantity
       }, { emitEvent: false });
 
-      // Recalculate purchase and sale discounts with new total quantity
+      // Recalculate discounts with new total quantity
       this.calculateDiscount(bagIndex, itemIndex, 'purchase');
       this.calculateDiscount(bagIndex, itemIndex, 'sale');
     });
