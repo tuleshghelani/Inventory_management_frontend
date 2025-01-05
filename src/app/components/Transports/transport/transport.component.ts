@@ -186,33 +186,26 @@ export class TransportComponent implements OnInit {
     const itemGroup = this.getBagItems(bagIndex).at(itemIndex);
     const prefix = type === 'purchase' ? 'purchase' : 'sale';
     
-
     const values = {
       quantity: (Number(itemGroup.get('quantity')?.value) || 0) * numberOfBags,
       unitPrice: Number(itemGroup.get(`${prefix}UnitPrice`)?.value) || 0,
-      discountPercentage: Number(itemGroup.get(`${prefix}Discount`)?.value),
-      discountAmount: Number(itemGroup.get(`${prefix}DiscountAmount`)?.value),
+      discountPercentage: Number(itemGroup.get(`${prefix}Discount`)?.value) || 0,
+      discountAmount: Number(itemGroup.get(`${prefix}DiscountAmount`)?.value) || 0,
       finalPrice: 0
     };
 
     const totalPrice = values.quantity * values.unitPrice;
 
-    // Reset logic
-    if (values.discountPercentage === 0 && values.discountAmount === 0) {
-      values.finalPrice = totalPrice;
-    }
-    // Handle discount amount changes
-    else if (itemGroup.get(`${prefix}DiscountAmount`)?.dirty) {
+    // Always calculate final price by subtracting discount amount
+    if (values.discountAmount > 0) {
       values.finalPrice = totalPrice - values.discountAmount;
+      // Update discount percentage based on discount amount
       values.discountPercentage = totalPrice > 0 ? (values.discountAmount / totalPrice) * 100 : 0;
-    }
-    // Handle discount percentage changes
-    else if (itemGroup.get(`${prefix}Discount`)?.dirty) {
+    } else if (values.discountPercentage > 0) {
+      // Calculate discount amount from percentage
       values.discountAmount = (totalPrice * values.discountPercentage) / 100;
       values.finalPrice = totalPrice - values.discountAmount;
-    }
-    // Default case
-    else {
+    } else {
       values.finalPrice = totalPrice;
     }
 
