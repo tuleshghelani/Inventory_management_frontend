@@ -147,7 +147,13 @@ export class TransportComponent implements OnInit {
     });
 
     items.push(newItem);
+    
+    // Setup calculations after item is added
+    this.setupItemCalculations(bagIndex, items.length - 1);
     this.setupDiscountCalculations(bagIndex, items.length - 1);
+    
+    // Initialize quantities based on current number of bags
+    this.updateItemQuantities(bagIndex, items.length - 1);
   }
 
   private setupDiscountCalculations(bagIndex: number, itemIndex: number): void {
@@ -697,5 +703,39 @@ export class TransportComponent implements OnInit {
       this.calculateDiscount(bagIndex, itemIndex, 'purchase');
       this.calculateDiscount(bagIndex, itemIndex, 'sale');
     });
+  }
+
+  private setupItemCalculations(bagIndex: number, itemIndex: number): void {
+    const bag = this.bags.at(bagIndex) as FormGroup;
+    const item = this.getBagItems(bagIndex).at(itemIndex);
+
+    // Watch for quantity changes
+    item.get('quantity')?.valueChanges.subscribe(() => {
+      this.updateItemQuantities(bagIndex, itemIndex);
+    });
+
+    // Watch for number of bags changes
+    bag.get('numberOfBags')?.valueChanges.subscribe(() => {
+      this.updateItemQuantities(bagIndex, itemIndex);
+    });
+  }
+
+  private updateItemQuantities(bagIndex: number, itemIndex: number): void {
+    const bag = this.bags.at(bagIndex) as FormGroup;
+    const item = this.getBagItems(bagIndex).at(itemIndex);
+    
+    const numberOfBags = bag.get('numberOfBags')?.value || 1;
+    const originalQuantity = item.get('quantity')?.value || 0;
+    const totalQuantity = originalQuantity * numberOfBags;
+
+    // Update quantities
+    item.patchValue({
+      originalQuantity: originalQuantity,
+      totalQuantity: totalQuantity
+    }, { emitEvent: false });
+
+    // Recalculate discounts with new total quantity
+    this.calculateDiscount(bagIndex, itemIndex, 'purchase');
+    this.calculateDiscount(bagIndex, itemIndex, 'sale');
   }
 }
