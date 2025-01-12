@@ -161,8 +161,8 @@ export class TransportComponent implements OnInit {
   private setupDiscountCalculations(bagIndex: number, itemIndex: number): void {
     const itemGroup = this.getBagItems(bagIndex).at(itemIndex);
     
-    // Setup purchase discount calculation
-    ['purchaseDiscount', 'purchaseDiscountAmount'].forEach(field => {
+    // Setup purchase calculations
+    ['purchaseUnitPrice', 'purchaseDiscount', 'purchaseDiscountAmount'].forEach(field => {
       itemGroup.get(field)?.valueChanges
         .pipe(
           distinctUntilChanged(),
@@ -181,8 +181,8 @@ export class TransportComponent implements OnInit {
         });
     });
   
-    // Setup sale discount calculation
-    ['saleDiscount', 'saleDiscountAmount'].forEach(field => {
+    // Setup sale calculations
+    ['saleUnitPrice', 'saleDiscount', 'saleDiscountAmount'].forEach(field => {
       itemGroup.get(field)?.valueChanges
         .pipe(
           distinctUntilChanged(),
@@ -218,28 +218,29 @@ export class TransportComponent implements OnInit {
   
     const totalPrice = values.quantity * values.unitPrice;
   
-    // If both discount percentage and amount are 0 or empty, reset everything
-    if (!values.discountPercentage && !values.discountAmount) {
-      itemGroup.patchValue({
-        [`${prefix}Discount`]: 0,
-        [`${prefix}DiscountAmount`]: 0,
-        [`${prefix}DiscountPrice`]: totalPrice
-      }, { emitEvent: false });
-      return;
+    // If unit price changed, recalculate using existing discount percentage
+    const unitPriceControl = itemGroup.get(`${prefix}UnitPrice`);
+    if (unitPriceControl?.dirty && unitPriceControl.touched) {
+      if (values.discountPercentage > 0) {
+        values.discountAmount = (totalPrice * values.discountPercentage) / 100;
+      }
+      values.finalPrice = totalPrice - values.discountAmount;
     }
-  
-    // Determine which field was last changed by checking form controls
-    const discountControl = itemGroup.get(`${prefix}Discount`);
-    const discountAmountControl = itemGroup.get(`${prefix}DiscountAmount`);
-    
-    if (discountControl?.dirty && discountControl.touched) {
-      // Discount percentage was changed
+    // If discount percentage changed
+    else if (values.discountPercentage > 0) {
       values.discountAmount = (totalPrice * values.discountPercentage) / 100;
       values.finalPrice = totalPrice - values.discountAmount;
-    } else if (discountAmountControl?.dirty && discountAmountControl.touched) {
-      // Discount amount was changed
+    }
+    // If discount amount changed
+    else if (values.discountAmount > 0) {
       values.discountPercentage = totalPrice > 0 ? (values.discountAmount / totalPrice) * 100 : 0;
       values.finalPrice = totalPrice - values.discountAmount;
+    }
+    // If no discounts
+    else {
+      values.finalPrice = totalPrice;
+      values.discountAmount = 0;
+      values.discountPercentage = 0;
     }
   
     // Ensure non-negative values and round to 2 decimal places
