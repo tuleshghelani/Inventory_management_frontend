@@ -52,6 +52,7 @@ export class TransportComponent implements OnInit {
   isEditMode = false;
   transportSummary: TransportSummary | null = null;
   isPrinting = false;
+  submitted = false;
 
   constructor(
     private fb: FormBuilder,
@@ -133,12 +134,12 @@ export class TransportComponent implements OnInit {
       remarks: [''],
       // Purchase fields
       purchaseUnitPrice: [0, [Validators.required, Validators.min(0)]],
-      purchaseDiscount: [0, [Validators.required, Validators.min(0)]],
+      purchaseDiscount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
       purchaseDiscountAmount: [0, [Validators.required, Validators.min(0)]],
       purchaseDiscountPrice: [0, [Validators.required, Validators.min(0)]],
       // Sale fields
       saleUnitPrice: [0, [Validators.required, Validators.min(0)]],
-      saleDiscount: [0, [Validators.required, Validators.min(0)]],
+      saleDiscount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
       saleDiscountAmount: [0, [Validators.required, Validators.min(0)]],
       saleDiscountPrice: [0, [Validators.required, Validators.min(0)]]
     });
@@ -331,8 +332,9 @@ export class TransportComponent implements OnInit {
     });
   }
 
-  isFieldInvalid(field: any): boolean {
-    return field?.invalid && (field?.dirty || field?.touched);
+  isFieldInvalid(control: AbstractControl | null): boolean {
+    if (!control) return false;
+    return (control.invalid && (control.touched || this.submitted));
   }
 
   getFieldError(field: any): string {
@@ -414,8 +416,11 @@ export class TransportComponent implements OnInit {
   }
 
   onSubmit(): void {
+    this.submitted = true;
+    
     if (this.transportForm.invalid) {
-      this.markFormGroupTouched(this.transportForm);
+      this.markAllFieldsAsTouched(this.transportForm);
+      this.snackbar.error('Please fill in all required fields correctly');
       return;
     }
 
@@ -462,12 +467,20 @@ export class TransportComponent implements OnInit {
     });
   }
 
-  private markFormGroupTouched(formGroup: FormGroup | FormArray) {
+  private markAllFieldsAsTouched(formGroup: FormGroup | FormArray): void {
     Object.values(formGroup.controls).forEach(control => {
-      if (control instanceof FormGroup || control instanceof FormArray) {
-        this.markFormGroupTouched(control);
-      } else {
+      if (control instanceof FormControl) {
         control.markAsTouched();
+        control.updateValueAndValidity();
+      } else if (control instanceof FormGroup) {
+        this.markAllFieldsAsTouched(control);
+      } else if (control instanceof FormArray) {
+        this.markAllFieldsAsTouched(control);
+        control.controls.forEach(ctrl => {
+          if (ctrl instanceof FormGroup) {
+            this.markAllFieldsAsTouched(ctrl);
+          }
+        });
       }
     });
   }
@@ -779,5 +792,23 @@ export class TransportComponent implements OnInit {
     // Recalculate discounts with new total quantity
     this.calculateDiscount(bagIndex, itemIndex, 'purchase');
     this.calculateDiscount(bagIndex, itemIndex, 'sale');
+  }
+
+  private createItemFormGroup(): FormGroup {
+    return this.fb.group({
+      productId: ['', Validators.required],
+      quantity: [1, [Validators.required, Validators.min(1)]],
+      remarks: [''],
+      purchaseUnitPrice: [0, [Validators.required, Validators.min(0)]],
+      purchaseDiscount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      purchaseDiscountAmount: [0, [Validators.required, Validators.min(0)]],
+      purchaseDiscountPrice: [0],
+      saleUnitPrice: [0, [Validators.required, Validators.min(0)]],
+      saleDiscount: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+      saleDiscountAmount: [0, [Validators.required, Validators.min(0)]],
+      saleDiscountPrice: [0],
+      totalQuantity: [0],
+      originalQuantity: [0]
+    });
   }
 }
