@@ -260,7 +260,8 @@
                             step="0.01"
                           >
                           <div class="invalid-feedback" *ngIf="isFieldInvalid(item.get('purchaseDiscount'))">
-                            Discount must be between 0 and 100
+                            {{ item.get('purchaseDiscount')?.errors?.['min'] ? 'Discount must be greater than 0' : 
+                               item.get('purchaseDiscount')?.errors?.['max'] ? 'Discount must be less than 100' : '' }}
                           </div>
                         </div>
 

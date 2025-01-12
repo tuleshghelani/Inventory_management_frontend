@@ -219,35 +219,38 @@ export class TransportComponent implements OnInit {
   
     const totalPrice = values.quantity * values.unitPrice;
   
-    // If unit price changed, recalculate using existing discount percentage
+    // Get controls to check which one was modified
+    const discountControl = itemGroup.get(`${prefix}Discount`);
+    const discountAmountControl = itemGroup.get(`${prefix}DiscountAmount`);
     const unitPriceControl = itemGroup.get(`${prefix}UnitPrice`);
-    if (unitPriceControl?.dirty && unitPriceControl.touched) {
-      if (values.discountPercentage > 0) {
-        values.discountAmount = (totalPrice * values.discountPercentage) / 100;
-      }
-      values.finalPrice = totalPrice - values.discountAmount;
-    }
-    // If discount percentage changed
-    else if (values.discountPercentage > 0) {
+  
+    // If discount percentage was changed (including when set to 0)
+    if (discountControl?.dirty && discountControl.touched) {
+      values.discountPercentage = Math.min(Math.max(values.discountPercentage, 0), 100);
       values.discountAmount = (totalPrice * values.discountPercentage) / 100;
       values.finalPrice = totalPrice - values.discountAmount;
     }
-    // If discount amount changed
-    else if (values.discountAmount > 0) {
+    // If discount amount was changed (including when set to 0)
+    else if (discountAmountControl?.dirty && discountAmountControl.touched) {
+      values.discountAmount = Math.min(Math.max(values.discountAmount, 0), totalPrice);
       values.discountPercentage = totalPrice > 0 ? (values.discountAmount / totalPrice) * 100 : 0;
       values.finalPrice = totalPrice - values.discountAmount;
     }
-    // If no discounts
+    // If unit price changed
+    else if (unitPriceControl?.dirty && unitPriceControl.touched) {
+      values.discountAmount = (totalPrice * values.discountPercentage) / 100;
+      values.finalPrice = totalPrice - values.discountAmount;
+    }
+    // Default case
     else {
-      values.finalPrice = totalPrice;
-      values.discountAmount = 0;
-      values.discountPercentage = 0;
+      values.discountAmount = (totalPrice * values.discountPercentage) / 100;
+      values.finalPrice = totalPrice - values.discountAmount;
     }
   
     // Ensure non-negative values and round to 2 decimal places
     values.finalPrice = Math.max(0, Number(values.finalPrice.toFixed(2)));
     values.discountAmount = Math.max(0, Number(values.discountAmount.toFixed(2)));
-    values.discountPercentage = Math.max(0, Number(values.discountPercentage.toFixed(2)));
+    values.discountPercentage = Math.max(0, Math.min(Number(values.discountPercentage.toFixed(2)), 100));
   
     // Update all related fields
     itemGroup.patchValue({
@@ -334,7 +337,8 @@ export class TransportComponent implements OnInit {
 
   isFieldInvalid(control: AbstractControl | null): boolean {
     if (!control) return false;
-    return (control.invalid && (control.touched || this.submitted));
+    return control.invalid;
+    // return (control.invalid && (control.touched || this.submitted));
   }
 
   getFieldError(field: any): string {
