@@ -212,6 +212,7 @@ export class ProductComponent implements OnInit {
     this.isEditing = false;
     this.editingId = undefined;
     this.productForm.reset({ status: 'A' });
+    this.initializeForms();
     this.isDialogOpen = true;
   }
 

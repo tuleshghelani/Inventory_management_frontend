@@ -11,6 +11,8 @@ import { Transport, TransportSummary } from '../../../models/transport.model';
 import { TransportService } from '../../../services/transport.service';
 import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { PriceService } from '../../../services/price.service';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 interface BagFormGroup extends FormGroup {
   controls: {
@@ -160,23 +162,43 @@ export class TransportComponent implements OnInit {
     const itemGroup = this.getBagItems(bagIndex).at(itemIndex);
     
     // Setup purchase discount calculation
-    ['quantity', 'purchaseUnitPrice', 'purchaseDiscount', 'purchaseDiscountAmount'].forEach(field => {
-      itemGroup.get(field)?.valueChanges.subscribe((value) => {
-        // Only calculate if the field is not null/undefined
-        if (value !== null && value !== undefined) {
-          this.calculateDiscount(bagIndex, itemIndex, 'purchase');
-        }
-      });
+    ['purchaseDiscount', 'purchaseDiscountAmount'].forEach(field => {
+      itemGroup.get(field)?.valueChanges
+        .pipe(
+          distinctUntilChanged(),
+          debounceTime(300)
+        )
+        .subscribe((value) => {
+          if (value !== null && value !== undefined) {
+            // Mark the current control as dirty and touched
+            const control = itemGroup.get(field);
+            if (control) {
+              control.markAsDirty();
+              control.markAsTouched();
+            }
+            this.calculateDiscount(bagIndex, itemIndex, 'purchase');
+          }
+        });
     });
-
+  
     // Setup sale discount calculation
-    ['quantity', 'saleUnitPrice', 'saleDiscount', 'saleDiscountAmount'].forEach(field => {
-      itemGroup.get(field)?.valueChanges.subscribe((value) => {
-        // Only calculate if the field is not null/undefined
-        if (value !== null && value !== undefined) {
-          this.calculateDiscount(bagIndex, itemIndex, 'sale');
-        }
-      });
+    ['saleDiscount', 'saleDiscountAmount'].forEach(field => {
+      itemGroup.get(field)?.valueChanges
+        .pipe(
+          distinctUntilChanged(),
+          debounceTime(300)
+        )
+        .subscribe((value) => {
+          if (value !== null && value !== undefined) {
+            // Mark the current control as dirty and touched
+            const control = itemGroup.get(field);
+            if (control) {
+              control.markAsDirty();
+              control.markAsTouched();
+            }
+            this.calculateDiscount(bagIndex, itemIndex, 'sale');
+          }
+        });
     });
   }
 
@@ -193,27 +215,39 @@ export class TransportComponent implements OnInit {
       discountAmount: Number(itemGroup.get(`${prefix}DiscountAmount`)?.value) || 0,
       finalPrice: 0
     };
-
+  
     const totalPrice = values.quantity * values.unitPrice;
-
-    // Always calculate final price by subtracting discount amount
-    if (values.discountAmount > 0) {
-      values.finalPrice = totalPrice - values.discountAmount;
-      // Update discount percentage based on discount amount
-      values.discountPercentage = totalPrice > 0 ? (values.discountAmount / totalPrice) * 100 : 0;
-    } else if (values.discountPercentage > 0) {
-      // Calculate discount amount from percentage
+  
+    // If both discount percentage and amount are 0 or empty, reset everything
+    if (!values.discountPercentage && !values.discountAmount) {
+      itemGroup.patchValue({
+        [`${prefix}Discount`]: 0,
+        [`${prefix}DiscountAmount`]: 0,
+        [`${prefix}DiscountPrice`]: totalPrice
+      }, { emitEvent: false });
+      return;
+    }
+  
+    // Determine which field was last changed by checking form controls
+    const discountControl = itemGroup.get(`${prefix}Discount`);
+    const discountAmountControl = itemGroup.get(`${prefix}DiscountAmount`);
+    
+    if (discountControl?.dirty && discountControl.touched) {
+      // Discount percentage was changed
       values.discountAmount = (totalPrice * values.discountPercentage) / 100;
       values.finalPrice = totalPrice - values.discountAmount;
-    } else {
-      values.finalPrice = totalPrice;
+    } else if (discountAmountControl?.dirty && discountAmountControl.touched) {
+      // Discount amount was changed
+      values.discountPercentage = totalPrice > 0 ? (values.discountAmount / totalPrice) * 100 : 0;
+      values.finalPrice = totalPrice - values.discountAmount;
     }
-
-    // Ensure non-negative values
-    values.finalPrice = Math.max(0, values.finalPrice);
-    values.discountAmount = Math.max(0, values.discountAmount);
-    values.discountPercentage = Math.max(0, values.discountPercentage);
-
+  
+    // Ensure non-negative values and round to 2 decimal places
+    values.finalPrice = Math.max(0, Number(values.finalPrice.toFixed(2)));
+    values.discountAmount = Math.max(0, Number(values.discountAmount.toFixed(2)));
+    values.discountPercentage = Math.max(0, Number(values.discountPercentage.toFixed(2)));
+  
+    // Update all related fields
     itemGroup.patchValue({
       [`${prefix}DiscountAmount`]: values.discountAmount,
       [`${prefix}Discount`]: values.discountPercentage,
