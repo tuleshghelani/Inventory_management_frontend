@@ -38,6 +38,10 @@ export class SearchableSelectComponent implements ControlValueAccessor {
   onChange: any = () => {};
   onTouch: any = () => {};
 
+  isMobile = window.innerWidth <= 768;
+  private currentScrollPosition = 0;
+  isKeyboardScrolling = false;
+
   ngOnInit() {
     this.filteredOptions = this.options;
   }
@@ -78,7 +82,13 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     this.highlightedIndex = -1;
   }
 
-  onBlur() {
+  onBlur(event: FocusEvent) {
+    const target = event.relatedTarget as HTMLElement;
+    if (target?.classList.contains('scroll-btn') || this.isKeyboardScrolling) {
+      event.preventDefault();
+      return;
+    }
+
     setTimeout(() => {
       this.isOpen = false;
       this.highlightedIndex = -1;
@@ -87,7 +97,7 @@ export class SearchableSelectComponent implements ControlValueAccessor {
         const selected = this.options.find(opt => opt[this.valueKey] === this.selectedValue);
         this.searchText = selected ? selected[this.labelKey] : '';
       }
-    }, 200);
+    }, 100);
   }
 
   onSearch(event: Event) {
@@ -155,26 +165,36 @@ export class SearchableSelectComponent implements ControlValueAccessor {
       return;
     }
 
+    const container = document.querySelector('.options-container');
+    if (!container) return;
+
+    const scrollStep = 160; // Height of 4 options (40px each)
+
     switch (event.key) {
       case 'ArrowDown':
+      case 'ArrowUp':
+        this.isKeyboardScrolling = true;
+        event.preventDefault();
+        event.stopPropagation();
+        
         this.highlightedIndex = Math.min(
-          this.highlightedIndex + 1, 
+          this.highlightedIndex + (event.key === 'ArrowDown' ? 4 : -4), 
           this.filteredOptions.length - 1
         );
-        event.preventDefault();
-        this.scrollToHighlighted();
-        break;
-
-      case 'ArrowUp':
-        this.highlightedIndex = Math.max(this.highlightedIndex - 1, 0);
-        event.preventDefault();
-        this.scrollToHighlighted();
+        
+        container.scrollBy({
+          top: event.key === 'ArrowDown' ? scrollStep : -scrollStep,
+          behavior: 'smooth'
+        });
+        
+        setTimeout(() => {
+          this.isKeyboardScrolling = false;
+        }, 100);
         break;
 
       case 'Enter':
         if (this.highlightedIndex >= 0 && this.filteredOptions[this.highlightedIndex]) {
           this.selectOption(this.filteredOptions[this.highlightedIndex]);
-          (event.target as HTMLElement).blur();
           event.preventDefault();
         }
         break;
@@ -187,22 +207,29 @@ export class SearchableSelectComponent implements ControlValueAccessor {
     }
   }
 
-  private scrollToHighlighted(): void {
-    setTimeout(() => {
-      const container = document.querySelector('.options-container');
-      const highlighted = document.querySelector('.option.highlighted');
-      
-      if (container && highlighted) {
-        const containerRect = container.getBoundingClientRect();
-        const highlightedRect = highlighted.getBoundingClientRect();
+  scrollOptions(direction: 'up' | 'down'): void {
+    const container = document.querySelector('.options-container');
+    if (!container) return;
 
-        if (highlightedRect.bottom > containerRect.bottom) {
-          container.scrollTop += highlightedRect.bottom - containerRect.bottom;
-        } else if (highlightedRect.top < containerRect.top) {
-          container.scrollTop -= containerRect.top - highlightedRect.top;
-        }
-      }
-    });
+    const scrollAmount = 160; // Height of 4 options (40px each)
+    const currentScroll = container.scrollTop;
+    
+    if (direction === 'up') {
+      container.scrollTo({
+        top: currentScroll - scrollAmount,
+        behavior: 'smooth'
+      });
+      this.highlightedIndex = Math.max(this.highlightedIndex - 4, 0);
+    } else {
+      container.scrollTo({
+        top: currentScroll + scrollAmount,
+        behavior: 'smooth'
+      });
+      this.highlightedIndex = Math.min(
+        this.highlightedIndex + 4, 
+        this.filteredOptions.length - 1
+      );
+    }
   }
 
   ngOnChanges(changes: any): void {

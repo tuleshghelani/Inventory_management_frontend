@@ -7,13 +7,17 @@
       [(ngModel)]="searchText"
       (input)="onSearch($event)"
       (focus)="onFocus()"
-      (blur)="onBlur()"
       (keydown)="handleKeydown($event)"
     >
+    
+    <!-- (blur)="onBlur()" -->
     <i class="fas" [class.fa-chevron-down]="!isOpen" [class.fa-chevron-up]="isOpen"></i>
   </div>
   
   <div class="select-dropdown" *ngIf="isOpen">
+    <button class="scroll-btn scroll-up" (click)="scrollOptions('up')">
+      <i class="fas fa-chevron-up"></i>
+    </button>
     <div class="options-container">
       <div 
         class="option" 
@@ -33,5 +37,8 @@
         No results found
       </div>
     </div>
+    <button class="scroll-btn scroll-down" (click)="scrollOptions('down')">
+      <i class="fas fa-chevron-down"></i>
+    </button>
   </div>
 </div> 
