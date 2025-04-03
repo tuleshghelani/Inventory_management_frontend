@@ -19,6 +19,8 @@ import { LoaderComponent } from './shared/components/loader/loader.component';
 import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
 import { TransportComponent } from './components/Transports/transport/transport.component';
 import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
+import { AddQuotationComponent } from './components/all-quotation/add-quotation/add-quotation.component';
+import { SearchableSelectComponent } from "./shared/components/searchable-select/searchable-select.component";
     
 
 
@@ -27,6 +29,7 @@ import { TransportListComponent } from './components/Transports/transport-list/t
     AppComponent,
     LoginComponent,
     HeaderComponent,
+    AddQuotationComponent,
     // ProductComponent,
     // PurchaseComponent,
     // SalesComponent
@@ -39,8 +42,10 @@ import { TransportListComponent } from './components/Transports/transport-list/t
     ReactiveFormsModule,
     RouterModule,
     AppRoutingModule,
-    ToastrModule.forRoot()
-  ],
+    ToastrModule.forRoot(),
+    SearchableSelectComponent,
+    LoaderComponent
+],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
