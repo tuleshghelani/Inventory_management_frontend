@@ -92,6 +92,9 @@ export class AuthService {
   }
 
   logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('refreshToken');
     localStorage.clear();
     this.authStateSubject.next(false);
   }
