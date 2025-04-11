@@ -99,22 +99,22 @@
             
             <div class="quotation-discount-wrapper">
               <div class="form-group quotation-discount-field">
-                <label for="quotationDiscount">Quotation Discount %</label>
+                <label for="quotationDiscountPercentage">Quotation Discount %</label>
                 <div class="input-group">
                   <input 
                     type="number" 
-                    id="quotationDiscount"
-                    formControlName="quotationDiscount" 
+                    id="quotationDiscountPercentage"
+                    formControlName="quotationDiscountPercentage" 
                     class="form-control" 
                     min="0" 
                     max="100" 
                     step="0.01"
-                    [class.is-invalid]="isFieldInvalid('quotationDiscount')"
-                    (input)="onQuotationDiscountChange($event)"
+                    [class.is-invalid]="isFieldInvalid('quotationDiscountPercentage')"
+                    (input)="onQuotationDiscountPercentageChange($event)"
                   >
                   <span class="input-group-text">%</span>
                 </div>
-                <div class="invalid-feedback" *ngIf="isFieldInvalid('quotationDiscount')">
+                <div class="invalid-feedback" *ngIf="isFieldInvalid('quotationDiscountPercentage')">
                   Discount must be between 0 and 100
                 </div>
               </div>
