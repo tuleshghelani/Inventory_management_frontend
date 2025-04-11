@@ -20,6 +20,7 @@ import { EmployeeOrderListComponent } from './components/employee-order/employee
 import { EmployeeOrderFormComponent } from './components/employee-order/employee-order-form/employee-order-form.component';
 import { DailyProfitComponent } from './components/all-profits/daily-profit/daily-profit.component';
 import { AddQuotationComponent } from './components/all-quotation/add-quotation/add-quotation.component';
+import { QuotationComponent } from './components/all-quotation/quotation/quotation.component';
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -86,6 +87,11 @@ const routes: Routes = [
   {
     path: 'transport',
     component: TransportListComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'quotation',
+    component: QuotationComponent,
     canActivate: [AuthGuard]
   },
   {

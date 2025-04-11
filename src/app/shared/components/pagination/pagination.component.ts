@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './pagination.component.html',
   styleUrls: ['./pagination.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, RouterModule]
 })
 export class PaginationComponent {
   @Input() currentPage = 0;

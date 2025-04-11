@@ -15,12 +15,10 @@ import { ProductComponent } from './components/product/product.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
 import { AppRoutingModule } from './app-routing.module';
-import { LoaderComponent } from './shared/components/loader/loader.component';
 import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purchase-sale/add-combined-purchase-sale.component';
 import { TransportComponent } from './components/Transports/transport/transport.component';
 import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
-import { AddQuotationComponent } from './components/all-quotation/add-quotation/add-quotation.component';
-import { SearchableSelectComponent } from "./shared/components/searchable-select/searchable-select.component";
+import { SharedComponentsModule } from './shared/components/shared-components.module';
     
 
 
@@ -29,7 +27,6 @@ import { SearchableSelectComponent } from "./shared/components/searchable-select
     AppComponent,
     LoginComponent,
     HeaderComponent,
-    AddQuotationComponent,
     // ProductComponent,
     // PurchaseComponent,
     // SalesComponent
@@ -43,8 +40,7 @@ import { SearchableSelectComponent } from "./shared/components/searchable-select
     RouterModule,
     AppRoutingModule,
     ToastrModule.forRoot(),
-    SearchableSelectComponent,
-    LoaderComponent
+    SharedComponentsModule
 ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

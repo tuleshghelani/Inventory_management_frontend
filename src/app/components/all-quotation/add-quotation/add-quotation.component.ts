@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl, AbstractControl, ValidatorFn, ValidationErrors } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule, FormControl, AbstractControl, ValidatorFn, ValidationErrors, FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil, Subscription, finalize, debounceTime, filter, distinctUntilChanged } from 'rxjs';
 import { formatDate } from '@angular/common';
@@ -11,11 +11,22 @@ import { CustomerService } from '../../../services/customer.service';
 import { SnackbarService } from '../../../shared/services/snackbar.service';
 import { QuotationService } from '../../../services/quotation.service';
 import { PriceService } from '../../../services/price.service';
+import { SearchableSelectComponent } from "../../../shared/components/searchable-select/searchable-select.component";
+import { MatDialogModule } from '@angular/material/dialog';
+import { SaleModalComponent } from '../../sale-modal/sale-modal.component';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
+  standalone: true,
   selector: 'app-add-quotation',
   templateUrl: './add-quotation.component.html',
-  styleUrl: './add-quotation.component.scss'
+  styleUrl: './add-quotation.component.scss',
+  imports: [SearchableSelectComponent, 
+    CommonModule, 
+    ReactiveFormsModule, 
+    FormsModule, 
+    RouterModule, MatDialogModule, SaleModalComponent, LoaderComponent, PaginationComponent]
 })
 export class AddQuotationComponent implements OnInit, OnDestroy {
   quotationForm!: FormGroup;
