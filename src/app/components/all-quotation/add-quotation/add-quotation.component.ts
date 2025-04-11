@@ -94,10 +94,27 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       remarks: [''],
       termsConditions: [''],
       items: this.fb.array([]),
-      address: ['']
+      address: [''],
+      quotationDiscount: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
     });
 
     this.addItem(true);
+    
+    // Improve the quotationDiscount subscription
+    this.quotationForm.get('quotationDiscount')?.valueChanges
+      .pipe(
+        takeUntil(this.destroy$),
+        debounceTime(100) // Use a shorter debounce time for better responsiveness
+      )
+      .subscribe(newValue => {
+        console.log('Quotation discount changed to:', newValue);
+        // Force recalculation of all items when quotation discount changes
+        this.itemsFormArray.controls.forEach((_, index) => {
+          this.calculateItemPrice(index);
+        });
+        this.calculateTotalAmount(); // Also update totals
+        this.cdr.detectChanges(); // Ensure UI updates
+      });
   }
 
   private createItemFormGroup(initialData?: any): FormGroup {
@@ -111,6 +128,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       taxPercentage: [{ value: initialData?.taxPercentage || 18 }],
       taxAmount: [{ value: initialData?.taxAmount || 0, disabled: true }],
       finalPrice: [{ value: initialData?.finalPrice || 0, disabled: true }],
+      quotationDiscountAmount: [{ value: initialData?.quotationDiscountAmount || 0, disabled: true }],
       calculations: [initialData?.calculations || []]
     });
   }
@@ -180,6 +198,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       taxPercentage: [18],
       taxAmount: [0],
       finalPrice: [0],
+      quotationDiscountAmount: [0],
       calculations: [[]]
     });
     
@@ -251,20 +270,29 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       taxPercentage: Number(group.get('taxPercentage')?.value || 18)
     };
 
+    // Get quotation discount from the form
+    const quotationDiscount = Number(Number(this.quotationForm.get('quotationDiscount')?.value || 0).toFixed(2));
+
     console.log(`Tax percentage used for calculation: ${values.taxPercentage}%`);
+    console.log(`Quotation discount percentage: ${quotationDiscount}%`);
 
     // Calculate base price and item discount
     const basePrice = Number((values.quantity * values.unitPrice).toFixed(2));
     const itemDiscountAmount = Number(((basePrice * values.discountPercentage) / 100).toFixed(2));
     const afterItemDiscount = Number((basePrice - itemDiscountAmount).toFixed(2));
     
-    // Calculate tax and final price using item discount price directly
-    const taxAmount = Number(((afterItemDiscount * values.taxPercentage) / 100).toFixed(2));
-    const finalPrice = Number((afterItemDiscount + taxAmount).toFixed(2));
+    // Apply quotation discount after item discount
+    const quotationDiscountAmount = Number(((afterItemDiscount * quotationDiscount) / 100).toFixed(2));
+    const afterQuotationDiscount = Number((afterItemDiscount - quotationDiscountAmount).toFixed(2));
+    
+    // Calculate tax and final price after both discounts
+    const taxAmount = Number(((afterQuotationDiscount * values.taxPercentage) / 100).toFixed(2));
+    const finalPrice = Number((afterQuotationDiscount + taxAmount).toFixed(2));
 
     // Update the form with calculated values
     group.patchValue({
       price: afterItemDiscount,
+      quotationDiscountAmount: quotationDiscountAmount,
       taxAmount: taxAmount,
       finalPrice: finalPrice
     }, { emitEvent: false }); // Using emitEvent: false to prevent triggering more calculations
@@ -274,6 +302,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       basePrice,
       itemDiscountAmount,
       afterItemDiscount,
+      quotationDiscountAmount,
+      afterQuotationDiscount,
       taxAmount,
       finalPrice
     });
@@ -365,6 +395,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       finalPrice: 0,
       taxAmount: 0,
       taxPercentage: 0,
+      quotationDiscountAmount: 0
     };
 
     this.itemsFormArray.controls.forEach((group: AbstractControl) => {
@@ -372,21 +403,26 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       const finalPrice = Number(Number(group.get('finalPrice')?.value || 0).toFixed(2));
       const taxAmount = Number(Number(group.get('taxAmount')?.value || 0).toFixed(2));
       const taxPercentage = Number(group.get('taxPercentage')?.value || 18);
+      const quotationDiscountAmount = Number(Number(group.get('quotationDiscountAmount')?.value || 0).toFixed(2));
 
       totals.price = Number((totals.price + price).toFixed(2));
       totals.tax = Number((totals.tax + taxAmount).toFixed(2));
       totals.finalPrice = Number((totals.finalPrice + finalPrice).toFixed(2));
       totals.taxAmount = Number((totals.taxAmount + taxAmount).toFixed(2));
       totals.taxPercentage = Number(taxPercentage);
+      totals.quotationDiscountAmount = Number((totals.quotationDiscountAmount + quotationDiscountAmount).toFixed(2));
     });
+
+    const quotationDiscount = Number(Number(this.quotationForm.get('quotationDiscount')?.value || 0).toFixed(2));
+    const afterQuotationDiscount = Number((totals.price - totals.quotationDiscountAmount).toFixed(2));
 
     this.totals = {
       price: totals.price,
       tax: totals.tax,
       finalPrice: totals.finalPrice,
       taxPercentage: totals.taxPercentage,
-      afterQuotationDiscount: 0,
-      quotationDiscountAmount: 0
+      afterQuotationDiscount: afterQuotationDiscount,
+      quotationDiscountAmount: totals.quotationDiscountAmount
     };
   }
 
@@ -400,6 +436,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       validUntil: formatDate(validUntil, 'yyyy-MM-dd', 'en'),
       remarks: '',
       termsConditions: '',
+      quotationDiscount: 0
     });
 
     // Clear items array and add one empty item
@@ -643,7 +680,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
       remarks: data.remarks || '',
       termsConditions: data.termsConditions || '',
       address: data.address,
-      contactNumber: data.contactNumber
+      contactNumber: data.contactNumber,
+      quotationDiscount: data.quotationDiscount || 0
     });
 
     // Add items
@@ -667,6 +705,7 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
           taxPercentage: [taxPercentage],
           taxAmount: [item.taxAmount || 0],
           finalPrice: [item.finalPrice || 0],
+          quotationDiscountAmount: [item.quotationDiscountAmount || 0],
           calculations: [item.calculations || []]
         });
         
@@ -712,8 +751,14 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
   private prepareFormData() {
     const formValue = this.quotationForm.value;
     
+    // Explicitly get quotationDiscount from form control (not form value)
+    const quotationDiscountControl = this.quotationForm.get('quotationDiscount');
+    const quotationDiscount = Number(quotationDiscountControl?.value);
+    
+    console.log('Explicitly getting quotationDiscount:', quotationDiscount);
+    
     // Ensure we get the correct values including disabled ones
-    const items = this.itemsFormArray.controls.map((control, index) => {
+    const items = this.itemsFormArray.controls.map((control) => {
       return {
         productId: control.get('productId')?.value,
         productType: control.get('productType')?.value,
@@ -724,18 +769,28 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         taxPercentage: control.get('taxPercentage')?.value,
         taxAmount: control.get('taxAmount')?.value,
         finalPrice: control.get('finalPrice')?.value,
+        quotationDiscountAmount: control.get('quotationDiscountAmount')?.value,
         calculations: control.get('calculations')?.value || []
       };
     });
 
-    console.log('Prepared form data items:', items);
-
-    return {
-      ...formValue,
+    // Create a new object without spreading formValue to avoid any potential issues
+    const finalFormData = {
+      customerId: formValue.customerId,
+      customerName: formValue.customerName,
+      contactNumber: formValue.contactNumber,
       quoteDate: formatDate(formValue.quoteDate, 'yyyy-MM-dd', 'en'),
       validUntil: formatDate(formValue.validUntil, 'yyyy-MM-dd', 'en'),
+      remarks: formValue.remarks,
+      termsConditions: formValue.termsConditions,
+      address: formValue.address,
+      quotationDiscount: quotationDiscount, // Explicitly including this
       items: items
     };
+    
+    console.log('Final form data to be submitted:', finalFormData);
+    
+    return finalFormData;
   }
 
   private setupItemSubscriptions(): void {
@@ -768,6 +823,27 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         // Clear the price cache when customer changes
         this.productPriceCache.clear();
       });
+  }
+
+  // Add this new function to handle quotation discount changes directly
+  onQuotationDiscountChange(event: any): void {
+    console.log('Quotation discount changed to:', event.target.value);
+    
+    const newValue = Number(event.target.value || 0);
+    
+    // Update the form value explicitly
+    this.quotationForm.get('quotationDiscount')?.setValue(newValue, { emitEvent: false });
+    
+    // Recalculate all items with the new discount
+    this.itemsFormArray.controls.forEach((_, index) => {
+      this.calculateItemPrice(index);
+    });
+    
+    // Update totals
+    this.calculateTotalAmount();
+    
+    // Ensure UI updates
+    this.cdr.detectChanges();
   }
 
 }
