@@ -708,7 +708,8 @@ export class AddQuotationComponent implements OnInit, OnDestroy {
         next: (response: any) => {
           if (response.success) {
             this.snackbar.success(`Quotation ${this.isEdit ? 'updated' : 'created'} successfully`);
-            this.router.navigate(['/quotation/create']);
+            this.quotationForm.reset();
+            this.router.navigate(['/quotation']);
           }
           this.isLoading = false;
         },
