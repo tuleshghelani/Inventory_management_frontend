@@ -201,6 +201,7 @@ export class QuotationComponent implements OnInit {
       D: 'status-declined',
       R: 'status-ready',
       P: 'status-processing',
+      PC: 'status-packaging',
       C: 'status-completed'
     };
     return statusClasses[status] || 'status-default';
@@ -256,6 +257,7 @@ export class QuotationComponent implements OnInit {
       D: 'fa-times-circle',     // Declined
       R: 'fa-clock',            // Ready
       P: 'fa-spinner fa-spin',  // Processing
+      PC: 'fa-spinner fa-spin',  // Processing
       C: 'fa-check-double'      // Completed
     };
     return statusIcons[status] || 'fa-question-circle';
@@ -281,7 +283,7 @@ export class QuotationComponent implements OnInit {
   }
 
   canChangeStatus(status: string): boolean {
-    return ['D','Q', 'A', 'P'].includes(status);
+    return ['D','Q', 'A', 'P','PC'].includes(status);
   }
 
   updateStatus(quotation: any, newStatus: string): void {
@@ -316,6 +318,8 @@ export class QuotationComponent implements OnInit {
           { label: QuotationStatus.D, value: 'D', disabled: false }
         ];
       case 'P':
+        return [{ label: QuotationStatus.PC, value: 'PC', disabled: false }];
+      case 'PC':
         return [{ label: QuotationStatus.C, value: 'C', disabled: false }];
       case 'D':
         return [{ label: QuotationStatus.A, value: 'A', disabled: false }];

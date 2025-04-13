@@ -4,6 +4,7 @@ export enum QuotationStatus {
     D = 'Declined',
     R = 'Ready',
     P = 'Processing',
+    PC = 'Packaging',
     C = 'Completed'
   }
   
