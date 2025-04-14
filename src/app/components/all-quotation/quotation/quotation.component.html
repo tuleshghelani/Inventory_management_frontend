@@ -138,7 +138,8 @@
                 >
                   <i class="fas" [ngClass]="quotation.isPrinting ? 'fa-spinner fa-spin' : ' fa-file-pdf'"></i>
                 </button>
-                <button *ngIf="quotation.status == 'D' || quotation.status == 'Q'"
+                <button *ngIf="quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C'
+                || quotation.status == 'PC'"
                   class="btn-icon edit" 
                   (click)="editQuotation(quotation.id!)"
                   title="Edit quotation"
@@ -153,7 +154,8 @@
                 >
                   <i class="fas" [ngClass]="quotation.isPrinting ? 'fa-spinner fa-spin' : 'fa-print'"></i>
                 </button>
-                <button *ngIf="quotation.status == 'D' || quotation.status == 'Q'"
+                <button *ngIf="quotation.status == 'D' || quotation.status == 'Q' || quotation.status == 'A' || quotation.status == 'C'
+                || quotation.status == 'PC'"
                   class="btn-icon delete" 
                   (click)="deleteQuotation(quotation.id!)"
                   title="Delete quotation"
