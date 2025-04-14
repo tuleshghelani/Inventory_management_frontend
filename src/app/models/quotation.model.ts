@@ -5,7 +5,8 @@ export enum QuotationStatus {
     R = 'Ready',
     P = 'Processing',
     PC = 'Packaging',
-    C = 'Completed'
+    C = 'Completed',
+    I = 'Invoiced'
   }
   
   export interface QuotationItem {
