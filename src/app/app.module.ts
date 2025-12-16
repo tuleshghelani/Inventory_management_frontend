@@ -19,7 +19,8 @@ import { AddCombinedPurchaseSaleComponent } from './components/add-combined-purc
 import { TransportComponent } from './components/Transports/transport/transport.component';
 import { TransportListComponent } from './components/Transports/transport-list/transport-list.component';
 import { SharedComponentsModule } from './shared/components/shared-components.module';
-    
+import { PasswordValidationModalComponent } from './components/password-validation-modal/password-validation-modal.component';
+
 
 
 @NgModule({
@@ -40,8 +41,9 @@ import { SharedComponentsModule } from './shared/components/shared-components.mo
     RouterModule,
     AppRoutingModule,
     ToastrModule.forRoot(),
-    SharedComponentsModule
-],
+    SharedComponentsModule,
+    PasswordValidationModalComponent
+  ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }

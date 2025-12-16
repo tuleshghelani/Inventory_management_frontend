@@ -4,6 +4,7 @@ import { LoginComponent } from './components/auth/login/login.component';
 import { CategoryComponent } from './components/category/category.component';
 import { ProductComponent } from './components/product/product.component';
 import { AuthGuard } from './guards/auth.guard';
+import { ClientPasswordGuard } from './guards/client-password.guard';
 import { PurchaseComponent } from './components/purchase/purchase.component';
 import { AddPurchaseComponent } from './components/add-purchase/add-purchase.component';
 import { SaleComponent } from './components/sale/sale.component';
@@ -24,20 +25,20 @@ import { QuotationComponent } from './components/all-quotation/quotation/quotati
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { 
-    path: 'category', 
-    component: CategoryComponent, 
-    canActivate: [AuthGuard] 
+  {
+    path: 'category',
+    component: CategoryComponent,
+    canActivate: [AuthGuard]
   },
-  { 
-    path: 'product', 
-    component: ProductComponent, 
-    canActivate: [AuthGuard] 
+  {
+    path: 'product',
+    component: ProductComponent,
+    canActivate: [AuthGuard]
   },
-  { 
-    path: 'purchase', 
-    component: PurchaseComponent, 
-    canActivate: [AuthGuard] 
+  {
+    path: 'purchase',
+    component: PurchaseComponent,
+    canActivate: [AuthGuard]
   },
   {
     path: 'purchase/create',
@@ -52,7 +53,7 @@ const routes: Routes = [
   {
     path: 'profit',
     component: ProfitComponent,
-    canActivate: [AuthGuard]
+    canActivate: [AuthGuard, ClientPasswordGuard]
   },
   {
     path: 'customer',
@@ -68,7 +69,7 @@ const routes: Routes = [
     path: 'powder-coating-process',
     component: PowderCoatingProcessComponent,
     canActivate: [AuthGuard]
-  },  
+  },
   {
     path: 'powder-coating-process/create',
     component: AddPowderCoatingProcessComponent,
@@ -113,7 +114,7 @@ const routes: Routes = [
     path: 'employee/create',
     component: EmployeeFormComponent,
     canActivate: [AuthGuard]
-  },  
+  },
   {
     path: 'employee/edit/:id',
     component: EmployeeFormComponent,
@@ -128,7 +129,7 @@ const routes: Routes = [
     path: 'employee-order/create',
     component: EmployeeOrderFormComponent,
     canActivate: [AuthGuard]
-  },  
+  },
   {
     path: 'employee-order/edit/:id',
     component: EmployeeOrderFormComponent,
@@ -137,8 +138,8 @@ const routes: Routes = [
   {
     path: 'daily-profit',
     component: DailyProfitComponent,
-    canActivate: [AuthGuard]
-  },  
+    canActivate: [AuthGuard, ClientPasswordGuard]
+  },
   {
     path: '**',
     redirectTo: '/login',
