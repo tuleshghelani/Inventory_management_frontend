@@ -247,12 +247,55 @@ export class PowderCoatingProcessComponent implements OnInit {
   }
 
   openReturnModal(processId: number): void {
+    // Returns are now item-level, should be managed from edit page
+    // This method is kept for backward compatibility but may not be used
     this.modalService.open('return', processId);
   }
 
   isCheckboxDisabled(process: any): boolean {
     return this.selectedCustomerId !== undefined && 
            this.selectedCustomerId !== process.customerId;
+  }
+
+  getTotalQuantity(process: PowderCoatingProcess): number {
+    if (!process.items || process.items.length === 0) return 0;
+    return process.items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+  }
+
+  getTotalRemainingQuantity(process: PowderCoatingProcess): number {
+    if (!process.items || process.items.length === 0) return 0;
+    return process.items.reduce((sum, item) => sum + (item.remainingQuantity || item.quantity || 0), 0);
+  }
+
+  getTotalBags(process: PowderCoatingProcess): number {
+    if (!process.items || process.items.length === 0) return 0;
+    return process.items.reduce((sum, item) => sum + (item.totalBags || 0), 0);
+  }
+
+  getTotalAmount(process: PowderCoatingProcess): number {
+    if (!process.items || process.items.length === 0) return 0;
+    return process.items.reduce((sum, item) => {
+      const itemTotal = item.totalAmount || (item.quantity * item.unitPrice);
+      return sum + itemTotal;
+    }, 0);
+  }
+
+  isProcessCompleted(process: PowderCoatingProcess): boolean {
+    if (!process.items || process.items.length === 0) return false;
+    return process.items.every(item => (item.remainingQuantity || item.quantity) === 0);
+  }
+
+  getItemCount(process: PowderCoatingProcess): number {
+    return process.items?.length || 0;
+  }
+
+  getItemNames(process: PowderCoatingProcess): string {
+    if (!process.items || process.items.length === 0) return '';
+    const names = process.items.map(item => item.productName || 'Unknown').filter(Boolean);
+    if (names.length === 0) return '';
+    if (names.length === 1) return names[0];
+    if (names.length <= 3) return names.join(', ');
+    return `${names.slice(0, 3).join(', ')} +${names.length - 3} more`;
   }
 
   toggleProcessSelection(process: any, event: Event): void {

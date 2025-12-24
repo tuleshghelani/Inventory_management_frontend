@@ -118,6 +118,22 @@
           min-width: 120px;
         }
       }
+
+      td {
+        .items-info {
+          white-space: normal;
+          
+          .item-names {
+            margin-top: 0.25rem;
+            
+            small {
+              color: var(--text-secondary);
+              font-size: 0.875rem;
+              display: block;
+            }
+          }
+        }
+      }
     }
   }
 }

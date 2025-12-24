@@ -18,7 +18,7 @@ export class ReturnModalComponent implements OnInit {
   
   returnForm!: FormGroup;
   loading = false;
-  processId?: number;
+  processItemId?: number;
   
   display$ = this.modalService.modalState$.pipe(
     map(state => state.isOpen && state.modalType === 'return')
@@ -36,7 +36,7 @@ export class ReturnModalComponent implements OnInit {
   ngOnInit() {
     this.modalService.modalState$.subscribe(state => {
       if (state.isOpen && state.modalType === 'return' && state.data) {
-        this.processId = state.data;
+        this.processItemId = state.data;
         this.initForm();
       }
     });
@@ -55,12 +55,12 @@ export class ReturnModalComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.returnForm.valid && this.processId) {
+    if (this.returnForm.valid && this.processItemId) {
       this.loading = true;
       const formData = this.returnForm.value;
       
       const request = {
-        id: this.processId,
+        processItemId: this.processItemId,
         returnQuantity: formData.returnQuantity,
         returnDate: formData.returnDate ? new Date(formData.returnDate).toLocaleString('en-GB', {
           day: '2-digit',

@@ -1,14 +1,22 @@
+export interface PowderCoatingProcessItem {
+  id?: number;
+  productId: number;
+  productName?: string;
+  quantity: number;
+  remainingQuantity?: number;
+  totalBags: number;
+  unitPrice: number;
+  totalAmount?: number;
+  remarks?: string;
+}
+
 export interface PowderCoatingProcess {
   id: number;
-  productId: number;
-  productName: string;
   customerId: number;
   customerName: string;
-  quantity: number;
-  remainingQuantity: number;
-  totalBags?: number;
-  totalAmount?: number;
+  status: string;
   createdAt: string;
+  items: PowderCoatingProcessItem[];
   showReturns?: boolean;
   returns?: PowderCoatingReturn[];
   isLoadingReturns?: boolean;
@@ -40,6 +48,9 @@ export interface PowderCoatingReturn {
   id: number;
   returnQuantity: number;
   createdAt: string;
+  processId?: number;
+  processItemId?: number;
+  productName?: string;
 }
 
 export interface PowderCoatingReturnResponse {
@@ -49,7 +60,7 @@ export interface PowderCoatingReturnResponse {
 }
 
 export interface PowderCoatingReturnRequest {
-  id: number;
+  processItemId: number;
   returnQuantity: number;
   returnDate?: string;
 } 

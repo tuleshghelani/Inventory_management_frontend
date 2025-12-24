@@ -20,18 +20,29 @@ export class PowderCoatingService {
 
   createProcess(data: {
     customerId: number;
-    productId: number;
-    quantity: number;
     status: string;
+    items: Array<{
+      productId: number;
+      quantity: number;
+      totalBags: number;
+      unitPrice: number;
+      remarks?: string;
+    }>;
   }): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
   }
 
   updateProcess(id: number, data: {
     customerId: number;
-    productId: number;
-    quantity: number;
     status: string;
+    items: Array<{
+      id?: number;
+      productId: number;
+      quantity: number;
+      totalBags: number;
+      unitPrice: number;
+      remarks?: string;
+    }>;
   }): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${id}`, data);
   }
@@ -49,6 +60,13 @@ export class PowderCoatingService {
     return this.http.post<any>(
       `${this.powderCoatingReturnsApiUrl}/getByProcessId`,
       { processId }
+    );
+  }
+
+  getProcessItemReturns(processItemId: number): Observable<any> {
+    return this.http.post<any>(
+      `${this.powderCoatingReturnsApiUrl}/getByProcessItemId`,
+      { processItemId }
     );
   }
 
