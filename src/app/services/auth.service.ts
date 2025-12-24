@@ -27,7 +27,7 @@ export class AuthService {
     private http: HttpClient,
     private encryptionService: EncryptionService,
     private router: Router
-  ) {}
+  ) { }
 
   login(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post(`${environment.apiUrl}/api/auth/login`, credentials).pipe(
@@ -53,7 +53,7 @@ export class AuthService {
 
     this.refreshTokenInProgress = true;
     const encryptedRefreshToken = localStorage.getItem('refreshToken');
-    
+
     if (!encryptedRefreshToken) {
       this.handleAuthError();
       return throwError(() => new Error('No refresh token available'));
@@ -102,5 +102,9 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem('token');
+  }
+
+  validateClientPassword(password: string): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/api/client/password/validate`, { password });
   }
 }

@@ -40,10 +40,9 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [
-            ]
-            // ,"baseHref": "https://admin.jkindustriesrajkot.com/",
-            // "deployUrl": "https://admin.jkindustriesrajkot.com/"
+            "scripts": [],
+            "baseHref": "https://admin.jkindustriesrajkot.com/",
+            "deployUrl": "https://admin.jkindustriesrajkot.com/"
           },
           "configurations": {
             "production": {
@@ -99,7 +98,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/CNAME"  
+              "src/CNAME"
             ],
             "styles": [
               "node_modules/aos/dist/aos.css",
